@@ -13,7 +13,8 @@ import {
   Settings, 
   Cpu, 
   Share2,
-  ChevronRight
+  ChevronRight,
+  CalendarDays
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -22,6 +23,7 @@ const navItems = [
   { label: 'Leads', icon: Users, href: '/leads' },
   { label: 'Campaigns', icon: Zap, href: '/campaigns' },
   { label: 'Messages', icon: MessageSquare, href: '/messages' },
+  { label: 'Calendar', icon: CalendarDays, href: '/calendar' },
   { label: 'Analytics', icon: BarChart3, href: '/analytics' },
   { label: 'Data Import', icon: FileUp, href: '/data-import' },
   { label: 'Integrations', icon: Share2, href: '/integrations' },
