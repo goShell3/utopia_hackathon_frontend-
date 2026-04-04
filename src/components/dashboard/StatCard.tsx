@@ -1,63 +1,72 @@
 'use client';
 
 import React from 'react';
-import { LucideIcon, TrendingUp, TrendingDown } from 'lucide-react';
+import { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface StatCardProps {
-  title: string;
+  label: string;
   value: string | number;
-  trend?: number;
-  trendLabel?: string;
   icon: LucideIcon;
-  iconColor: string;
-  iconBg: string;
+  variant?: 'white' | 'black';
+  active?: boolean;
 }
 
 export function StatCard({ 
-  title, 
+  label, 
   value, 
-  trend, 
-  trendLabel, 
-  icon: Icon, 
-  iconColor, 
-  iconBg 
+  icon: Icon,
+  variant = 'white',
+  active = false
 }: StatCardProps) {
-  const isPositive = trend && trend > 0;
-
   return (
     <motion.div
-      whileHover={{ y: -4, shadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
-      className="utopia-card p-6 flex flex-col gap-4 group"
+      whileHover={{ y: -2 }}
+      className={cn(
+        "relative p-6 h-32 flex flex-col justify-between transition-all duration-200 rounded-[1px]",
+        variant === 'white' ? "industrial-card" : "industrial-card-black",
+        active && "ring-1 ring-accent-green"
+      )}
     >
-      <div className="flex items-center justify-between">
-        <div className={cn(
-          "w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110",
-          iconBg
+      <div className="flex items-start justify-between">
+        <span className={cn(
+          "technical-label leading-tight max-w-[70%]",
+          variant === 'black' ? "text-neutral-400" : "text-neutral-500"
         )}>
-          <Icon className={cn("w-6 h-6", iconColor)} />
-        </div>
-        {trend !== undefined && (
-          <div className={cn(
-            "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-bold transition-colors",
-            isPositive ? "bg-emerald-50 text-emerald-600" : "bg-rose-50 text-rose-600"
-          )}>
-            {isPositive ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-            {isPositive ? '+' : ''}{trend}%
-          </div>
-        )}
+          {label}
+        </span>
+        <Icon className={cn(
+          "w-4 h-4",
+          variant === 'black' ? "text-neutral-500" : "text-neutral-400"
+        )} strokeWidth={2.5} />
       </div>
 
-      <div>
-        <h3 className="text-sm font-medium text-gray-500 tracking-tight">{title}</h3>
-        <div className="flex items-baseline gap-2 mt-1">
-          <span className="text-2xl font-bold text-gray-900 leading-none">{value}</span>
-          {trendLabel && (
-            <span className="text-xs text-gray-400 font-medium">{trendLabel}</span>
-          )}
-        </div>
+      <div className="flex items-baseline gap-2">
+        <span className={cn(
+          "display-header text-4xl",
+          variant === 'black' ? "text-white" : "text-black"
+        )}>
+          {typeof value === 'string' && value.startsWith('#') ? (
+            <>
+              <span className="text-2xl opacity-50 mr-0.5">#</span>
+              {value.substring(1)}
+            </>
+          ) : value}
+        </span>
       </div>
+
+      {active && (
+        <div className="absolute top-2 right-2 flex items-center gap-1.5">
+          <div className="w-1.5 h-1.5 rounded-full bg-accent-green animate-pulse" />
+        </div>
+      )}
+      
+      {/* Industrial accent line */}
+      <div className={cn(
+        "absolute bottom-0 left-0 h-[2px] w-8",
+        variant === 'black' ? "bg-accent-green" : "bg-neutral-200"
+      )} />
     </motion.div>
   );
 }
