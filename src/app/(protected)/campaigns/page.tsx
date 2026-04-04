@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { 
-  Zap, Plus, Send, Calendar, BarChart3, BellRing, MoreVertical, 
+  Zap, Plus, Send, Calendar, BellRing, MoreVertical, 
   ChevronRight, Sparkles, MessageSquare, Brain, Target, ArrowRight,
   Loader2, TrendingUp, Users
 } from 'lucide-react';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
-import { useCampaigns, useCampaignStats } from '@/hooks/useCampaigns';
+import { useCampaigns } from '@/hooks/useCampaigns';
 import { useAIRecommendations } from '@/hooks/useAI';
 import type { Campaign } from '@/types';
 
@@ -18,8 +18,9 @@ export default function CampaignsPage() {
   // Queries
   const { data: campaigns, isLoading: campaignsLoading } = useCampaigns();
   const { data: recommendations, isLoading: recsLoading } = useAIRecommendations({
-    hotel_id: 'current', // Placeholder for context
-    focus_area: 'Revenue'
+    hotel_id: 'current',
+    timeframe_days: 30,
+    preferred_channels: ['sms']
   });
 
   return (
@@ -57,13 +58,13 @@ export default function CampaignsPage() {
                     <span className="px-2 py-0.5 bg-utopia/10 text-utopia text-[8px] font-black italic uppercase tracking-widest border border-utopia/20 rounded-[1px]">
                       {rec.campaign_type}
                     </span>
-                    <span className="text-[9px] technical-label text-emerald-500 italic">ROI Pred: {rec.predicted_roi ?? 'High'}</span>
+                    <span className="text-[9px] technical-label text-emerald-500 italic">ROI Pred: {rec.expected_roi ?? 'High'}%</span>
                   </div>
                   <h3 className="text-sm font-black italic uppercase tracking-tight mb-2 group-hover/item:text-utopia transition-colors">
-                    {rec.title}
+                    {rec.campaign_type}
                   </h3>
                   <p className="text-[10px] text-neutral-500 font-bold italic leading-relaxed mb-4 line-clamp-2">
-                    {rec.description}
+                    {rec.message_strategy}
                   </p>
                   <div className="flex items-center justify-between pt-4 border-t border-neutral-800">
                     <div className="flex items-center gap-2 text-[9px] technical-label text-neutral-500">
@@ -97,7 +98,7 @@ export default function CampaignsPage() {
               <div className="flex items-start justify-between mb-4">
                 <div className={cn(
                   "p-2 rounded-full",
-                  campaign.status === 'Active' ? "bg-emerald-50 text-emerald-600" : "bg-neutral-100 text-neutral-400"
+                  campaign.status === 'active' ? "bg-emerald-50 text-emerald-600" : "bg-neutral-100 text-neutral-400"
                 )}>
                   <Zap size={16} />
                 </div>
@@ -108,7 +109,7 @@ export default function CampaignsPage() {
               
               <div className="mb-6">
                 <h3 className="text-sm font-black italic tracking-tight uppercase leading-tight">{campaign.name}</h3>
-                <p className="technical-label text-[9px] text-neutral-400 mt-1">{campaign.type}</p>
+                <p className="technical-label text-[9px] text-neutral-400 mt-1">{campaign.campaign_type}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pb-4 border-b border-neutral-100 mb-4">
@@ -125,7 +126,7 @@ export default function CampaignsPage() {
               <div className="flex items-center justify-between">
                 <div className={cn(
                   "text-[8px] font-black italic uppercase px-2 py-0.5 rounded-[1px]",
-                  campaign.status === 'Active' ? "bg-emerald-500 text-white" : "bg-neutral-800 text-neutral-500"
+                  campaign.status === 'active' ? "bg-emerald-500 text-white" : "bg-neutral-800 text-neutral-500"
                 )}>
                   {campaign.status}
                 </div>
