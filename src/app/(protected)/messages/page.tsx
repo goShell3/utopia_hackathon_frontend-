@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  MessageSquare, Send, Search, MoreVertical, CheckCheck, 
-  Zap, Filter, Paperclip, Sparkles, 
+import {
+  MessageSquare, Send, Search, MoreVertical, CheckCheck,
+  Zap, Filter, Paperclip, Sparkles,
   TrendingUp, AlertTriangle, Target, Brain, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/shared/Button';
@@ -30,7 +30,7 @@ export default function MessagesPage() {
 
   const handleSend = async () => {
     if (!message || !activeLeadId || !activeLead?.phone) return;
-    
+
     await sendSms.mutateAsync({
       to: activeLead.phone,
       message: message
@@ -40,7 +40,7 @@ export default function MessagesPage() {
 
   const handleSuggest = async () => {
     if (!activeLeadId) return;
-    
+
     const request: MessageGenerationRequest = {
       lead_id: activeLeadId,
       campaign_goal: 're_engagement',
@@ -71,10 +71,10 @@ export default function MessagesPage() {
           <h2 className="display-header text-xl italic uppercase tracking-tighter mb-4">Inbox Stream</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400" />
-            <input 
-              type="text" 
-              placeholder="Search conversations..." 
-              className="w-full bg-neutral-100 border border-neutral-200 py-2 pl-9 pr-3 text-[10px] technical-label focus:outline-none focus:ring-1 focus:ring-utopia/30" 
+            <input
+              type="text"
+              placeholder="Search conversations..."
+              className="w-full bg-neutral-100 border border-neutral-200 py-2 pl-9 pr-3 text-[10px] technical-label focus:outline-none focus:ring-1 focus:ring-utopia/30"
             />
           </div>
         </div>
@@ -84,11 +84,11 @@ export default function MessagesPage() {
             <div className="flex items-center justify-center h-20"><Loader2 className="w-5 h-5 animate-spin text-neutral-300" /></div>
           ) : (
             leads?.items.map((lead: Lead) => (
-              <div 
-                key={lead.id} 
-                onClick={() => setActiveLeadId(lead.id)} 
+              <div
+                key={lead.id}
+                onClick={() => setActiveLeadId(lead.id)}
                 className={cn(
-                  "p-4 cursor-pointer transition-all hover:bg-neutral-50", 
+                  "p-4 cursor-pointer transition-all hover:bg-neutral-50",
                   activeLeadId === lead.id ? "bg-black text-white" : "text-black"
                 )}
               >
@@ -140,18 +140,18 @@ export default function MessagesPage() {
             </div>
 
             <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-neutral-50/30 italic">
-               {/* Simplified feed for demo */}
-               <div className="flex flex-col items-start space-y-1">
-                 <div className="p-4 bg-white text-black border border-neutral-200 rounded-r-2xl rounded-tl-2xl shadow-sm">
-                   <p className="text-xs font-bold leading-relaxed italic">Hello, I have a question about my booking.</p>
-                 </div>
-                 <span className="text-[8px] technical-label text-neutral-400 uppercase tracking-widest">Received</span>
-               </div>
+              {/* Simplified feed for demo */}
+              <div className="flex flex-col items-start space-y-1">
+                <div className="p-4 bg-white text-black border border-neutral-200 rounded-r-2xl rounded-tl-2xl shadow-sm">
+                  <p className="text-xs font-bold leading-relaxed italic">Hello, I have a question about my booking.</p>
+                </div>
+                <span className="text-[8px] technical-label text-neutral-400 uppercase tracking-widest">Received</span>
+              </div>
             </div>
 
             <div className="p-6 bg-white border-t border-neutral-200">
               {aiSuggestions && (
-                <div 
+                <div
                   onClick={applySuggestion}
                   className="mb-4 p-4 bg-black text-white rounded-xl cursor-pointer hover:bg-neutral-900 transition-all border-l-4 border-utopia animate-in slide-in-from-bottom-4 duration-300 group"
                 >
@@ -169,7 +169,7 @@ export default function MessagesPage() {
               <div className="bg-neutral-100 border border-neutral-200 rounded-xl p-2 focus-within:ring-2 focus-within:ring-utopia/10 transition-all flex items-end gap-2">
                 <div className="flex items-center gap-1 mb-1">
                   <button className="p-1.5 text-neutral-400 hover:text-black hover:bg-white rounded-lg transition-colors"><Paperclip size={18} /></button>
-                  <button 
+                  <button
                     onClick={handleSuggest}
                     disabled={generateAI.isPending}
                     className="p-1.5 text-neutral-400 hover:text-amber-500 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
@@ -177,13 +177,13 @@ export default function MessagesPage() {
                     <Sparkles size={18} />
                   </button>
                 </div>
-                <textarea 
+                <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Protocol: Enter secure SMS content..." 
-                  className="flex-1 bg-transparent border-none outline-none text-xs font-bold italic resize-none py-2 min-h-[40px] max-h-32" 
+                  placeholder="Protocol: Enter secure SMS content..."
+                  className="flex-1 bg-transparent border-none outline-none text-xs font-bold italic resize-none py-2 min-h-[40px] max-h-32"
                 />
-                <button 
+                <button
                   onClick={handleSend}
                   disabled={sendSms.isPending || !message}
                   className="bg-utopia text-white p-3 rounded-lg hover:bg-utopia/90 transition-all shadow-lg shadow-utopia/20 -translate-y-0.5 disabled:opacity-50"
@@ -207,7 +207,7 @@ export default function MessagesPage() {
               <Zap size={24} className="text-utopia" />
               <h3 className="display-header text-xl italic uppercase font-black">Strategic Intelligence</h3>
             </div>
-            
+
             {!activeLeadId ? (
               <p className="text-[10px] technical-label text-neutral-500 font-bold uppercase tracking-widest leading-relaxed">Select identity to generate predictive enrichment</p>
             ) : (
@@ -218,9 +218,9 @@ export default function MessagesPage() {
                     <span className="text-xl font-black italic text-utopia">{aiScore?.conversion_probability ?? '--'}%</span>
                   </div>
                   <div className="h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-utopia transition-all duration-1000" 
-                      style={{ width: `${aiScore?.conversion_probability ?? 0}%` }} 
+                    <div
+                      className="h-full bg-utopia transition-all duration-1000"
+                      style={{ width: `${aiScore?.conversion_probability ?? 0}%` }}
                     />
                   </div>
                 </div>
@@ -257,35 +257,33 @@ export default function MessagesPage() {
         <div className="industrial-card p-6 flex-1 flex flex-col">
           <h3 className="text-sm font-black italic uppercase tracking-tight mb-4">Guest Preferences</h3>
           {!activeLeadId ? (
-             <div className="flex-1 flex flex-col items-center justify-center text-center">
-               <Filter className="w-8 h-8 text-neutral-100 mb-2" />
-               <p className="text-[10px] technical-label text-neutral-300 uppercase">Awaiting Signal</p>
-             </div>
+            <div className="flex-1 flex flex-col items-center justify-center text-center">
+              <Filter className="w-8 h-8 text-neutral-100 mb-2" />
+              <p className="text-[10px] technical-label text-neutral-300 uppercase">Awaiting Signal</p>
+            </div>
           ) : (
-              <div className="space-y-4 flex-1">
-                <div className="space-y-2">
-                  <span className="text-[9px] technical-label text-neutral-400 uppercase">Predicted Preferences</span>
-                  <div className="flex flex-wrap gap-2">
-                    {aiEnrichment?.predicted_preferences?.amenities?.map((tag: string) => (
-                      <span key={tag} className="px-2 py-1 bg-neutral-100 border border-neutral-200 text-[8px] font-black italic uppercase tracking-widest">{tag}</span>
-                    )) ?? ['SPA', 'LATE CHECKOUT', 'FAMILY SUITE'].map(tag => (
-                      <span key={tag} className="px-2 py-1 bg-neutral-100 border border-neutral-200 text-[8px] font-black italic uppercase tracking-widest">{tag}</span>
-                    ))}
-                  </div>
+            <div className="space-y-4 flex-1">
+              <div className="space-y-2">
+                <span className="text-[9px] technical-label text-neutral-400 uppercase">Predicted Preferences</span>
+                <div className="flex flex-wrap gap-2">
+                  {(aiEnrichment?.predicted_preferences?.amenities ?? ['SPA', 'LATE CHECKOUT', 'FAMILY SUITE']).map((tag: string) => (
+                    <span key={tag} className="px-2 py-1 bg-neutral-100 border border-neutral-200 text-[8px] font-black italic uppercase tracking-widest">{tag}</span>
+                  ))}
                 </div>
-                
-                {aiEnrichment?.engagement_tips && aiEnrichment.engagement_tips.length > 0 && (
-                  <div className="p-4 bg-orange-50 border border-orange-100 rounded-lg">
-                    <div className="flex items-center gap-2 mb-2 text-orange-600">
-                      <AlertTriangle size={14} />
-                      <span className="text-[10px] font-black italic uppercase tracking-widest">Engagement Strategy</span>
-                    </div>
-                    <p className="text-[10px] font-bold italic text-orange-800 leading-tight">
-                      {aiEnrichment.engagement_tips[0]}
-                    </p>
-                  </div>
-                )}
               </div>
+
+              {aiEnrichment?.engagement_tips?.[0] && (
+                <div className="p-4 bg-orange-50 border border-orange-100 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2 text-orange-600">
+                    <AlertTriangle size={14} />
+                    <span className="text-[10px] font-black italic uppercase tracking-widest">Engagement Tip</span>
+                  </div>
+                  <p className="text-[10px] font-bold italic text-orange-800 leading-tight">
+                    {aiEnrichment.engagement_tips[0]}
+                  </p>
+                </div>
+              )}
+            </div>
           )}
           <Button variant="primary" size="md" className="w-full mt-auto" icon={Zap}>
             Trigger Retention

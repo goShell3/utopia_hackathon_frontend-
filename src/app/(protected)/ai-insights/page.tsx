@@ -1,101 +1,317 @@
 'use client';
 
-import React from 'react';
-import { ArrowUpRight, ChevronRight, BrainCircuit, Lightbulb, AlertCircle } from 'lucide-react';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  Zap, RefreshCcw, ArrowRight, CheckCircle2, AlertTriangle,
+  XCircle, Loader2, Sparkles, Copy, RotateCcw, Users, MessageSquare
+} from 'lucide-react';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
-import { LeadsTrendChart } from '@/components/dashboard/LeadsTrendChart';
+import { useMe } from '@/hooks/useAuth';
+import { useAIHealth, useAIUsageStats, useAIRecommendations, useGenerateMessage } from '@/hooks/useAI';
+import type { MessageGenerationRequest } from '@/types';
 
-const suggestions = [
-  { id: 1, title: 'High-Value Churn Risk', desc: '42 VIP guests (LTV > $2,500) have not engaged in 90 days.', action: 'Activate Churn Flow', impact: 'High', urgency: true },
-  { id: 2, title: 'Peak Response Window', desc: 'SMS response rates are 40% higher on Tuesdays between 2PM-4PM.', action: 'Reschedule Campaigns', impact: 'Medium', urgency: false },
-  { id: 3, title: 'New Segment: Local Foodies', desc: '128 leads identified with high interest in F&B dining packages.', action: 'Create Segment', impact: 'Low', urgency: false },
-];
+// --- AI Status Card ---
+function AIStatusCard() {
+  const { data, isLoading, refetch, isFetching } = useAIHealth();
+  const health = data as Record<string, unknown> | undefined;
+  const status = health?.status as string | undefined;
 
-const scoringData = [
-  { date: 'Mon', value: 82 }, { date: 'Tue', value: 85 }, { date: 'Wed', value: 78 },
-  { date: 'Thu', value: 91 }, { date: 'Fri', value: 88 }, { date: 'Sat', value: 94 },
-];
+  const isHealthy = status === 'healthy';
+  const isDegraded = status === 'degraded';
 
-export default function AIInsightsPage() {
+  return (
+    <div className="industrial-card p-6 flex flex-col gap-4">
+      <div className="flex items-center justify-between">
+        <span className="technical-label text-neutral-400">AI Service Status</span>
+        <button onClick={() => refetch()} className="text-neutral-400 hover:text-black transition-colors">
+          <RefreshCcw size={12} className={isFetching ? 'animate-spin' : ''} />
+        </button>
+      </div>
+
+      {isLoading ? (
+        <div className="flex items-center gap-2"><Loader2 size={16} className="animate-spin text-neutral-400" /><span className="text-xs font-bold italic">Checking...</span></div>
+      ) : (
+        <>
+          <div className="flex items-center gap-3">
+            {isHealthy ? <CheckCircle2 size={20} className="text-emerald-500" /> :
+             isDegraded ? <AlertTriangle size={20} className="text-amber-500" /> :
+             <XCircle size={20} className="text-rose-500" />}
+            <span className="text-sm font-black italic uppercase">
+              {isHealthy ? 'Operational' : isDegraded ? 'Degraded' : status ?? 'Unavailable'}
+            </span>
+          </div>
+          <p className="text-[10px] technical-label text-neutral-400">
+            {isHealthy ? 'All AI services are running normally.' :
+             isDegraded ? 'Generation latency elevated. Some features may be slow.' :
+             'AI services are temporarily unavailable.'}
+          </p>
+        </>
+      )}
+    </div>
+  );
+}
+
+// --- Usage Card ---
+function AIUsageCard() {
+  const { data, isLoading } = useAIUsageStats();
+
+  return (
+    <div className="industrial-card p-6 flex flex-col gap-4">
+      <span className="technical-label text-neutral-400">Usage Summary</span>
+      {isLoading ? (
+        <div className="flex items-center gap-2"><Loader2 size={16} className="animate-spin text-neutral-400" /><span className="text-xs font-bold italic">Loading...</span></div>
+      ) : data ? (
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <span className="text-xl font-black italic">{data.total_requests}</span>
+            <p className="text-[9px] technical-label text-neutral-400 mt-0.5">Total Requests</p>
+          </div>
+          <div>
+            <span className="text-xl font-black italic text-emerald-500">
+              {data.total_requests > 0 ? Math.round((data.successful_requests / data.total_requests) * 100) : 0}%
+            </span>
+            <p className="text-[9px] technical-label text-neutral-400 mt-0.5">Success Rate</p>
+          </div>
+          <div>
+            <span className="text-xl font-black italic">{data.avg_response_time.toFixed(2)}s</span>
+            <p className="text-[9px] technical-label text-neutral-400 mt-0.5">Avg Response</p>
+          </div>
+          <div>
+            <span className="text-xl font-black italic">${data.estimated_cost.toFixed(4)}</span>
+            <p className="text-[9px] technical-label text-neutral-400 mt-0.5">Est. Cost</p>
+          </div>
+        </div>
+      ) : (
+        <p className="text-[10px] technical-label text-neutral-400">No AI requests recorded yet.</p>
+      )}
+    </div>
+  );
+}
+
+// --- Recommendations ---
+function RecommendationsSection({ hotelId }: { hotelId: string }) {
+  const router = useRouter();
+  const { data, isLoading } = useAIRecommendations({
+    hotel_id: hotelId,
+    timeframe_days: 30,
+    preferred_channels: ['sms'],
+  });
+
+  const recs = data?.recommendations ?? [];
+
+  return (
+    <div className="space-y-4">
+      <h3 className="text-sm font-black italic uppercase tracking-tight flex items-center gap-2">
+        <Sparkles size={14} className="text-amber-500" /> Recommended Actions
+      </h3>
+
+      {isLoading ? (
+        <div className="flex items-center gap-3 p-6 industrial-card">
+          <Loader2 size={16} className="animate-spin text-neutral-400" />
+          <span className="text-xs font-bold italic text-neutral-400">Generating recommendations...</span>
+        </div>
+      ) : recs.length === 0 ? (
+        <div className="industrial-card p-6">
+          <p className="text-[10px] technical-label text-neutral-400">Nothing urgent right now. AI will surface opportunities as new lead and campaign data arrives.</p>
+        </div>
+      ) : (
+        recs.map((rec, i) => (
+          <div key={i} className={cn(
+            "industrial-card p-6 flex flex-col gap-4 hover:scale-[1.01] transition-all",
+            rec.expected_roi > 2 ? "border-l-4 border-l-utopia" : "border-l-4 border-l-black"
+          )}>
+            <div className="flex items-start justify-between">
+              <div>
+                <h4 className="text-sm font-black italic uppercase tracking-tight">{rec.campaign_type}</h4>
+                <span className="text-[9px] technical-label text-neutral-400 mt-0.5 block">
+                  Target: {rec.target_segment} · Confidence: {Math.round(rec.confidence * 100)}%
+                </span>
+              </div>
+              <div className={cn("text-[9px] font-black italic uppercase px-2 py-0.5 rounded-[1px]",
+                rec.expected_roi > 2 ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-neutral-100 text-neutral-500"
+              )}>
+                ROI ×{rec.expected_roi.toFixed(1)}
+              </div>
+            </div>
+
+            <p className="text-xs font-bold italic text-neutral-600 leading-relaxed">&quot;{rec.reasoning}&quot;</p>
+
+            <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
+              <div className="flex items-center gap-4 text-[9px] technical-label text-neutral-400">
+                <span>Est. cost: ${rec.estimated_cost}</span>
+                <span>Est. revenue: ${rec.estimated_revenue}</span>
+                <span>Send: {rec.optimal_send_time}</span>
+              </div>
+              <Button variant="primary" size="sm" icon={ArrowRight} onClick={() => router.push('/campaigns')}>
+                Create Campaign
+              </Button>
+            </div>
+          </div>
+        ))
+      )}
+    </div>
+  );
+}
+
+// --- Generate Message Panel ---
+function GenerateMessagePanel() {
+  const { mutateAsync: generate, isPending } = useGenerateMessage();
+  const [form, setForm] = useState({ goal: '', channel: 'sms', tone: 'friendly', language: 'en' });
+  const [output, setOutput] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  function set(field: string, value: string) {
+    setForm(prev => ({ ...prev, [field]: value }));
+  }
+
+  async function handleGenerate() {
+    if (!form.goal) return;
+    const req: MessageGenerationRequest = {
+      lead_id: '',
+      campaign_goal: form.goal as 'booking' | 'upsell' | 're_engagement' | 'feedback' | 'loyalty' | 'promotion',
+      channel: form.channel as 'sms' | 'email',
+      tone: form.tone as 'friendly' | 'professional' | 'urgent',
+      language: form.language,
+      max_length: form.channel === 'sms' ? 160 : null,
+    };
+    const res = await generate(req);
+    if (res.variants?.[0]) setOutput(res.variants[0].text);
+  }
+
+  function handleCopy() {
+    navigator.clipboard.writeText(output);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  return (
+    <div className="industrial-card p-6 flex flex-col gap-4">
+      <div className="flex items-center gap-2">
+        <Sparkles size={14} className="text-amber-500" />
+        <h3 className="text-sm font-black italic uppercase tracking-tight">Generate Message</h3>
+      </div>
+
+      <div className="space-y-3">
+        <div>
+          <label className="technical-label text-neutral-400 mb-1 block">Campaign Goal</label>
+          <input
+            type="text"
+            value={form.goal}
+            onChange={e => set('goal', e.target.value)}
+            placeholder="e.g. re-engage dormant guests"
+            className="w-full bg-neutral-50 border border-neutral-200 py-2 px-3 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-black placeholder:font-normal placeholder:text-neutral-400"
+          />
+        </div>
+
+        <div className="grid grid-cols-3 gap-2">
+          <div>
+            <label className="technical-label text-neutral-400 mb-1 block">Channel</label>
+            <select value={form.channel} onChange={e => set('channel', e.target.value)} className="w-full bg-neutral-50 border border-neutral-200 py-2 px-2 text-xs font-bold focus:outline-none uppercase">
+              <option value="sms">SMS</option>
+              <option value="email">Email</option>
+            </select>
+          </div>
+          <div>
+            <label className="technical-label text-neutral-400 mb-1 block">Tone</label>
+            <select value={form.tone} onChange={e => set('tone', e.target.value)} className="w-full bg-neutral-50 border border-neutral-200 py-2 px-2 text-xs font-bold focus:outline-none uppercase">
+              <option value="friendly">Friendly</option>
+              <option value="professional">Professional</option>
+              <option value="urgent">Urgent</option>
+            </select>
+          </div>
+          <div>
+            <label className="technical-label text-neutral-400 mb-1 block">Language</label>
+            <select value={form.language} onChange={e => set('language', e.target.value)} className="w-full bg-neutral-50 border border-neutral-200 py-2 px-2 text-xs font-bold focus:outline-none uppercase">
+              <option value="en">EN</option>
+              <option value="am">AM</option>
+            </select>
+          </div>
+        </div>
+
+        <Button variant="primary" size="sm" icon={isPending ? Loader2 : Sparkles} className="w-full" onClick={handleGenerate} disabled={isPending || !form.goal}>
+          {isPending ? 'Generating...' : 'Generate Draft'}
+        </Button>
+      </div>
+
+      {output && (
+        <div className="mt-2 p-4 bg-neutral-50 border border-neutral-200 space-y-3">
+          <p className="text-xs font-bold italic leading-relaxed">&quot;{output}&quot;</p>
+          <div className="flex items-center gap-2">
+            <button onClick={handleCopy} className="flex items-center gap-1.5 text-[9px] technical-label text-neutral-500 hover:text-black transition-colors">
+              <Copy size={10} /> {copied ? 'Copied!' : 'Copy'}
+            </button>
+            <button onClick={handleGenerate} className="flex items-center gap-1.5 text-[9px] technical-label text-neutral-500 hover:text-black transition-colors">
+              <RotateCcw size={10} /> Regenerate
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- Quick Actions ---
+function QuickActions() {
+  const router = useRouter();
+  return (
+    <div className="industrial-card p-6 flex flex-col gap-4">
+      <h3 className="text-sm font-black italic uppercase tracking-tight">Quick Actions</h3>
+      <div className="space-y-2">
+        {[
+          { label: 'Open Top Leads', icon: Users, href: '/leads' },
+          { label: 'Create Campaign', icon: Zap, href: '/campaigns' },
+          { label: 'Go to Messages', icon: MessageSquare, href: '/messages' },
+        ].map(a => (
+          <button key={a.href} onClick={() => router.push(a.href)}
+            className="w-full flex items-center justify-between p-3 bg-neutral-50 border border-neutral-100 hover:border-black hover:bg-white transition-all group">
+            <div className="flex items-center gap-3">
+              <a.icon size={14} className="text-neutral-400 group-hover:text-black transition-colors" />
+              <span className="text-xs font-black italic uppercase tracking-tight">{a.label}</span>
+            </div>
+            <ArrowRight size={12} className="text-neutral-300 group-hover:text-black transition-colors" />
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// --- Page ---
+export default function AIHubPage() {
+  const { data: user } = useMe();
+  const hotelId = user?.hotel_id ?? '';
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="display-header text-4xl italic tracking-tighter">AI Neural Engine</h1>
-          <p className="technical-label text-neutral-500 mt-1">Predictive behavioral analytics</p>
-        </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-black text-white border border-neutral-800">
-          <BrainCircuit size={16} className="text-utopia" />
-          <span className="text-[10px] technical-label uppercase tracking-widest">Core Status: Optimized</span>
+          <h1 className="display-header text-4xl italic tracking-tighter">AI Hub</h1>
+          <p className="technical-label text-neutral-500 mt-1">Recommendations, status, and message generation</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6">
-          <h3 className="text-sm font-black italic uppercase tracking-tight flex items-center gap-2">
-            <Lightbulb size={16} className="text-amber-500" /> Strategic Interventions
-          </h3>
-          <div className="space-y-4">
-            {suggestions.map((item) => (
-              <div key={item.id} className={cn("industrial-card p-6 flex flex-col justify-between transition-all hover:scale-[1.01] relative overflow-hidden", item.urgency ? "border-l-4 border-l-utopia" : "border-l-4 border-l-black")}>
-                <div className="flex justify-between items-start mb-4">
-                  <div className="flex flex-col">
-                    <h4 className="text-sm font-black italic tracking-tight uppercase">{item.title}</h4>
-                    <span className={cn("text-[8px] technical-label uppercase font-bold mt-1", item.impact === 'High' ? "text-utopia" : "text-neutral-400")}>IMPACT: {item.impact}</span>
-                  </div>
-                  {item.urgency && <div className="flex items-center gap-1 text-utopia"><AlertCircle size={14} /><span className="text-[9px] font-black italic uppercase">Urgent</span></div>}
-                </div>
-                <p className="text-xs font-bold italic text-neutral-600 leading-relaxed max-w-md">&quot;{item.desc}&quot;</p>
-                <div className="flex justify-end mt-6">
-                  <Button variant={item.urgency ? "primary" : "outline"} size="sm" icon={ChevronRight} className="technical-label text-[10px]">{item.action}</Button>
-                </div>
-              </div>
-            ))}
-          </div>
+      {/* Row 1: Status + Usage + Quick Actions */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <AIStatusCard />
+        <AIUsageCard />
+        <QuickActions />
+      </div>
+
+      {/* Row 2: Recommendations + Generate Message */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
+          {hotelId ? (
+            <RecommendationsSection hotelId={hotelId} />
+          ) : (
+            <div className="industrial-card p-6">
+              <p className="text-[10px] technical-label text-neutral-400">Loading recommendations...</p>
+            </div>
+          )}
         </div>
-
-        <div className="space-y-8">
-          <div className="industrial-card p-8 flex flex-col items-center justify-center text-center bg-black text-white">
-            <div className="relative mb-6">
-              <svg className="w-24 h-24 -rotate-90">
-                <circle cx="48" cy="48" r="40" className="stroke-neutral-800 fill-none" strokeWidth="8" />
-                <circle cx="48" cy="48" r="40" className="stroke-utopia fill-none" strokeWidth="8" strokeDasharray="251" strokeDashoffset="25" />
-              </svg>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"><span className="text-2xl font-black italic">90%</span></div>
-            </div>
-            <h4 className="text-xs font-black italic tracking-tight uppercase mb-1">Model Precision</h4>
-            <p className="text-[9px] technical-label text-neutral-500">Confidence score for current predictions</p>
-          </div>
-
-          <div className="industrial-card p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h4 className="text-xs font-black italic tracking-tight uppercase">Scoring Velocity</h4>
-              <ArrowUpRight size={14} className="text-emerald-500" />
-            </div>
-            <div className="h-40"><LeadsTrendChart data={scoringData} height={160} width={280} /></div>
-            <div className="mt-4 pt-4 border-t border-neutral-100 flex justify-between items-center">
-              <div className="flex flex-col"><span className="text-[10px] technical-label text-neutral-400">AVG SCORE</span><span className="text-sm font-black italic uppercase">86.2%</span></div>
-              <div className="flex flex-col text-right"><span className="text-[10px] technical-label text-neutral-400">DELTA</span><span className="text-sm font-black italic uppercase text-emerald-500">+4.2%</span></div>
-            </div>
-          </div>
-
-          <div className="industrial-card p-6 flex flex-col gap-4">
-            <h4 className="text-xs font-black italic tracking-tight uppercase">Top Automation Triggers</h4>
-            <div className="space-y-3 italic">
-              {[{ label: 'PMS: Checkout', score: 98 }, { label: 'LTV Segment Update', score: 85 }, { label: 'Bulk SMS Response', score: 72 }, { label: 'Manual Lead Import', score: 64 }].map(t => (
-                <div key={t.label} className="flex flex-col gap-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[10px] technical-label text-black uppercase">{t.label}</span>
-                    <span className="text-[10px] font-black italic text-utopia">{t.score}%</span>
-                  </div>
-                  <div className="w-full h-1 bg-neutral-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-black transition-all" style={{ width: `${t.score}%` }} />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+        <div>
+          <GenerateMessagePanel />
         </div>
       </div>
     </div>

@@ -1,11 +1,30 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { aiService } from '@/lib/api/ai';
 import { queryKeys } from './queryKeys';
-import type { 
-  MessageGenerationRequest, 
-  CampaignAdvisorRequest, 
-  BatchMessageRequest 
-} from '@/types';
+import type { MessageGenerationRequest, CampaignAdvisorRequest, BatchMessageRequest } from '@/types';
+
+export function useAIHealth() {
+  return useQuery({
+    queryKey: queryKeys.ai.health(),
+    queryFn: aiService.healthCheck,
+    refetchInterval: 60_000,
+  });
+}
+
+export function useAIUsageStats() {
+  return useQuery({
+    queryKey: queryKeys.ai.usage(),
+    queryFn: aiService.getUsageStats,
+  });
+}
+
+export function useAIRecommendations(params: CampaignAdvisorRequest) {
+  return useQuery({
+    queryKey: queryKeys.ai.recommendations(params),
+    queryFn: () => aiService.getRecommendations(params),
+    enabled: !!params.hotel_id,
+  });
+}
 
 export function useAIScore(leadId: string, params?: { include_explanation?: boolean; include_recommendations?: boolean }) {
   return useQuery({
@@ -20,21 +39,6 @@ export function useAIEnrichment(leadId: string, params?: { include_predictions?:
     queryKey: queryKeys.ai.enrichment(leadId),
     queryFn: () => aiService.enrichLead(leadId, params),
     enabled: !!leadId,
-  });
-}
-
-export function useAIRecommendations(params: CampaignAdvisorRequest) {
-  return useQuery({
-    queryKey: queryKeys.ai.recommendations(params),
-    queryFn: () => aiService.getRecommendations(params),
-    enabled: !!params,
-  });
-}
-
-export function useAIUsageStats() {
-  return useQuery({
-    queryKey: queryKeys.ai.usage(),
-    queryFn: aiService.getUsageStats,
   });
 }
 
@@ -54,8 +58,14 @@ export function useScoreLeadsBatch() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (leadIds: string[]) => aiService.scoreLeadsBatch(leadIds),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['ai', 'score'] });
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['ai', 'score'] }),
+  });
+}
+
+export function useClearAICache() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: aiService.clearCache,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['ai'] }),
   });
 }
