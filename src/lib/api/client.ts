@@ -66,6 +66,7 @@ async function request<T>(path: string, init: RequestInit = {}, retry = true): P
 
   if (!res.ok) {
     const body = await res.json().catch(() => ({}));
+    console.error('[API ERROR]', res.status, path, body);
     throw new ApiError(res.status, body?.detail ?? res.statusText);
   }
 

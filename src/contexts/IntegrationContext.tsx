@@ -23,8 +23,8 @@ interface IntegrationContextType {
 const defaultIntegrations: IntegrationNode[] = [
   { id: 1, name: 'TotalEnergies PMS', category: 'PMS', status: 'Connected', lastSync: '5m ago', iconName: 'Globe', desc: 'Bi-directional guest profile and stay history synchronization.' },
   { id: 2, name: 'Meta Ads Manager', category: 'Marketing', status: 'Connected', lastSync: '1h ago', iconName: 'BarChart3', desc: 'Import leads from Facebook & Instagram lead forms.' },
-  { id: 3, name: 'AWS Pinpoint', category: 'SMS Gateway', status: 'Disconnected', lastSync: 'Never', iconName: 'MessageCircle', desc: 'High-throughput enterprise SMS delivery service.' },
-  { id: 4, name: 'Opera Cloud', category: 'PMS', status: 'Inactive', lastSync: '2d ago', iconName: 'Layers', desc: 'Oracle Hospitality cloud node integration.' },
+  // { id: 3, name: 'AWS Pinpoint', category: 'SMS Gateway', status: 'Disconnected', lastSync: 'Never', iconName: 'MessageCircle', desc: 'High-throughput enterprise SMS delivery service.' },
+  // { id: 4, name: 'Opera Cloud', category: 'PMS', status: 'Inactive', lastSync: '2d ago', iconName: 'Layers', desc: 'Oracle Hospitality cloud node integration.' },
 ];
 
 const IntegrationContext = createContext<IntegrationContextType | undefined>(undefined);

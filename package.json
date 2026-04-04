@@ -7,14 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "mock": "prism mock api.json -p 4000"
+    "mock": "node mock-server.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@tanstack/react-query": "^5.96.2",
     "@tanstack/react-query-devtools": "^5.96.2",
     "clsx": "^2.1.1",
+    "cors": "^2.8.6",
     "d3": "^7.9.0",
+    "express": "^5.2.1",
     "framer-motion": "^11.2.6",
     "lucide-react": "^0.378.0",
     "next": "16.2.2",

@@ -1,0 +1,76 @@
+{
+  "me": {
+    "id": "usr_mock",
+    "email": "demo@utopia.com",
+    "first_name": "Demo",
+    "last_name": "User",
+    "hotel_id": "hot_mock"
+  },
+  "leads": [
+    {
+      "id": "1",
+      "hotel_id": "hot_mock",
+      "first_name": "Tessema",
+      "last_name": "Belay",
+      "phone": "+251 911 222 333",
+      "email": "tessema@example.com",
+      "segment": "vip",
+      "source": "pms",
+      "status": "active",
+      "created_at": "2026-04-01T10:00:00Z",
+      "updated_at": "2026-04-01T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "hotel_id": "hot_mock",
+      "first_name": "Hanna",
+      "last_name": "Yohannes",
+      "phone": "+251 922 000 111",
+      "email": "hanna@example.com",
+      "segment": "new",
+      "source": "marketing",
+      "status": "active",
+      "created_at": "2026-04-02T12:30:00Z",
+      "updated_at": "2026-04-02T12:30:00Z"
+    }
+  ],
+  "campaigns": [
+    {
+      "id": "cmp_1",
+      "hotel_id": "hot_mock",
+      "name": "Welcome SMS Variant Alpha",
+      "description": "Sent 1 minute after reservation creation.",
+      "campaign_type": "trigger",
+      "status": "active",
+      "trigger_event": "booking.confirmed",
+      "channels": [
+        "sms"
+      ],
+      "enable_ab_test": true,
+      "created_at": "2026-04-03T00:00:00Z",
+      "updated_at": "2026-04-03T00:00:00Z"
+    },
+    {
+      "name": "Easter",
+      "campaign_type": "trigger",
+      "channels": [
+        "sms"
+      ],
+      "enable_ab_test": true,
+      "id": "cmp_1775330687801",
+      "status": "paused",
+      "created_at": "2026-04-04T19:24:47.801Z",
+      "updated_at": "2026-04-04T19:25:02.449Z"
+    }
+  ],
+  "stats": {
+    "cmp_1": {
+      "campaign_id": "cmp_1",
+      "total_sent": 8432,
+      "delivery_rate": 99.2,
+      "open_rate": 84.1,
+      "click_rate": 22.4,
+      "opt_out_rate": 0.3
+    }
+  }
+}
