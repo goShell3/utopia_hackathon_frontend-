@@ -39,6 +39,7 @@ export type MessageGenerationRequest = components['schemas']['MessageGenerationR
 export type MessageGenerationResponse = components['schemas']['MessageGenerationResponse'];
 export type MessageVariant = components['schemas']['MessageVariant'];
 export type MessageTone = components['schemas']['MessageTone'];
+export type CampaignGoal = components['schemas']['CampaignGoal'];
 export type BatchMessageRequest = components['schemas']['BatchMessageRequest'];
 export type AILeadScoringResponse = components['schemas']['LeadScoringResponse'];
 export type CampaignAdvisorRequest = components['schemas']['CampaignAdvisorRequest'];

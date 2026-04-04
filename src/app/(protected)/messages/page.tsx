@@ -127,7 +127,7 @@ export default function MessagesPage() {
         total_bookings: selectedLead.total_bookings,
         source: selectedLead.source,
         loyalty_type: leadAnalysis.loyaltyType
-      }
+      } as any // Type assertion needed due to OpenAPI schema limitation
     };
 
     const suggestion = await generateAI.mutateAsync(request);

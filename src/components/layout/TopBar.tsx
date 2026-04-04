@@ -51,7 +51,7 @@ function ProfileDropdown() {
             <p className="text-sm font-black italic tracking-tight">{user?.full_name}</p>
             <p className="text-[10px] technical-label text-neutral-400 mt-0.5">{user?.email}</p>
             <div className="mt-2 inline-flex px-2 py-0.5 bg-black text-white text-[9px] font-black italic uppercase rounded-[1px]">
-              {user?.role}
+              Staff
             </div>
           </div>
 

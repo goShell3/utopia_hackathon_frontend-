@@ -130,7 +130,7 @@ export default function SettingsPage() {
                   <p className="text-sm font-black italic uppercase">{user?.full_name ?? 'User'}</p>
                   <p className="technical-label text-[9px] text-neutral-400">{user?.email ?? '—'}</p>
                   <span className="inline-block mt-1 px-2 py-0.5 bg-black text-white text-[9px] font-black italic uppercase rounded-[1px]">
-                    {user?.role ?? 'staff'}
+                    Staff
                   </span>
                 </div>
               </div>
@@ -143,9 +143,6 @@ export default function SettingsPage() {
                 </Field>
                 <Field label="Email">
                   <Input defaultValue={user?.email} placeholder="your@email.com" type="email" />
-                </Field>
-                <Field label="Role">
-                  <Input defaultValue={user?.role} placeholder="Role" />
                 </Field>
                 <Field label="Language">
                   <select className="w-full h-10 border-b-2 border-neutral-100 bg-neutral-50 px-3 text-sm font-bold italic focus:border-black transition-colors outline-none">
