@@ -139,7 +139,7 @@ export default function LeadsPage() {
       </div>
 
       {/* Pagination / Summary Footer */}
-      <div className="flex items-center justify-between p-4 bg-white border border-neutral-200 mt-[-2rem]">
+      <div className="flex items-center justify-between p-4 bg-white border border-neutral-200 -mt-8">
         <div className="flex items-center gap-4">
           <span className="text-[10px] technical-label text-neutral-500">Showing 6 of 2,400 active nodes</span>
           <div className="flex items-center gap-1">
