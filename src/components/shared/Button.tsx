@@ -2,24 +2,24 @@
 
 import React from 'react';
 import { LucideIcon } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface ButtonProps extends HTMLMotionProps<"button"> {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   icon?: LucideIcon;
   isLoading?: boolean;
 }
 
-export function Button({ 
-  children, 
-  variant = 'primary', 
-  size = 'md', 
-  icon: Icon, 
-  className, 
+export function Button({
+  children,
+  variant = 'primary',
+  size = 'md',
+  icon: Icon,
+  className,
   isLoading,
-  ...props 
+  ...props
 }: ButtonProps) {
   const variants = {
     primary: 'bg-black text-white hover:bg-neutral-800 border-black',
