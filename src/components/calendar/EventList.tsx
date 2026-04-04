@@ -18,9 +18,10 @@ const TYPE_LABELS: Record<CalendarEvent['type'], string> = {
 interface Props {
   date: string;
   events: CalendarEvent[];
+  selectedEventId?: string;
 }
 
-export function EventList({ date, events }: Props) {
+export function EventList({ date, events, selectedEventId }: Props) {
   const formatted = new Date(date + 'T00:00:00').toLocaleDateString('default', {
     weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
   });
@@ -43,7 +44,12 @@ export function EventList({ date, events }: Props) {
             <li key={event.id}>
               <Link
                 href={`/calendar/${event.id}`}
-                className="flex items-start gap-3 p-3 rounded-lg border border-neutral-100 hover:border-neutral-300 hover:bg-neutral-50 transition-all group"
+                className={cn(
+                  'flex items-start gap-3 p-3 rounded-lg border transition-all group',
+                  selectedEventId === event.id
+                    ? 'border-black bg-neutral-50'
+                    : 'border-neutral-100 hover:border-neutral-300 hover:bg-neutral-50'
+                )}
               >
                 <span className={cn('mt-1 w-2.5 h-2.5 rounded-full shrink-0', TYPE_COLORS[event.type])} />
                 <div className="flex flex-col gap-0.5 min-w-0 flex-1">
