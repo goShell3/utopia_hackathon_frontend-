@@ -47,20 +47,116 @@
         "sms"
       ],
       "enable_ab_test": true,
-      "created_at": "2026-04-03T00:00:00Z",
-      "updated_at": "2026-04-03T00:00:00Z"
+      "start_date": "2026-04-01",
+      "end_date": "2026-04-30",
+      "created_at": "2026-04-01T00:00:00Z",
+      "updated_at": "2026-04-01T00:00:00Z"
     },
     {
-      "name": "Easter",
-      "campaign_type": "trigger",
+      "id": "cmp_2",
+      "hotel_id": "hot_mock",
+      "name": "Easter Promo Blast",
+      "description": "Easter holiday promotional campaign.",
+      "campaign_type": "scheduled",
+      "status": "paused",
       "channels": [
         "sms"
       ],
-      "enable_ab_test": true,
-      "id": "cmp_1775330687801",
-      "status": "paused",
+      "enable_ab_test": false,
+      "start_date": "2026-04-10",
+      "end_date": "2026-04-20",
       "created_at": "2026-04-04T19:24:47.801Z",
       "updated_at": "2026-04-04T19:25:02.449Z"
+    },
+    {
+      "id": "cmp_3",
+      "hotel_id": "hot_mock",
+      "name": "Churn Prevention Flow",
+      "description": "Re-engage lapsed guests with a win-back offer.",
+      "campaign_type": "trigger",
+      "status": "active",
+      "trigger_event": "checkout.completed",
+      "channels": [
+        "sms",
+        "email"
+      ],
+      "enable_ab_test": true,
+      "start_date": "2026-04-05",
+      "end_date": "2026-05-05",
+      "created_at": "2026-04-05T08:00:00Z",
+      "updated_at": "2026-04-05T08:00:00Z"
+    },
+    {
+      "id": "cmp_4",
+      "hotel_id": "hot_mock",
+      "name": "Loyalty Bonus May",
+      "description": "Exclusive loyalty reward for returning guests.",
+      "campaign_type": "scheduled",
+      "status": "draft",
+      "channels": [
+        "email"
+      ],
+      "enable_ab_test": false,
+      "start_date": "2026-05-01",
+      "end_date": "2026-05-31",
+      "created_at": "2026-04-06T10:00:00Z",
+      "updated_at": "2026-04-06T10:00:00Z"
+    },
+    {
+      "id": "cmp_5",
+      "hotel_id": "hot_mock",
+      "name": "Upsell Room Upgrade",
+      "description": "Offer room upgrades 24h before check-in.",
+      "campaign_type": "trigger",
+      "status": "active",
+      "trigger_event": "checkin",
+      "channels": [
+        "sms"
+      ],
+      "enable_ab_test": false,
+      "start_date": "2026-04-15",
+      "end_date": "2026-06-15",
+      "created_at": "2026-04-07T09:00:00Z",
+      "updated_at": "2026-04-07T09:00:00Z"
+    },
+    {
+      "name": "Welcome Campaign",
+      "campaign_type": "scheduled",
+      "channels": [
+        "email"
+      ],
+      "enable_ab_test": false,
+      "description": "Onboarding campaign for new leads",
+      "id": "cmp_1775333874300",
+      "status": "active",
+      "created_at": "2026-04-04T20:17:54.300Z",
+      "updated_at": "2026-04-04T20:17:54.301Z"
+    },
+    {
+      "name": "Welcome Campaign",
+      "campaign_type": "scheduled",
+      "channels": [
+        "email"
+      ],
+      "enable_ab_test": false,
+      "description": "Onboarding campaign for new leads",
+      "id": "cmp_1775333935506",
+      "status": "active",
+      "created_at": "2026-04-04T20:18:55.507Z",
+      "updated_at": "2026-04-04T20:18:55.507Z"
+    },
+    {
+      "name": "Welcome Campaign",
+      "campaign_type": "scheduled",
+      "channels": [
+        "email"
+      ],
+      "enable_ab_test": false,
+      "description": "Onboarding campaign for new leads",
+      "id": "cmp_1775333976287",
+      "status": "active",
+      "created_at": "2026-04-04T20:19:36.287Z",
+      "updated_at": "2026-04-04T20:19:36.287Z"
     }
   ],
   "stats": {

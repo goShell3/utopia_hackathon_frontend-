@@ -1,25 +1,27 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { 
-  Zap, Plus, Send, Calendar, 
-  ChevronRight, Sparkles, MessageSquare, Brain, Target, ArrowRight,
-  Loader2, TrendingUp, X, Trash2
+  Zap, Plus, Calendar, Filter,
+  ArrowRight, Loader2, X, Trash2, ChevronDown
 } from 'lucide-react';
+import { toSlug } from '@/lib/utils';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
+import { CampaignTimeline } from '@/components/campaigns/CampaignTimeline';
 import { 
-  useCampaigns, useCampaignStats, useCampaignTargetLeads,
-  useActivateCampaign, usePauseCampaign, useExecuteCampaign,
+  useCampaigns,
   useCreateCampaign, useUpdateCampaign, useDeleteCampaign
 } from '@/hooks/useCampaigns';
-import { useTemplates } from '@/hooks/useTemplates';
-import type { Campaign, CampaignCreate, CampaignUpdate, CampaignType, Lead, MessageChannel, TriggerEvent } from '@/types';
+import type { Campaign, CampaignCreate, CampaignUpdate, CampaignType, MessageChannel, TriggerEvent } from '@/types';
 
 export default function CampaignsPage() {
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'workflow' | 'stats' | 'leads'>('workflow');
   const [showDialog, setShowDialog] = useState<false | 'create' | 'edit'>(false);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [showFilter, setShowFilter] = useState(false);
   const [formData, setFormData] = useState<Partial<CampaignCreate>>({
     name: '',
     campaign_type: 'trigger',
@@ -27,34 +29,22 @@ export default function CampaignsPage() {
     enable_ab_test: false
   });
 
-  // Queries
   const { data: campaigns, isLoading: campaignsLoading } = useCampaigns();
-  const activeCampaign = campaigns?.items.find(c => c.id === selectedId);
-
-  const { data: stats, isLoading: statsLoading } = useCampaignStats(selectedId ?? '');
-  const { data: targets, isLoading: targetsLoading } = useCampaignTargetLeads(selectedId ?? '');
-
-  // Mutations
   const createCampaign = useCreateCampaign();
   const updateCampaign = useUpdateCampaign();
   const deleteCampaign = useDeleteCampaign();
-  const activate = useActivateCampaign();
-  const pause = usePauseCampaign();
-  const execute = useExecuteCampaign();
 
-  const handleAction = async (action: 'activate' | 'pause' | 'execute' | 'delete', id: string) => {
-    if (action === 'activate') await activate.mutateAsync(id);
-    if (action === 'pause') await pause.mutateAsync(id);
-    if (action === 'delete') {
-      if (confirm('Permanently delete this campaign protocol?')) {
-        await deleteCampaign.mutateAsync(id);
-        if (selectedId === id) setSelectedId(null);
-      }
-    }
-    if (action === 'execute') {
-      if (confirm('Deploy campaign to all target leads now?')) {
-        await execute.mutateAsync({ id });
-      }
+  const filteredCampaigns = campaigns?.items.filter(c => {
+    if (filterStatus !== 'all' && c.status !== filterStatus) return false;
+    if (filterType !== 'all' && c.campaign_type !== filterType) return false;
+    return true;
+  }) ?? [];
+
+  const activeFilterCount = (filterStatus !== 'all' ? 1 : 0) + (filterType !== 'all' ? 1 : 0);
+
+  const handleDelete = async (id: string) => {
+    if (confirm('Permanently delete this campaign protocol?')) {
+      await deleteCampaign.mutateAsync(id);
     }
   };
 
@@ -112,6 +102,57 @@ export default function CampaignsPage() {
           <p className="technical-label text-neutral-500 mt-1 uppercase tracking-widest">Automated Strategic Deployment</p>
         </div>
         <div className="flex items-center gap-3">
+          {/* Filter */}
+          <div className="relative">
+            <button
+              onClick={() => setShowFilter(v => !v)}
+              className={cn(
+                "flex items-center gap-2 h-9 px-4 border text-[10px] font-black italic uppercase transition-colors",
+                showFilter || activeFilterCount > 0 ? "border-utopia text-utopia bg-utopia/5" : "border-neutral-200 text-neutral-500 bg-white hover:border-black hover:text-black"
+              )}
+            >
+              <Filter size={12} />
+              Filter
+              {activeFilterCount > 0 && (
+                <span className="bg-utopia text-white text-[8px] font-black rounded-full w-4 h-4 flex items-center justify-center">{activeFilterCount}</span>
+              )}
+              <ChevronDown size={10} className={cn('transition-transform', showFilter && 'rotate-180')} />
+            </button>
+
+            {showFilter && (
+              <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-neutral-200 shadow-xl p-4 w-56 space-y-4">
+                <div className="space-y-1.5">
+                  <p className="text-[9px] font-black italic uppercase text-neutral-400">Status</p>
+                  {['all', 'active', 'paused', 'draft', 'completed'].map(s => (
+                    <button key={s} onClick={() => setFilterStatus(s)}
+                      className={cn(
+                        'w-full text-left px-3 py-1.5 text-[10px] font-black italic uppercase transition-colors',
+                        filterStatus === s ? 'bg-black text-white' : 'hover:bg-neutral-50 text-neutral-600'
+                      )}
+                    >{s === 'all' ? 'All Statuses' : s}</button>
+                  ))}
+                </div>
+                <div className="border-t border-neutral-100 pt-4 space-y-1.5">
+                  <p className="text-[9px] font-black italic uppercase text-neutral-400">Type</p>
+                  {['all', 'trigger', 'scheduled', 'manual'].map(t => (
+                    <button key={t} onClick={() => setFilterType(t)}
+                      className={cn(
+                        'w-full text-left px-3 py-1.5 text-[10px] font-black italic uppercase transition-colors',
+                        filterType === t ? 'bg-black text-white' : 'hover:bg-neutral-50 text-neutral-600'
+                      )}
+                    >{t === 'all' ? 'All Types' : t}</button>
+                  ))}
+                </div>
+                {activeFilterCount > 0 && (
+                  <button
+                    onClick={() => { setFilterStatus('all'); setFilterType('all'); }}
+                    className="w-full text-[9px] font-black italic uppercase text-utopia hover:underline text-left pt-1"
+                  >Clear filters</button>
+                )}
+              </div>
+            )}
+          </div>
+
           <Button variant="outline" size="md" icon={Calendar} className="bg-white uppercase font-black">Archive</Button>
           <Button 
             variant="primary" size="md" icon={Plus} className="uppercase font-black"
@@ -129,170 +170,51 @@ export default function CampaignsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {campaigns?.items.map((campaign) => (
-            <div key={campaign.id} onClick={() => setSelectedId(campaign.id)}
-              className={cn("industrial-card p-6 flex flex-col justify-between group cursor-pointer transition-all hover:scale-[1.02]",
-                selectedId === campaign.id ? "ring-2 ring-utopia border-transparent shadow-xl translate-y-[-4px]" : ""
-              )}>
+          {filteredCampaigns.map((campaign) => (
+            <div key={campaign.id} className="industrial-card p-6 flex flex-col justify-between group transition-all hover:scale-[1.02]">
               <div className="flex items-start justify-between mb-4">
                 <div className={cn(
-                  "p-2 rounded-full", 
+                  "p-2 rounded-full",
                   campaign.status === 'active' ? "bg-emerald-50 text-emerald-600" : "bg-neutral-100 text-neutral-400"
                 )}>
                   <Zap size={16} className={campaign.status === 'active' ? "animate-pulse" : ""} />
                 </div>
                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                   <button 
-                    onClick={(e) => { e.stopPropagation(); handleAction(campaign.status === 'active' ? 'pause' : 'activate', campaign.id); }}
-                    className="p-1.5 hover:bg-neutral-100 rounded text-[10px] uppercase font-bold italic"
-                    title={campaign.status === 'active' ? 'Pause Protocol' : 'Activate Protocol'}
-                   >
-                    {campaign.status === 'active' ? 'Pause' : 'Start'}
-                   </button>
-                   <button 
+                  <button
                     onClick={(e) => { e.stopPropagation(); openEdit(campaign); }}
                     className="p-1.5 hover:bg-neutral-100 rounded text-[10px] uppercase font-bold italic"
-                    title="Configure Parameters"
-                   >
-                    Edit
-                   </button>
-                   <button 
-                    onClick={(e) => { e.stopPropagation(); handleAction('delete', campaign.id); }}
+                  >Edit</button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleDelete(campaign.id); }}
                     className="p-1.5 hover:bg-utopia/10 text-utopia rounded transition-colors"
-                    title="Terminate Protocol"
-                   >
-                    <Trash2 size={14} />
-                   </button>
+                  ><Trash2 size={14} /></button>
                 </div>
               </div>
               <div className="mb-6">
                 <h3 className="text-sm font-black italic tracking-tight uppercase leading-tight group-hover:text-utopia transition-colors">{campaign.name}</h3>
                 <p className="technical-label text-[9px] text-neutral-400 mt-1 uppercase tracking-tighter">{campaign.campaign_type} Protocol</p>
               </div>
-              
               <div className="flex items-center justify-between pt-4 border-t border-neutral-100">
                 <div className={cn("text-[8px] font-black italic uppercase px-2 py-0.5 rounded-[1px]",
                   campaign.status === 'active' ? "bg-emerald-500 text-white" : "bg-neutral-800 text-neutral-500"
                 )}>{campaign.status}</div>
-                <div className="flex items-center gap-1 text-[10px] font-black italic text-utopia">
-                   Live Stats <ArrowRight size={10} />
-                </div>
+                <Link href={`/campaigns/${toSlug(campaign.name)}`} className="flex items-center gap-1 text-[10px] font-black italic text-utopia hover:underline">
+                  Live Stats <ArrowRight size={10} />
+                </Link>
               </div>
             </div>
           ))}
         </div>
       )}
 
-      {selectedId && activeCampaign && (
-        <div className="industrial-card p-1 overflow-hidden bg-neutral-100/50">
-          <div className="flex overflow-x-auto border-b border-neutral-200 bg-white">
-            <button 
-              onClick={() => setActiveTab('workflow')}
-              className={cn("px-8 py-4 text-[10px] technical-label uppercase font-black italic border-b-2 transition-all",
-                activeTab === 'workflow' ? "border-utopia text-utopia bg-utopia/5" : "border-transparent text-neutral-400 hover:text-black"
-              )}
-            >Logic Flow</button>
-            <button 
-              onClick={() => setActiveTab('stats')}
-              className={cn("px-8 py-4 text-[10px] technical-label uppercase font-black italic border-b-2 transition-all",
-                activeTab === 'stats' ? "border-utopia text-utopia bg-utopia/5" : "border-transparent text-neutral-400 hover:text-black"
-              )}
-            >Live Metrics</button>
-            <button 
-              onClick={() => setActiveTab('leads')}
-              className={cn("px-8 py-4 text-[10px] technical-label uppercase font-black italic border-b-2 transition-all",
-                activeTab === 'leads' ? "border-utopia text-utopia bg-utopia/5" : "border-transparent text-neutral-400 hover:text-black"
-              )}
-            >Audience Pool</button>
+      {/* Timeline */}
+      {!campaignsLoading && campaigns?.items && campaigns.items.length > 0 && (
+        <div className="industrial-card p-6">
+          <div className="mb-6">
+            <h3 className="display-header text-xl italic">Campaign Timeline</h3>
+            <p className="technical-label text-[9px] text-neutral-400">Scroll to zoom · Drag to pan</p>
           </div>
-
-          <div className="p-8 bg-white min-h-[400px]">
-             {/* Sub-Views Content (Logic previously implemented) */}
-             {activeTab === 'workflow' && (
-              <div className="flex flex-col items-center justify-center gap-12 py-10 relative">
-                <div className="absolute top-1/2 left-0 w-full h-[1px] bg-neutral-100 -translate-y-1/2" />
-                <div className="flex items-center gap-20 relative z-10">
-                  <div className="flex flex-col items-center gap-4 group">
-                    <div className="w-16 h-16 bg-black text-white flex items-center justify-center rounded-2xl shadow-xl transition-transform group-hover:scale-110"><Zap size={32} /></div>
-                    <div className="text-center">
-                      <span className="text-[9px] font-black italic text-neutral-400 uppercase">Trigger</span>
-                      <p className="text-[10px] font-bold uppercase italic mt-1">{activeCampaign.trigger_event ? activeCampaign.trigger_event.replace('.', ' ') : 'Manual Start'}</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-4 group">
-                    <div className="w-14 h-14 bg-white border border-neutral-200 text-black flex items-center justify-center rounded-2xl rotate-45 shadow-lg group-hover:rotate-90 transition-transform">
-                      <Brain className="-rotate-45 group-hover:-rotate-90 transition-transform" size={24} />
-                    </div>
-                    <div className="text-center">
-                      <span className="text-[9px] font-black italic text-neutral-400 uppercase">Protocol</span>
-                      <p className="text-xs font-bold uppercase italic mt-1">Utopia AI Filter</p>
-                    </div>
-                  </div>
-                  <div className="flex flex-col items-center gap-4 group">
-                    <div className="w-16 h-16 bg-utopia text-white flex items-center justify-center rounded-2xl shadow-xl transition-transform group-hover:scale-110"><MessageSquare size={32} /></div>
-                    <div className="text-center">
-                      <span className="text-[9px] font-black italic text-neutral-400 uppercase">Action</span>
-                      <p className="text-xs font-bold uppercase italic mt-1">{activeCampaign.channels[0]} Deployment</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'stats' && (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 animate-in slide-in-from-bottom-4 duration-500">
-                {statsLoading ? <Loader2 className="animate-spin" /> : (
-                  <>
-                    <StatCard label="Total Sent" value={stats?.total_sent} icon={Send} color="neutral" />
-                    <StatCard label="Delivery Rate" value={`${stats?.delivery_rate}%`} icon={Zap} color="utopia" />
-                    <StatCard label="Open Rate" value={`${stats?.open_rate}%`} icon={TrendingUp} color="neutral" />
-                    <StatCard label="Conversion" value={`${stats?.click_rate}%`} icon={Target} color="utopia" />
-                  </>
-                )}
-              </div>
-            )}
-
-            {activeTab === 'leads' && (
-              <div className="space-y-4 animate-in slide-in-from-bottom-4 duration-500">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-[10px] font-black italic uppercase tracking-[0.2em] text-neutral-400">Target Segment Pool</h4>
-                  <span className="text-[10px] font-bold technical-label">{(targets as unknown as any[])?.length ?? 0} Matched Profiles</span>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 text-black">
-                  {targetsLoading ? <Loader2 className="animate-spin" /> : (targets as unknown as Lead[])?.map((lead, idx) => (
-                    <div key={idx} className="p-3 border border-neutral-100 hover:border-utopia/30 transition-colors flex items-center justify-between group">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-[10px] font-black italic">
-                          {lead.first_name?.[0] || '?'}{lead.last_name?.[0] || ''}
-                        </div>
-                        <div>
-                          <p className="text-[10px] font-bold uppercase italic">{lead.first_name} {lead.last_name}</p>
-                          <p className="text-[8px] technical-label text-neutral-400 tracking-tighter">{lead.phone}</p>
-                        </div>
-                      </div>
-                      <ChevronRight size={12} className="text-neutral-200 group-hover:text-utopia transition-colors" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="p-4 bg-black text-white flex items-center justify-between uppercase italic">
-            <div className="flex items-center gap-4">
-               <span className="text-[9px] font-black tracking-widest">Selected Unit: {activeCampaign.name}</span>
-               <div className="w-1.5 h-1.5 rounded-full bg-utopia animate-pulse" />
-               <span className="text-[9px] technical-label tracking-widest text-neutral-400">System Ready for Protocol Execution</span>
-            </div>
-            <div className="flex gap-4">
-               <Button 
-                variant="primary" size="sm" icon={Send} 
-                onClick={() => handleAction('execute', activeCampaign.id)}
-                className="bg-utopia text-[8px] font-black italic h-7"
-               >Manual Force deployment</Button>
-               <Sparkles size={14} className="text-utopia" />
-            </div>
-          </div>
+          <CampaignTimeline campaigns={filteredCampaigns} />
         </div>
       )}
 
@@ -413,23 +335,3 @@ export default function CampaignsPage() {
   );
 }
 
-interface StatCardProps {
-  label: string;
-  value: string | number | undefined;
-  icon: React.ElementType;
-  color: 'utopia' | 'neutral';
-}
-
-function StatCard({ label, value, icon: Icon, color }: StatCardProps) {
-  return (
-    <div className="p-6 border border-neutral-200 bg-neutral-50/50 hover:bg-white transition-colors group">
-      <div className={cn("inline-flex p-2 rounded-lg mb-4 h-10 w-10 items-center justify-center transition-transform group-hover:scale-110", 
-        color === 'utopia' ? "bg-utopia text-white shadow-lg shadow-utopia/20" : "bg-black text-white shadow-lg"
-      )}>
-        <Icon size={18} />
-      </div>
-      <p className="text-[9px] font-black italic uppercase text-neutral-400 tracking-widest mb-1">{label}</p>
-      <p className="text-2xl font-black italic uppercase tracking-tighter text-black">{value ?? '--'}</p>
-    </div>
-  );
-}
