@@ -157,6 +157,78 @@
       "status": "active",
       "created_at": "2026-04-04T20:19:36.287Z",
       "updated_at": "2026-04-04T20:19:36.287Z"
+    },
+    {
+      "name": "Welcome Campaign",
+      "campaign_type": "scheduled",
+      "channels": [
+        "email"
+      ],
+      "enable_ab_test": false,
+      "description": "Onboarding campaign for new leads",
+      "id": "cmp_1775338266944",
+      "status": "active",
+      "created_at": "2026-04-04T21:31:06.944Z",
+      "updated_at": "2026-04-04T21:31:06.945Z"
+    }
+  ],
+  "events": [
+    {
+      "id": "evt_1",
+      "title": "Addis Jazz Festival",
+      "description": "Annual jazz festival featuring local and international artists.",
+      "category": "Music",
+      "start_time": "2026-05-10T18:00:00Z",
+      "end_time": "2026-05-10T23:00:00Z",
+      "location_name": "Millennium Hall, Addis Ababa",
+      "source_url": "https://example.com/addis-jazz",
+      "created_at": "2026-04-01T08:00:00Z"
+    },
+    {
+      "id": "evt_2",
+      "title": "Ethiopian Coffee Expo",
+      "description": "Showcase of Ethiopia's finest coffee producers and exporters.",
+      "category": "Business",
+      "start_time": "2026-05-15T09:00:00Z",
+      "end_time": "2026-05-17T17:00:00Z",
+      "location_name": "Addis Ababa Exhibition Center",
+      "source_url": "https://example.com/coffee-expo",
+      "created_at": "2026-04-02T08:00:00Z"
+    },
+    {
+      "id": "evt_3",
+      "title": "Timkat Celebration",
+      "description": "Ethiopian Orthodox Epiphany celebration with processions and ceremonies.",
+      "category": "Cultural",
+      "start_time": "2026-01-19T06:00:00Z",
+      "end_time": "2026-01-20T18:00:00Z",
+      "location_name": "Jan Meda, Addis Ababa",
+      "source_url": null,
+      "created_at": "2026-04-03T08:00:00Z"
+    }
+  ],
+  "ad_campaigns": [
+    {
+      "id": "adc_1",
+      "event_id": "evt_1",
+      "headline": "Experience the Rhythm of Addis!",
+      "body_text": "Book your stay at Utopia Hotel and enjoy the Addis Jazz Festival just minutes away. Use code JAZZ15 for 15% off.",
+      "generated_image_url": null,
+      "target_audience": {},
+      "ai_rationale": "Jazz festival attendees are likely to seek premium accommodation nearby.",
+      "status": "ready",
+      "created_at": "2026-04-05T10:00:00Z"
+    },
+    {
+      "id": "adc_2",
+      "event_id": "evt_2",
+      "headline": "Business Travel Made Comfortable",
+      "body_text": "Attending the Coffee Expo? Stay at Utopia Hotel — 5 minutes from the exhibition center. Corporate rates available.",
+      "generated_image_url": null,
+      "target_audience": {},
+      "ai_rationale": "Business expo attendees prioritize proximity and comfort.",
+      "status": "ready",
+      "created_at": "2026-04-05T11:00:00Z"
     }
   ],
   "stats": {
