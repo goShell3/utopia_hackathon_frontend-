@@ -27,11 +27,35 @@ export type CampaignStats = components['schemas']['CampaignStatsResponse'];
 export type CampaignStatus = components['schemas']['CampaignStatus'];
 export type CampaignType = components['schemas']['CampaignType'];
 export type TriggerEvent = components['schemas']['TriggerEvent'];
-export type MessageChannel = components['schemas']['MessageChannel'];
+export type MessageChannel = components['schemas']['app__models__campaign__MessageChannel'];
+export type AIMessageChannel = components['schemas']['app__schemas__ai__MessageChannel'];
 
 // Templates
 export type MessageTemplate = components['schemas']['MessageTemplateResponse'];
 export type MessageTemplateCreate = components['schemas']['MessageTemplateCreate'];
+
+// AI
+export type AIUsageStats = components['schemas']['AIUsageStats'];
+export type MessageGenerationRequest = components['schemas']['MessageGenerationRequest'];
+export type MessageGenerationResponse = components['schemas']['MessageGenerationResponse'];
+export type MessageVariant = components['schemas']['MessageVariant'];
+export type MessageTone = components['schemas']['MessageTone'];
+export type BatchMessageRequest = components['schemas']['BatchMessageRequest'];
+export type AILeadScoringResponse = components['schemas']['LeadScoringResponse'];
+export type CampaignAdvisorRequest = components['schemas']['CampaignAdvisorRequest'];
+export type CampaignAdvisorResponse = components['schemas']['CampaignAdvisorResponse'];
+export type CampaignRecommendation = components['schemas']['CampaignRecommendation'];
+export type LeadEnrichmentResponse = components['schemas']['LeadEnrichmentResponse'];
+
+// SMS
+export type SendSMSRequest = components['schemas']['SendSMSRequest'];
+export type SMSResponse = components['schemas']['SMSResponse'];
+export type SendBulkSMSRequest = components['schemas']['SendBulkSMSRequest'];
+export type BulkSMSResponse = components['schemas']['BulkSMSResponse'];
+export type SendOTPRequest = components['schemas']['SendOTPRequest'];
+export type OTPResponse = components['schemas']['OTPResponse'];
+export type VerifyOTPRequest = components['schemas']['VerifyOTPRequest'];
+export type OTPVerifyResponse = components['schemas']['OTPVerifyResponse'];
 
 // Query params
 export type ListLeadsParams = operations['list_leads_api_v1_leads_get']['parameters']['query'];
