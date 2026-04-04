@@ -12,8 +12,6 @@ import { ApiError } from '@/lib/api/client';
 import { registerSchema, type RegisterFormData } from '@/lib/validation/auth';
 import { cn } from '@/lib/utils';
 
-const ROLES = ['owner', 'manager', 'staff'] as const;
-
 export default function RegisterPage() {
   const router = useRouter();
   const { mutateAsync: register, isPending: isRegistering } = useRegister();
@@ -26,13 +24,12 @@ export default function RegisterPage() {
 
   const { register: field, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
-    defaultValues: { role: 'staff' },
   });
 
   async function onSubmit(data: RegisterFormData) {
     setServerError('');
     try {
-      await register({ full_name: data.full_name, email: data.email, password: data.password, hotel_id: data.hotel_id, role: data.role });
+      await register({ full_name: data.full_name, email: data.email, password: data.password, hotel_id: data.hotel_id });
       await login({ email: data.email, password: data.password });
       router.replace('/dashboard');
     } catch (err) {
@@ -101,14 +98,6 @@ export default function RegisterPage() {
               <label className="technical-label text-neutral-500">Hotel ID</label>
               <input {...field('hotel_id')} type="text" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" className={inputClass(!!errors.hotel_id)} />
               {errors.hotel_id && <p className="text-[10px] text-rose-500 font-bold italic">{errors.hotel_id.message}</p>}
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="technical-label text-neutral-500">Role</label>
-              <select {...field('role')} className={cn(inputClass(!!errors.role), "uppercase")}>
-                {ROLES.map(r => <option key={r} value={r}>{r}</option>)}
-              </select>
-              {errors.role && <p className="text-[10px] text-rose-500 font-bold italic">{errors.role.message}</p>}
             </div>
 
             {serverError && (

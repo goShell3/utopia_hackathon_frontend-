@@ -11,7 +11,6 @@ export const registerSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirm_password: z.string(),
   hotel_id: z.string().uuid('Hotel ID must be a valid UUID'),
-  role: z.enum(['owner', 'manager', 'staff']),
 }).refine(data => data.password === data.confirm_password, {
   message: 'Passwords do not match',
   path: ['confirm_password'],

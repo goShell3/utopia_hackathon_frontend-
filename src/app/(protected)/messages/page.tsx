@@ -1,19 +1,21 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
-  Send, Search, Sparkles, Filter, Target, Loader2, Workflow, Globe, Box
+  Send, Search, Sparkles, Filter, Target, Loader2, Workflow, Globe, Box, Bug, Users, TrendingUp
 } from 'lucide-react';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
 import { useCampaigns, useCampaignTargetLeads, useExecuteCampaign } from '@/hooks/useCampaigns';
 import { useGenerateMessage } from '@/hooks/useAI';
-import type { Campaign, Lead, MessageGenerationRequest } from '@/types';
+import type { Campaign, Lead, MessageGenerationRequest, LeadSource, CampaignGoal, MessageTone } from '@/types';
 
 export default function MessagesPage() {
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState<string | null>(null);
+  const [selectedLeadForTemplate, setSelectedLeadForTemplate] = useState<Lead | null>(null);
+  const [showDebugPanel, setShowDebugPanel] = useState(false);
 
   // Queries
   const { data: campaigns, isLoading: campaignsLoading } = useCampaigns();
@@ -38,16 +40,94 @@ export default function MessagesPage() {
     setAiSuggestions(null);
   };
 
+  // Analyze lead characteristics for intelligent template generation
+  const leadAnalysis = useMemo(() => {
+    if (!targetLeads || (targetLeads as Lead[]).length === 0) return null;
+
+    const leads = targetLeads as Lead[];
+    const selectedLead = selectedLeadForTemplate || leads[0];
+
+    // Determine loyalty type based on booking history
+    const getLoyaltyType = (lead: Lead): 'vip' | 'loyal' | 'new' | 'dormant' => {
+      const bookings = lead.total_bookings || 0;
+      const lastBooking = lead.last_booking_date;
+      const daysSinceLastBooking = lastBooking 
+        ? Math.floor((Date.now() - new Date(lastBooking).getTime()) / (1000 * 60 * 60 * 24))
+        : 999;
+
+      if (bookings >= 5) return 'vip';
+      if (bookings >= 2 && daysSinceLastBooking < 90) return 'loyal';
+      if (bookings === 1 && daysSinceLastBooking > 180) return 'dormant';
+      return 'new';
+    };
+
+    // Determine campaign goal based on loyalty type
+    const getCampaignGoal = (loyaltyType: string): CampaignGoal => {
+      switch (loyaltyType) {
+        case 'vip': return 'loyalty';
+        case 'loyal': return 'upsell';
+        case 'dormant': return 're_engagement';
+        case 'new': return 'booking';
+        default: return 'booking';
+      }
+    };
+
+    // Determine tone based on source and loyalty
+    const getTone = (source: LeadSource, loyaltyType: string): MessageTone => {
+      if (loyaltyType === 'vip') return 'professional';
+      if (source === 'pms') return 'friendly';
+      if (source === 'meta_ads') return 'casual';
+      return 'professional';
+    };
+
+    const loyaltyType = getLoyaltyType(selectedLead);
+    const campaignGoal = getCampaignGoal(loyaltyType);
+    const tone = getTone(selectedLead.source, loyaltyType);
+
+    // Aggregate stats for debugging
+    const sourceDistribution = leads.reduce((acc, lead) => {
+      acc[lead.source] = (acc[lead.source] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const loyaltyDistribution = leads.reduce((acc, lead) => {
+      const type = getLoyaltyType(lead);
+      acc[type] = (acc[type] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return {
+      selectedLead,
+      loyaltyType,
+      campaignGoal,
+      tone,
+      sourceDistribution,
+      loyaltyDistribution,
+      totalLeads: leads.length,
+      avgBookings: (leads.reduce((sum, l) => sum + (l.total_bookings || 0), 0) / leads.length).toFixed(1),
+      avgRevenue: (leads.reduce((sum, l) => sum + (l.total_revenue || 0), 0) / leads.length).toFixed(0)
+    };
+  }, [targetLeads, selectedLeadForTemplate]);
+
   const handleGenerateTemplate = async () => {
-    if (!activeCampaignId || !activeCampaign) return;
+    if (!activeCampaignId || !activeCampaign || !leadAnalysis) return;
+
+    const { selectedLead, campaignGoal, tone } = leadAnalysis;
 
     const request: MessageGenerationRequest = {
-      lead_id: (targetLeads as Lead[])?.[0]?.id || 'campaign_bulk',
-      campaign_goal: 're_engagement',
-      tone: 'professional',
+      lead_id: selectedLead.id,
+      campaign_goal: campaignGoal,
+      tone: tone,
       channel: 'sms',
-      language: 'en',
-      max_length: 160
+      language: selectedLead.language || 'en',
+      max_length: 160,
+      personalization_data: {
+        first_name: selectedLead.first_name,
+        last_name: selectedLead.last_name,
+        total_bookings: selectedLead.total_bookings,
+        source: selectedLead.source,
+        loyalty_type: leadAnalysis.loyaltyType
+      }
     };
 
     const suggestion = await generateAI.mutateAsync(request);
@@ -137,12 +217,165 @@ export default function MessagesPage() {
                   </span>
                 </div>
               </div>
-              <Button variant="outline" size="sm" icon={Sparkles} className="bg-white" onClick={handleGenerateTemplate} disabled={generateAI.isPending}>
-                {generateAI.isPending ? 'Processing...' : 'AI Template'}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  icon={Bug} 
+                  className="bg-white" 
+                  onClick={() => setShowDebugPanel(!showDebugPanel)}
+                >
+                  Debug
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  icon={Sparkles} 
+                  className="bg-white" 
+                  onClick={handleGenerateTemplate} 
+                  disabled={generateAI.isPending || !leadAnalysis}
+                >
+                  {generateAI.isPending ? 'Processing...' : 'AI Template'}
+                </Button>
+              </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 bg-neutral-50/30 flex items-center justify-center">
+            <div className="flex-1 overflow-y-auto p-6 bg-neutral-50/30 flex items-start justify-center gap-6">
+              {/* Debug Panel */}
+              {showDebugPanel && leadAnalysis && (
+                <div className="w-80 industrial-card p-6 bg-white animate-in slide-in-from-left-4 duration-300">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Bug size={20} className="text-utopia" />
+                    <h3 className="display-header text-lg italic uppercase">Debug Panel</h3>
+                  </div>
+
+                  {/* Selected Lead Info */}
+                  <div className="mb-6 p-4 bg-neutral-50 border border-neutral-200 rounded-lg">
+                    <h4 className="text-[9px] font-black italic uppercase text-neutral-400 mb-3">Selected Lead</h4>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Name:</span>
+                        <span className="font-bold">{leadAnalysis.selectedLead.first_name} {leadAnalysis.selectedLead.last_name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Source:</span>
+                        <span className="font-bold uppercase text-utopia">{leadAnalysis.selectedLead.source}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Bookings:</span>
+                        <span className="font-bold">{leadAnalysis.selectedLead.total_bookings || 0}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Revenue:</span>
+                        <span className="font-bold">{leadAnalysis.selectedLead.total_revenue || 0} birr</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Segment:</span>
+                        <span className={cn(
+                          "font-bold uppercase text-[10px] px-2 py-0.5 rounded",
+                          leadAnalysis.selectedLead.segment === 'hot' ? 'bg-red-100 text-red-700' :
+                          leadAnalysis.selectedLead.segment === 'warm' ? 'bg-orange-100 text-orange-700' :
+                          leadAnalysis.selectedLead.segment === 'cold' ? 'bg-blue-100 text-blue-700' :
+                          'bg-neutral-100 text-neutral-700'
+                        )}>{leadAnalysis.selectedLead.segment || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* AI Strategy */}
+                  <div className="mb-6 p-4 bg-utopia/5 border border-utopia/20 rounded-lg">
+                    <h4 className="text-[9px] font-black italic uppercase text-utopia mb-3">AI Strategy</h4>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Loyalty Type:</span>
+                        <span className="font-bold uppercase">{leadAnalysis.loyaltyType}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Campaign Goal:</span>
+                        <span className="font-bold uppercase text-utopia">{leadAnalysis.campaignGoal}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Tone:</span>
+                        <span className="font-bold uppercase">{leadAnalysis.tone}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Audience Stats */}
+                  <div className="mb-6">
+                    <h4 className="text-[9px] font-black italic uppercase text-neutral-400 mb-3">Audience Stats</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span className="text-neutral-500">Total Leads</span>
+                          <span className="font-bold">{leadAnalysis.totalLeads}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px] mb-1">
+                          <span className="text-neutral-500">Avg Bookings</span>
+                          <span className="font-bold">{leadAnalysis.avgBookings}</span>
+                        </div>
+                        <div className="flex justify-between text-[10px]">
+                          <span className="text-neutral-500">Avg Revenue</span>
+                          <span className="font-bold">{leadAnalysis.avgRevenue} birr</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Source Distribution */}
+                  <div className="mb-6">
+                    <h4 className="text-[9px] font-black italic uppercase text-neutral-400 mb-3">Source Distribution</h4>
+                    <div className="space-y-2">
+                      {Object.entries(leadAnalysis.sourceDistribution).map(([source, count]) => (
+                        <div key={source} className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <div className="flex justify-between text-[10px] mb-1">
+                              <span className="uppercase font-bold">{source}</span>
+                              <span className="text-neutral-500">{count}</span>
+                            </div>
+                            <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-utopia rounded-full transition-all"
+                                style={{ width: `${(count / leadAnalysis.totalLeads) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Loyalty Distribution */}
+                  <div>
+                    <h4 className="text-[9px] font-black italic uppercase text-neutral-400 mb-3">Loyalty Distribution</h4>
+                    <div className="space-y-2">
+                      {Object.entries(leadAnalysis.loyaltyDistribution).map(([type, count]) => (
+                        <div key={type} className="flex items-center gap-2">
+                          <div className="flex-1">
+                            <div className="flex justify-between text-[10px] mb-1">
+                              <span className="uppercase font-bold">{type}</span>
+                              <span className="text-neutral-500">{count}</span>
+                            </div>
+                            <div className="h-1.5 bg-neutral-100 rounded-full overflow-hidden">
+                              <div 
+                                className={cn(
+                                  "h-full rounded-full transition-all",
+                                  type === 'vip' ? 'bg-purple-500' :
+                                  type === 'loyal' ? 'bg-green-500' :
+                                  type === 'new' ? 'bg-blue-500' :
+                                  'bg-orange-500'
+                                )}
+                                style={{ width: `${(count / leadAnalysis.totalLeads) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Preview Area */}
               <div className="w-full max-w-sm">
                 <div className="text-center mb-6">
@@ -239,15 +472,44 @@ export default function MessagesPage() {
              ) : (targetLeads as Lead[])?.length === 0 ? (
                  <div className="text-[10px] technical-label text-neutral-400 uppercase text-center mt-10">Target audience is empty.</div>
              ) : (
-                 (targetLeads as Lead[])?.map((l: Lead) => (
-                    <div key={l.id} className="p-3 bg-neutral-50 border border-neutral-100 rounded-lg flex justify-between items-center">
-                       <div>
-                          <p className="text-xs font-black italic uppercase">{l.first_name} {l.last_name}</p>
-                          <p className="text-[9px] technical-label text-neutral-400 mt-0.5">{l.phone}</p>
+                 (targetLeads as Lead[])?.map((l: Lead) => {
+                   const bookings = l.total_bookings || 0;
+                   const loyaltyType = bookings >= 5 ? 'vip' : bookings >= 2 ? 'loyal' : bookings === 1 ? 'new' : 'dormant';
+                   const isSelected = selectedLeadForTemplate?.id === l.id;
+                   
+                   return (
+                    <div 
+                      key={l.id} 
+                      onClick={() => setSelectedLeadForTemplate(l)}
+                      className={cn(
+                        "p-3 border rounded-lg flex justify-between items-center cursor-pointer transition-all hover:shadow-md",
+                        isSelected ? "bg-utopia/10 border-utopia" : "bg-neutral-50 border-neutral-100"
+                      )}
+                    >
+                       <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-xs font-black italic uppercase">{l.first_name} {l.last_name}</p>
+                            <span className={cn(
+                              "text-[8px] font-bold uppercase px-1.5 py-0.5 rounded",
+                              loyaltyType === 'vip' ? 'bg-purple-100 text-purple-700' :
+                              loyaltyType === 'loyal' ? 'bg-green-100 text-green-700' :
+                              loyaltyType === 'new' ? 'bg-blue-100 text-blue-700' :
+                              'bg-orange-100 text-orange-700'
+                            )}>{loyaltyType}</span>
+                          </div>
+                          <p className="text-[9px] technical-label text-neutral-400">{l.phone}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[8px] text-neutral-500">{l.source}</span>
+                            <span className="text-[8px] text-neutral-500">• {bookings} bookings</span>
+                          </div>
                        </div>
-                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                       <div className={cn(
+                         "w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.5)]",
+                         isSelected ? "bg-utopia" : "bg-emerald-500"
+                       )}></div>
                     </div>
-                 ))
+                   );
+                 })
              )}
           </div>
         </div>
