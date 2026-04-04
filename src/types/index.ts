@@ -5,7 +5,6 @@ export type Token = components['schemas']['Token'];
 export type UserLogin = components['schemas']['UserLogin'];
 export type UserCreate = components['schemas']['UserCreate'];
 export type UserResponse = components['schemas']['UserResponse'];
-export type Role = components['schemas']['Role'];
 
 // Leads
 export type Lead = components['schemas']['LeadResponse'];

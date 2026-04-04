@@ -4555,17 +4555,6 @@
         "title": "PredictedPreferences",
         "description": "Predicted guest preferences."
       },
-      "Role": {
-        "type": "string",
-        "enum": [
-          "owner",
-          "manager",
-          "staff",
-          "api"
-        ],
-        "title": "Role",
-        "description": "User roles for RBAC"
-      },
       "SMSResponse": {
         "properties": {
           "success": {
@@ -4883,14 +4872,6 @@
           "hotel_id": {
             "type": "string",
             "title": "Hotel Id"
-          },
-          "role": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Role"
-              }
-            ],
-            "default": "staff"
           }
         },
         "type": "object",
@@ -4937,9 +4918,6 @@
             "type": "string",
             "title": "Full Name"
           },
-          "role": {
-            "$ref": "#/components/schemas/Role"
-          },
           "hotel_id": {
             "type": "string",
             "format": "uuid4",
@@ -4964,7 +4942,6 @@
           "id",
           "email",
           "full_name",
-          "role",
           "hotel_id",
           "is_active",
           "is_verified",
