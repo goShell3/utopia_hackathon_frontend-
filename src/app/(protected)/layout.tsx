@@ -16,7 +16,7 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
     }
   }, [isLoading, isError, router]);
 
-  if (isLoading) {
+  if (isLoading || !user) {
     return (
       <div className="h-screen w-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
@@ -26,8 +26,6 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
       </div>
     );
   }
-
-  if (!user) return null;
 
   return (
     <div className="flex h-screen overflow-hidden">

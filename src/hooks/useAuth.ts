@@ -15,7 +15,10 @@ export function useLogin() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (credentials: UserLogin) => authService.login(credentials),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: queryKeys.auth.me() }),
+    onSuccess: async () => {
+      const user = await authService.me();
+      queryClient.setQueryData(queryKeys.auth.me(), user);
+    },
   });
 }
 

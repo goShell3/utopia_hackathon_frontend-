@@ -3,35 +3,38 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { useLogin } from '@/hooks/useAuth';
 import { Button } from '@/components/shared/Button';
 import { ApiError } from '@/lib/api/client';
+import { loginSchema, type LoginFormData } from '@/lib/validation/auth';
+import { cn } from '@/lib/utils';
 
 export default function LoginPage() {
   const router = useRouter();
   const { mutateAsync: login, isPending } = useLogin();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [serverError, setServerError] = useState('');
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  });
+
+  async function onSubmit(data: LoginFormData) {
+    setServerError('');
     try {
-      await login({ email, password });
+      await login(data);
       router.replace('/');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Login failed. Please try again.');
+      setServerError(err instanceof ApiError ? err.message : 'Login failed. Please try again.');
     }
   }
 
   return (
     <div className="min-h-screen bg-black flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Brand */}
         <div className="flex items-center gap-3 mb-12">
           <div className="w-12 h-12 bg-white text-black flex items-center justify-center font-black italic text-2xl">U</div>
           <div>
@@ -40,48 +43,51 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Card */}
         <div className="bg-white p-8 space-y-6">
           <div>
             <h2 className="display-header text-2xl italic text-black">Access Portal</h2>
             <p className="technical-label text-neutral-400 mt-1">Authenticate to continue</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-1.5">
               <label className="technical-label text-neutral-500">Email Address</label>
               <input
+                {...register('email')}
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
                 autoComplete="email"
                 placeholder="you@hotel.com"
-                className="w-full bg-neutral-50 border border-neutral-200 py-3 px-4 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-black placeholder:font-normal placeholder:text-neutral-400"
+                className={cn(
+                  "w-full bg-neutral-50 border py-3 px-4 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-black placeholder:font-normal placeholder:text-neutral-400",
+                  errors.email ? "border-rose-400" : "border-neutral-200"
+                )}
               />
+              {errors.email && <p className="text-[10px] text-rose-500 font-bold italic">{errors.email.message}</p>}
             </div>
 
             <div className="space-y-1.5">
               <label className="technical-label text-neutral-500">Password</label>
               <div className="relative">
                 <input
+                  {...register('password')}
                   type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
                   autoComplete="current-password"
                   placeholder="••••••••"
-                  className="w-full bg-neutral-50 border border-neutral-200 py-3 px-4 pr-10 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-black placeholder:font-normal placeholder:text-neutral-400"
+                  className={cn(
+                    "w-full bg-neutral-50 border py-3 px-4 pr-10 text-sm font-bold focus:outline-none focus:ring-1 focus:ring-black placeholder:font-normal placeholder:text-neutral-400",
+                    errors.password ? "border-rose-400" : "border-neutral-200"
+                  )}
                 />
                 <button type="button" onClick={() => setShowPassword(v => !v)} className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-black transition-colors">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+              {errors.password && <p className="text-[10px] text-rose-500 font-bold italic">{errors.password.message}</p>}
             </div>
 
-            {error && (
+            {serverError && (
               <div className="px-4 py-3 bg-rose-50 border border-rose-200 text-rose-600 text-xs font-bold italic">
-                {error}
+                {serverError}
               </div>
             )}
 
@@ -92,9 +98,7 @@ export default function LoginPage() {
 
           <p className="text-center text-[10px] technical-label text-neutral-400">
             No account?{' '}
-            <Link href="/register" className="text-black font-black italic hover:underline uppercase">
-              Register here
-            </Link>
+            <Link href="/register" className="text-black font-black italic hover:underline uppercase">Register here</Link>
           </p>
         </div>
       </div>
