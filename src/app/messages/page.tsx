@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState } from 'react';
-import { 
-  MessageSquare, 
-  Send, 
-  Search, 
-  MoreVertical, 
-  CheckCheck, 
-  User, 
-  Plus, 
+import {
+  MessageSquare,
+  Send,
+  Search,
+  MoreVertical,
+  CheckCheck,
+  User,
+  Plus,
   Zap,
   Filter,
   Paperclip,
@@ -45,9 +45,9 @@ export default function MessagesPage() {
           <h2 className="display-header text-xl italic uppercase tracking-tighter mb-4">Inbox Stream</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400" />
-            <input 
-              type="text" 
-              placeholder="Search conversations..." 
+            <input
+              type="text"
+              placeholder="Search conversations..."
               className="w-full bg-neutral-100 border border-neutral-200 py-2 pl-9 pr-3 text-[10px] technical-label focus:outline-none focus:ring-1 focus:ring-utopia/30"
             />
           </div>
@@ -55,8 +55,8 @@ export default function MessagesPage() {
 
         <div className="flex-1 overflow-y-auto divide-y divide-neutral-100 italic">
           {conversations.map((conv) => (
-            <div 
-              key={conv.id} 
+            <div
+              key={conv.id}
               onClick={() => setActiveConv(conv.id)}
               className={cn(
                 "p-4 cursor-pointer transition-all hover:bg-neutral-50",
@@ -77,17 +77,17 @@ export default function MessagesPage() {
                 {conv.lastMsg}
               </p>
               <div className="flex items-center justify-between mt-2">
-                 <div className="flex items-center gap-1">
-                   {conv.status === 'Responded' ? (
-                     <div className="w-1.5 h-1.5 rounded-full bg-utopia" />
-                   ) : (
-                     <CheckCheck size={10} className={activeConv === conv.id ? "text-utopia" : "text-neutral-400"} />
-                   )}
-                   <span className="text-[8px] technical-label uppercase">{conv.status}</span>
-                 </div>
-                 {conv.unread && activeConv !== conv.id && (
-                   <span className="w-2 h-2 bg-utopia rounded-full" />
-                 )}
+                <div className="flex items-center gap-1">
+                  {conv.status === 'Responded' ? (
+                    <div className="w-1.5 h-1.5 rounded-full bg-utopia" />
+                  ) : (
+                    <CheckCheck size={10} className={activeConv === conv.id ? "text-utopia" : "text-neutral-400"} />
+                  )}
+                  <span className="text-[8px] technical-label uppercase">{conv.status}</span>
+                </div>
+                {conv.unread && activeConv !== conv.id && (
+                  <span className="w-2 h-2 bg-utopia rounded-full" />
+                )}
               </div>
             </div>
           ))}
@@ -108,8 +108,8 @@ export default function MessagesPage() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-             <Button variant="outline" size="sm" icon={Zap} className="bg-white">Automation</Button>
-             <button className="p-2 hover:bg-neutral-100 rounded-full transition-colors"><MoreVertical size={18} /></button>
+            <Button variant="outline" size="sm" icon={Zap} className="bg-white">Automation</Button>
+            <button className="p-2 hover:bg-neutral-100 rounded-full transition-colors"><MoreVertical size={18} /></button>
           </div>
         </div>
 
@@ -135,23 +135,23 @@ export default function MessagesPage() {
         <div className="p-6 bg-white border-t border-neutral-200">
           <div className="bg-neutral-100 border border-neutral-200 rounded-xl p-2 focus-within:ring-2 focus-within:ring-utopia/10 transition-all flex items-end gap-2">
             <div className="flex items-center gap-1 mb-1">
-               <button className="p-1.5 text-neutral-400 hover:text-black hover:bg-white rounded-lg transition-colors"><Paperclip size={18} /></button>
-               <button className="p-1.5 text-neutral-400 hover:text-black hover:bg-white rounded-lg transition-colors"><Smile size={18} /></button>
+              <button className="p-1.5 text-neutral-400 hover:text-black hover:bg-white rounded-lg transition-colors"><Paperclip size={18} /></button>
+              <button className="p-1.5 text-neutral-400 hover:text-black hover:bg-white rounded-lg transition-colors"><Smile size={18} /></button>
             </div>
-            <textarea 
-              placeholder="Protocol: Enter secure SMS content..." 
+            <textarea
+              placeholder="Protocol: Enter secure SMS content..."
               className="flex-1 bg-transparent border-none outline-none text-xs font-bold italic resize-none py-2 min-h-[40px] max-h-32"
             />
             <button className="bg-utopia text-white p-3 rounded-lg hover:bg-utopia/90 transition-all shadow-lg shadow-utopia/20 -translate-y-0.5">
-               <Send size={18} />
+              <Send size={18} />
             </button>
           </div>
           <div className="flex items-center justify-between mt-3 px-2">
-             <div className="flex items-center gap-2">
-                <Sparkles size={12} className="text-amber-500" />
-                <span className="text-[9px] technical-label text-neutral-400 uppercase italic">AI Suggested: "Sounds great. When would you like..."</span>
-             </div>
-             <span className="text-[9px] technical-label text-neutral-300">120 / 160 GSM</span>
+            <div className="flex items-center gap-2">
+              <Sparkles size={12} className="text-amber-500" />
+              <span className="text-[9px] technical-label text-neutral-400 uppercase italic">AI Suggested: "Sounds great. When would you like..."</span>
+            </div>
+            <span className="text-[9px] technical-label text-neutral-300">120 / 160 GSM</span>
           </div>
         </div>
       </div>
@@ -159,27 +159,27 @@ export default function MessagesPage() {
       {/* Bulk SMS / Segment Panel */}
       <div className="w-80 flex flex-col space-y-6">
         <div className="industrial-card p-6 bg-utopia text-white border-none shadow-xl shadow-utopia/20">
-           <div className="flex items-center gap-3 mb-6">
-              <Zap size={24} />
-              <h3 className="display-header text-xl italic uppercase font-black">Bulk Signal</h3>
-           </div>
-           <p className="text-[10px] technical-label text-white/50 mb-6 font-bold uppercase tracking-widest leading-relaxed">Broadcast encrypted SMS packets to customer segments</p>
-           <Button variant="outline" size="md" className="w-full bg-white text-utopia border-none hover:bg-white/90" icon={Plus}>
-              Broadcast Manually
-           </Button>
+          <div className="flex items-center gap-3 mb-6">
+            <Zap size={24} />
+            <h3 className="display-header text-xl italic uppercase font-black">Bulk Signal</h3>
+          </div>
+          <p className="text-[10px] technical-label text-white/50 mb-6 font-bold uppercase tracking-widest leading-relaxed">Broadcast encrypted SMS packets to customer segments</p>
+          <Button variant="outline" size="md" className="w-full bg-white text-utopia border-none hover:bg-white/90" icon={Plus}>
+            Broadcast Manually
+          </Button>
         </div>
 
         <div className="industrial-card p-6 flex-1 flex flex-col">
-           <h3 className="text-sm font-black italic uppercase tracking-tight mb-4">Segment Targets</h3>
-           <div className="space-y-3 flex-1 overflow-y-auto mb-6 italic">
-              <SegmentItem label="High LTV VIPs" count="1,240" />
-              <SegmentItem label="Recent Checkouts" count="842" active />
-              <SegmentItem label="Churn Risk (30d)" count="4,923" />
-              <SegmentItem label="Meta Ad Leads" count="212" />
-           </div>
-           <Button variant="primary" size="md" className="w-full" icon={Filter}>
-              Apply Segment
-           </Button>
+          <h3 className="text-sm font-black italic uppercase tracking-tight mb-4">Segment Targets</h3>
+          <div className="space-y-3 flex-1 overflow-y-auto mb-6 italic">
+            <SegmentItem label="High LTV VIPs" count="1,240" />
+            <SegmentItem label="Recent Checkouts" count="842" active />
+            <SegmentItem label="Churn Risk (30d)" count="4,923" />
+            <SegmentItem label="Meta Ad Leads" count="212" />
+          </div>
+          <Button variant="primary" size="md" className="w-full" icon={Filter}>
+            Apply Segment
+          </Button>
         </div>
       </div>
     </div>
@@ -192,11 +192,11 @@ function SegmentItem({ label, count, active }: { label: string, count: string, a
       "p-3 border flex items-center justify-between cursor-pointer transition-all hover:scale-[1.02]",
       active ? "bg-black border-black text-white" : "bg-white border-neutral-100 text-black hover:border-black"
     )}>
-       <span className="text-[10px] font-black italic tracking-widest uppercase">{label}</span>
-       <span className={cn(
-         "text-[9px] technical-label px-1.5 py-0.5 rounded-[1px]",
-         active ? "bg-white text-black" : "bg-neutral-100 text-neutral-500"
-       )}>{count}</span>
+      <span className="text-[10px] font-black italic tracking-widest uppercase">{label}</span>
+      <span className={cn(
+        "text-[9px] technical-label px-1.5 py-0.5 rounded-[1px]",
+        active ? "bg-white text-black" : "bg-neutral-100 text-neutral-500"
+      )}>{count}</span>
     </div>
   );
 }
