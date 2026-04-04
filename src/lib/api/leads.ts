@@ -16,24 +16,24 @@ export const leadsService = {
         .filter(([, v]) => v != null)
         .map(([k, v]) => [k, String(v)])
     ).toString();
-    return client.get<LeadListResponse>(`/api/v1/leads${query ? `?${query}` : ''}`);
+    return client.get<LeadListResponse>(`/leads${query ? `?${query}` : ''}`);
   },
 
-  get: (id: string) => client.get<Lead>(`/api/v1/leads/${id}`),
+  get: (id: string) => client.get<Lead>(`/leads/${id}`),
 
-  create: (data: LeadCreate) => client.post<Lead>('/api/v1/leads', data),
+  create: (data: LeadCreate) => client.post<Lead>('/leads', data),
 
-  update: (id: string, data: LeadUpdate) => client.put<Lead>(`/api/v1/leads/${id}`, data),
+  update: (id: string, data: LeadUpdate) => client.put<Lead>(`/leads/${id}`, data),
 
-  delete: (id: string) => client.delete<void>(`/api/v1/leads/${id}`),
+  delete: (id: string) => client.delete<void>(`/leads/${id}`),
 
   updateSegment: (id: string, data: LeadSegmentUpdate) =>
-    client.put<Lead>(`/api/v1/leads/${id}/segment`, data),
+    client.put<Lead>(`/leads/${id}/segment`, data),
 
-  score: (id: string) => client.post<LeadScoreResponse>(`/api/v1/leads/${id}/score`),
+  score: (id: string) => client.post<LeadScoreResponse>(`/leads/${id}/score`),
 
   bulkScore: (limit?: number) =>
-    client.post<unknown>(`/api/v1/leads/score/bulk${limit ? `?limit=${limit}` : ''}`),
+    client.post<unknown>(`/leads/score/bulk${limit ? `?limit=${limit}` : ''}`),
 
-  summary: () => client.get<unknown>('/api/v1/leads/stats/summary'),
+  summary: () => client.get<unknown>('/leads/stats/summary'),
 };

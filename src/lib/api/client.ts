@@ -1,4 +1,4 @@
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+const BASE_URL = (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000') + '/api/v1';
 
 const TOKEN_KEY = 'utopia_access_token';
 const REFRESH_KEY = 'utopia_refresh_token';
@@ -27,8 +27,11 @@ async function refreshAccessToken(): Promise<string | null> {
   const refresh = tokenStorage.getRefresh();
   if (!refresh) return null;
 
-  const res = await fetch(`${BASE_URL}/api/v1/auth/refresh?refresh_token=${refresh}`, {
+  const res = await fetch(`${BASE_URL}/auth/refresh?refresh_token=${refresh}`, {
     method: 'POST',
+    headers: {
+      'ngrok-skip-browser-warning': 'true',
+    },
   });
 
   if (!res.ok) {
@@ -48,6 +51,7 @@ async function request<T>(path: string, init: RequestInit = {}, retry = true): P
     ...init,
     headers: {
       'Content-Type': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...init.headers,
     },

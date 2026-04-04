@@ -1,4 +1,4 @@
-import type { ListLeadsParams, ListCampaignsParams, ListTemplatesParams } from '@/types';
+import type { ListLeadsParams, ListCampaignsParams, ListTemplatesParams, CampaignAdvisorRequest } from '@/types';
 
 export const queryKeys = {
   auth: {
@@ -21,5 +21,11 @@ export const queryKeys = {
     all: () => ['templates'] as const,
     list: (params?: ListTemplatesParams) => ['templates', 'list', params] as const,
     detail: (id: string) => ['templates', 'detail', id] as const,
+  },
+  ai: {
+    score: (leadId: string) => ['ai', 'score', leadId] as const,
+    enrichment: (leadId: string) => ['ai', 'enrichment', leadId] as const,
+    recommendations: (params?: CampaignAdvisorRequest) => ['ai', 'recommendations', params] as const,
+    usage: () => ['ai', 'usage'] as const,
   },
 };

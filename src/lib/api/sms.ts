@@ -12,16 +12,16 @@ import type {
 
 export const smsService = {
   send: (data: SendSMSRequest) =>
-    client.post<SMSResponse>('/api/v1/sms/send', data),
+    client.post<SMSResponse>('/sms/send', data),
 
   sendBulk: (data: SendBulkSMSRequest) =>
-    client.post<BulkSMSResponse>('/api/v1/sms/send-bulk', data),
+    client.post<BulkSMSResponse>('/sms/send-bulk', data),
 
   sendOtp: (data: SendOTPRequest) =>
-    client.post<OTPResponse>('/api/v1/sms/otp/send', data),
+    client.post<OTPResponse>('/sms/otp/send', data),
 
   verifyOtp: (data: VerifyOTPRequest) =>
-    client.post<OTPVerifyResponse>('/api/v1/sms/otp/verify', data),
+    client.post<OTPVerifyResponse>('/sms/otp/verify', data),
 
-  healthCheck: () => client.get<unknown>('/api/v1/sms/health'),
+  healthCheck: () => client.get<unknown>('/sms/health'),
 };

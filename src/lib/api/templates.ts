@@ -8,11 +8,11 @@ export const templatesService = {
         .filter(([, v]) => v != null)
         .map(([k, v]) => [k, String(v)])
     ).toString();
-    return client.get<MessageTemplate[]>(`/api/v1/templates${query ? `?${query}` : ''}`);
+    return client.get<MessageTemplate[]>(`/templates${query ? `?${query}` : ''}`);
   },
 
-  get: (id: string) => client.get<MessageTemplate>(`/api/v1/templates/${id}`),
+  get: (id: string) => client.get<MessageTemplate>(`/templates/${id}`),
 
   create: (data: MessageTemplateCreate) =>
-    client.post<MessageTemplate>('/api/v1/templates', data),
+    client.post<MessageTemplate>('/templates', data),
 };

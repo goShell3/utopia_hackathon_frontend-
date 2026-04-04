@@ -15,26 +15,26 @@ export const campaignsService = {
         .filter(([, v]) => v != null)
         .map(([k, v]) => [k, String(v)])
     ).toString();
-    return client.get<CampaignListResponse>(`/api/v1/campaigns${query ? `?${query}` : ''}`);
+    return client.get<CampaignListResponse>(`/campaigns${query ? `?${query}` : ''}`);
   },
 
-  get: (id: string) => client.get<Campaign>(`/api/v1/campaigns/${id}`),
+  get: (id: string) => client.get<Campaign>(`/campaigns/${id}`),
 
-  create: (data: CampaignCreate) => client.post<Campaign>('/api/v1/campaigns', data),
+  create: (data: CampaignCreate) => client.post<Campaign>('/campaigns', data),
 
   update: (id: string, data: CampaignUpdate) =>
-    client.put<Campaign>(`/api/v1/campaigns/${id}`, data),
+    client.put<Campaign>(`/campaigns/${id}`, data),
 
-  delete: (id: string) => client.delete<void>(`/api/v1/campaigns/${id}`),
+  delete: (id: string) => client.delete<void>(`/campaigns/${id}`),
 
-  activate: (id: string) => client.post<Campaign>(`/api/v1/campaigns/${id}/activate`),
+  activate: (id: string) => client.post<Campaign>(`/campaigns/${id}/activate`),
 
-  pause: (id: string) => client.post<Campaign>(`/api/v1/campaigns/${id}/pause`),
+  pause: (id: string) => client.post<Campaign>(`/campaigns/${id}/pause`),
 
   execute: (id: string, leadIds?: string[]) =>
-    client.post<unknown>(`/api/v1/campaigns/${id}/execute`, leadIds ?? null),
+    client.post<unknown>(`/campaigns/${id}/execute`, leadIds ?? null),
 
-  stats: (id: string) => client.get<CampaignStats>(`/api/v1/campaigns/${id}/stats`),
+  stats: (id: string) => client.get<CampaignStats>(`/campaigns/${id}/stats`),
 
-  targetLeads: (id: string) => client.get<unknown>(`/api/v1/campaigns/${id}/leads`),
+  targetLeads: (id: string) => client.get<unknown>(`/campaigns/${id}/leads`),
 };
