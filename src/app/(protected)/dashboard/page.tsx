@@ -40,7 +40,20 @@ const activities = [
   { id: '4', type: 'system' as const, message: 'Updated campaign "Loyalty Bonus" priority', timestamp: '2h ago' },
 ];
 
+import { useIntegration } from '@/contexts/IntegrationContext';
+
 export default function Dashboard() {
+  const { integrations } = useIntegration();
+  
+  const isPmsConnected = integrations.some(i => i.category === 'PMS' && i.status === 'Connected');
+  const isMetaConnected = integrations.some(i => i.category === 'Marketing' && i.status === 'Connected');
+
+  const activeSourceData = sourceData.filter(src => {
+    if (src.name === 'PMS Integration' && !isPmsConnected) return false;
+    if (src.name === 'Meta Ads' && !isMetaConnected) return false;
+    return true;
+  });
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
@@ -82,7 +95,11 @@ export default function Dashboard() {
             <p className="technical-label text-[9px] text-neutral-400">Core acquisition channels</p>
           </div>
           <div className="flex-1 w-full flex items-center justify-center">
-            <SourceDonutChart data={sourceData} />
+            {activeSourceData.length > 0 ? (
+              <SourceDonutChart data={activeSourceData} />
+            ) : (
+              <div className="text-center text-neutral-400 technical-label text-xs">NO ACTIVE SOURCES</div>
+            )}
           </div>
         </div>
       </div>
