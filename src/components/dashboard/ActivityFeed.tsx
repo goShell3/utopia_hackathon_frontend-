@@ -62,7 +62,7 @@ export function ActivityFeed({ items }: { items: ActivityItem[] }) {
                 <span className="text-xs font-medium text-gray-400">{item.timestamp}</span>
               </div>
               <p className="text-sm text-gray-600 leading-relaxed italic">
-                "{item.message}"
+                &quot;{item.message}&quot;
               </p>
             </div>
           </div>

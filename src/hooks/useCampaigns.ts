@@ -85,3 +85,11 @@ export function useExecuteCampaign() {
       queryClient.invalidateQueries({ queryKey: queryKeys.campaigns.stats(id) }),
   });
 }
+
+export function useCampaignTargetLeads(id: string) {
+  return useQuery({
+    queryKey: [...queryKeys.campaigns.detail(id), 'leads'],
+    queryFn: () => campaignsService.targetLeads(id),
+    enabled: !!id,
+  });
+}

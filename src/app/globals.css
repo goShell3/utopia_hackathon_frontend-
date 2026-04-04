@@ -1,28 +1,22 @@
 @import "tailwindcss";
 
-@font-face {
-  font-family: 'Inter';
-  font-style: italic;
-  font-weight: 900;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZJhiI2B.woff2') format('woff2');
-}
-
 :root {
   --background: #f3f4f6;
   --foreground: #000000;
   --utopia-red: #ff0000;
   --utopia-black: #000000;
   --accent-green: #22c55e;
+  --accent-orange: #f97316;
   --card-white: #ffffff;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-utopia: var(--utopia-red);
-  --color-utopia-black: var(--utopia-black);
-  --color-accent-green: var(--accent-green);
+@theme {
+  --color-background: #f3f4f6;
+  --color-foreground: #000000;
+  --color-utopia: #ff0000;
+  --color-utopia-black: #000000;
+  --color-accent-green: #22c55e;
+  --color-accent-orange: #f97316;
 }
 
 body {
