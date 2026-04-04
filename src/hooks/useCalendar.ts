@@ -1,20 +1,32 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { calendarService } from '@/lib/api/calendar';
-import type { CalendarEventCreate, ListCalendarEventsParams } from '@/types';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { eventsService } from '@/lib/api/calendar';
+import type { EventSearchRequest } from '@/types';
 
-const CALENDAR_KEY = ['calendar', 'events'] as const;
+export const EVENTS_KEY = ['events'] as const;
 
-export function useCalendarEvents(params?: ListCalendarEventsParams) {
+export function useEvents() {
   return useQuery({
-    queryKey: [...CALENDAR_KEY, params],
-    queryFn: () => calendarService.list(params),
+    queryKey: EVENTS_KEY,
+    queryFn: () => eventsService.list(),
   });
 }
 
-export function useCreateCalendarEvent() {
-  const queryClient = useQueryClient();
+export function useSearchEvents() {
   return useMutation({
-    mutationFn: (data: CalendarEventCreate) => calendarService.create(data),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: CALENDAR_KEY }),
+    mutationFn: (data: EventSearchRequest) => eventsService.search(data),
+  });
+}
+
+export function useEventCampaigns(eventId: string) {
+  return useQuery({
+    queryKey: [...EVENTS_KEY, eventId, 'campaigns'],
+    queryFn: () => eventsService.campaigns(eventId),
+    enabled: !!eventId,
+  });
+}
+
+export function useGenerateCampaigns() {
+  return useMutation({
+    mutationFn: (eventId: string) => eventsService.campaigns(eventId),
   });
 }
