@@ -18,14 +18,14 @@ import {
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { label: 'Dashboard', icon: LayoutDashboard, href: '/' },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
   { label: 'Leads', icon: Users, href: '/leads' },
   { label: 'Campaigns', icon: Zap, href: '/campaigns' },
   { label: 'Messages', icon: MessageSquare, href: '/messages' },
   { label: 'Analytics', icon: BarChart3, href: '/analytics' },
   { label: 'Data Import', icon: FileUp, href: '/data-import' },
   { label: 'Integrations', icon: Share2, href: '/integrations' },
-  { label: 'AI Insights', icon: Cpu, href: '/ai-insights' },
+  { label: 'AI Hub', icon: Cpu, href: '/ai-insights' },
   { label: 'Settings', icon: Settings, href: '/settings' },
 ];
 

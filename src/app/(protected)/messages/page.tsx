@@ -266,22 +266,20 @@ export default function MessagesPage() {
                 <div className="space-y-2">
                   <span className="text-[9px] technical-label text-neutral-400 uppercase">Predicted Interests</span>
                   <div className="flex flex-wrap gap-2">
-                    {aiEnrichment?.predicted_interests?.map(tag => (
-                      <span key={tag} className="px-2 py-1 bg-neutral-100 border border-neutral-200 text-[8px] font-black italic uppercase tracking-widest">{tag}</span>
-                    )) ?? ['SPA', 'LATE CHECKOUT', 'FAMILY SUITE'].map(tag => (
+                    {(aiEnrichment?.predicted_preferences?.amenities ?? ['SPA', 'LATE CHECKOUT', 'FAMILY SUITE']).map((tag: string) => (
                       <span key={tag} className="px-2 py-1 bg-neutral-100 border border-neutral-200 text-[8px] font-black italic uppercase tracking-widest">{tag}</span>
                     ))}
                   </div>
                 </div>
                 
-                {aiEnrichment?.risk_assessment && (
+                {aiEnrichment?.engagement_tips?.[0] && (
                   <div className="p-4 bg-orange-50 border border-orange-100 rounded-lg">
                     <div className="flex items-center gap-2 mb-2 text-orange-600">
                       <AlertTriangle size={14} />
-                      <span className="text-[10px] font-black italic uppercase tracking-widest">Risk Assessment</span>
+                      <span className="text-[10px] font-black italic uppercase tracking-widest">Engagement Tip</span>
                     </div>
                     <p className="text-[10px] font-bold italic text-orange-800 leading-tight">
-                      {aiEnrichment.risk_assessment}
+                      {aiEnrichment.engagement_tips[0]}
                     </p>
                   </div>
                 )}
