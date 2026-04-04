@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import { LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -11,6 +12,7 @@ interface StatCardProps {
   icon: LucideIcon;
   variant?: 'white' | 'black';
   active?: boolean;
+  href?: string;
 }
 
 export function StatCard({ 
@@ -18,9 +20,10 @@ export function StatCard({
   value, 
   icon: Icon,
   variant = 'white',
-  active = false
+  active = false,
+  href
 }: StatCardProps) {
-  return (
+  const card = (
     <motion.div
       whileHover={{ y: -2 }}
       className={cn(
@@ -69,4 +72,6 @@ export function StatCard({
       )} />
     </motion.div>
   );
+
+  return href ? <Link href={href}>{card}</Link> : card;
 }

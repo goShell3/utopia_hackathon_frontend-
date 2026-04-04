@@ -160,6 +160,64 @@
         }
       }
     },
+    "/api/v1/calendar/events": {
+      "get": {
+        "tags": ["calendar"],
+        "summary": "List Calendar Events",
+        "description": "List calendar events with optional date range filtering.",
+        "operationId": "list_calendar_events_api_v1_calendar_events_get",
+        "security": [{"HTTPBearer": []}],
+        "parameters": [
+          {
+            "name": "from_date",
+            "in": "query",
+            "required": false,
+            "schema": {"type": "string", "format": "date", "title": "From Date"}
+          },
+          {
+            "name": "to_date",
+            "in": "query",
+            "required": false,
+            "schema": {"type": "string", "format": "date", "title": "To Date"}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CalendarEventListResponse"}
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["calendar"],
+        "summary": "Create Calendar Event",
+        "description": "Create a new calendar event.",
+        "operationId": "create_calendar_event_api_v1_calendar_events_post",
+        "security": [{"HTTPBearer": []}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref": "#/components/schemas/CalendarEventCreate"}
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/CalendarEventResponse"}
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/leads": {
       "post": {
         "tags": [
@@ -2191,6 +2249,59 @@
   },
   "components": {
     "schemas": {
+      "CalendarEventType": {
+        "type": "string",
+        "enum": ["campaign", "meeting", "sms", "reminder"],
+        "title": "CalendarEventType",
+        "description": "Calendar event types"
+      },
+      "CalendarEventCreate": {
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 200, "title": "Title"},
+          "date": {"type": "string", "format": "date", "title": "Date"},
+          "type": {"$ref": "#/components/schemas/CalendarEventType"},
+          "description": {
+            "anyOf": [{"type": "string"}, {"type": "null"}],
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": ["title", "date", "type"],
+        "title": "CalendarEventCreate",
+        "description": "Schema for creating a calendar event."
+      },
+      "CalendarEventResponse": {
+        "properties": {
+          "id": {"type": "string", "format": "uuid4", "title": "Id"},
+          "hotel_id": {"type": "string", "format": "uuid4", "title": "Hotel Id"},
+          "title": {"type": "string", "title": "Title"},
+          "date": {"type": "string", "format": "date", "title": "Date"},
+          "type": {"$ref": "#/components/schemas/CalendarEventType"},
+          "description": {
+            "anyOf": [{"type": "string"}, {"type": "null"}],
+            "title": "Description"
+          },
+          "created_at": {"type": "string", "format": "date-time", "title": "Created At"}
+        },
+        "type": "object",
+        "required": ["id", "hotel_id", "title", "date", "type", "created_at"],
+        "title": "CalendarEventResponse",
+        "description": "Schema for calendar event response."
+      },
+      "CalendarEventListResponse": {
+        "properties": {
+          "items": {
+            "items": {"$ref": "#/components/schemas/CalendarEventResponse"},
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {"type": "integer", "title": "Total"}
+        },
+        "type": "object",
+        "required": ["items", "total"],
+        "title": "CalendarEventListResponse",
+        "description": "Schema for calendar event list response."
+      },
       "AIUsageStats": {
         "properties": {
           "total_requests": {
