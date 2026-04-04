@@ -1,36 +1,58 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Inter';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuGKYAZJhiI2B.woff2') format('woff2');
+}
+
 :root {
-  --background: #f9fafb; /* Light background */
-  --foreground: #111827; /* Dark text */
-  --sidebar-background: #000000;
+  --background: #f3f4f6;
+  --foreground: #000000;
   --utopia-red: #ff0000;
-  --card-background: #ffffff;
+  --utopia-black: #000000;
+  --accent-green: #22c55e;
+  --card-white: #ffffff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-sidebar: var(--sidebar-background);
   --color-utopia: var(--utopia-red);
-  --color-card: var(--card-background);
-  --radius-xl: 0.75rem;
-  --radius-2xl: 1rem;
+  --color-utopia-black: var(--utopia-black);
+  --color-accent-green: var(--accent-green);
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
-.utopia-card {
-  background-color: var(--card-background);
-  border-radius: var(--radius-xl);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+/* LINELESS Industrial Typography */
+.display-header {
+  @apply font-black italic uppercase tracking-tighter leading-none;
 }
 
-.sidebar-item-active {
-  background-color: var(--utopia-red);
-  color: #ffffff;
+.technical-label {
+  @apply text-[10px] font-bold uppercase tracking-widest text-neutral-500;
+}
+
+.industrial-card {
+  @apply bg-white border border-neutral-200 shadow-sm transition-all duration-200;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+.industrial-card-black {
+  @apply bg-black text-white border-none;
+}
+
+.neon-border-green {
+  border: 1px solid var(--accent-green);
+}
+
+.neon-border-orange {
+  border: 1px solid var(--accent-orange);
 }
