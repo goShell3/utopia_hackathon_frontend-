@@ -1,16 +1,18 @@
 'use client';
 
 import React from 'react';
-import { CalendarDays, Clock } from 'lucide-react';
+import Link from 'next/link';
+import { CalendarDays, Clock, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CalendarEvent } from './CalendarView';
 import { TYPE_COLORS } from './CalendarView';
 
 const TYPE_LABELS: Record<CalendarEvent['type'], string> = {
-  campaign: 'Campaign',
+  campaign_start: 'Campaign Start',
+  campaign_end: 'Campaign End',
+  holiday: 'Holiday',
   meeting: 'Meeting',
-  sms: 'SMS Blast',
-  reminder: 'Reminder',
+  gathering: 'Gathering',
 };
 
 interface Props {
@@ -38,21 +40,24 @@ export function EventList({ date, events }: Props) {
       ) : (
         <ul className="flex flex-col gap-3">
           {events.map(event => (
-            <li
-              key={event.id}
-              className="flex items-start gap-3 p-3 rounded-lg border border-neutral-100 hover:border-neutral-300 transition-colors"
-            >
-              <span className={cn('mt-1 w-2.5 h-2.5 rounded-full shrink-0', TYPE_COLORS[event.type])} />
-              <div className="flex flex-col gap-0.5 min-w-0">
-                <span className="text-sm font-black italic uppercase tracking-tight truncate">{event.title}</span>
-                {event.description && (
-                  <span className="text-xs text-neutral-500 truncate">{event.description}</span>
-                )}
-                <div className="flex items-center gap-1 mt-1">
-                  <Clock className="w-3 h-3 text-neutral-400" />
-                  <span className="technical-label text-[9px]">{TYPE_LABELS[event.type]}</span>
+            <li key={event.id}>
+              <Link
+                href={`/calendar/${event.id}`}
+                className="flex items-start gap-3 p-3 rounded-lg border border-neutral-100 hover:border-neutral-300 hover:bg-neutral-50 transition-all group"
+              >
+                <span className={cn('mt-1 w-2.5 h-2.5 rounded-full shrink-0', TYPE_COLORS[event.type])} />
+                <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                  <span className="text-sm font-black italic uppercase tracking-tight truncate">{event.title}</span>
+                  {event.description && (
+                    <span className="text-xs text-neutral-500 truncate">{event.description}</span>
+                  )}
+                  <div className="flex items-center gap-1 mt-1">
+                    <Clock className="w-3 h-3 text-neutral-400" />
+                    <span className="technical-label text-[9px]">{TYPE_LABELS[event.type]}</span>
+                  </div>
                 </div>
-              </div>
+                <ChevronRight className="w-3.5 h-3.5 text-neutral-300 group-hover:text-neutral-500 transition-colors shrink-0 mt-1" />
+              </Link>
             </li>
           ))}
         </ul>

@@ -8,15 +8,16 @@ export type CalendarEvent = {
   id: string;
   title: string;
   date: string; // YYYY-MM-DD
-  type: 'campaign' | 'meeting' | 'sms' | 'reminder';
+  type: 'campaign_start' | 'campaign_end' | 'holiday' | 'meeting' | 'gathering';
   description?: string;
 };
 
 export const TYPE_COLORS: Record<CalendarEvent['type'], string> = {
-  campaign: 'bg-utopia',
+  campaign_start: 'bg-utopia',
+  campaign_end: 'bg-rose-500',
+  holiday: 'bg-yellow-400',
   meeting: 'bg-blue-500',
-  sms: 'bg-accent-green',
-  reminder: 'bg-yellow-400',
+  gathering: 'bg-accent-green',
 };
 
 interface Props {
