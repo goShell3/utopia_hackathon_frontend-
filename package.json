@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "mock": "prism mock api.json -p 4000"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
@@ -25,6 +26,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@stoplight/prism-cli": "^5.14.2",
     "@tailwindcss/postcss": "^4",
     "@types/d3": "^7.4.3",
     "@types/node": "^20",
