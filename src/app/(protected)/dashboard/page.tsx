@@ -1,19 +1,18 @@
 'use client';
 
 import React from 'react';
-import { Users, Zap, MessageSquare, BarChart3, Plus, Send, TrendingUp } from 'lucide-react';
+import { Users, Zap, MessageSquare, BarChart3, TrendingUp } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { LeadsTrendChart } from '@/components/dashboard/LeadsTrendChart';
 import { SourceDonutChart } from '@/components/dashboard/SourceDonutChart';
 import { CampaignBarChart } from '@/components/dashboard/CampaignBarChart';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
-import { Button } from '@/components/shared/Button';
 
 const kpiData = [
-  { label: 'Total Leads', value: '28,492', icon: Users, variant: 'black' as const, active: true },
-  { label: 'Active Campaigns', value: '12', icon: Zap },
-  { label: 'SMS Sent', value: '142.8k', icon: MessageSquare },
-  { label: 'Response Rate', value: '18.4%', icon: BarChart3 },
+  { label: 'Total Leads', value: '28,492', icon: Users, variant: 'black' as const, active: true, href: '/leads' },
+  { label: 'Active Campaigns', value: '12', icon: Zap, href: '/campaigns' },
+  { label: 'SMS Sent', value: '142.8k', icon: MessageSquare, href: '/messages' },
+  { label: 'Response Rate', value: '18.4%', icon: BarChart3, href: '/campaigns' },
 ];
 
 const trendData = [
@@ -43,16 +42,9 @@ const activities = [
 export default function Dashboard() {
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="display-header text-4xl italic tracking-tighter">Analytical Hub</h1>
-          <p className="technical-label text-neutral-500 mt-1">Real-time performance monitoring</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <Button variant="outline" size="md" icon={Plus} className="bg-white">Add Lead</Button>
-          <Button variant="outline" size="md" icon={Zap} className="bg-white">Campaign</Button>
-          <Button variant="primary" size="md" icon={Send}>Trigger SMS</Button>
-        </div>
+      <div>
+        <h1 className="display-header text-4xl italic tracking-tighter">Analytical Hub</h1>
+        <p className="technical-label text-neutral-500 mt-1">Real-time performance monitoring</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

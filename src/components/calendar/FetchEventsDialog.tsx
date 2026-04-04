@@ -1,0 +1,273 @@
+'use client';
+
+import React from 'react';
+import { X, Download, CalendarPlus, Loader2, CheckCircle2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { CalendarEvent } from './CalendarView';
+import { TYPE_COLORS } from './CalendarView';
+
+const TIMEFRAMES = [
+  { label: '2 Weeks', days: 14 },
+  { label: '1 Month', days: 30 },
+  { label: '3 Months', days: 90 },
+  { label: 'Custom', days: 0 },
+];
+
+const EVENT_TEMPLATES = [
+  { title: 'Welcome Campaign', type: 'campaign_start' as const, description: 'Onboarding campaign for new leads' },
+  { title: 'Q2 Campaign Launch', type: 'campaign_start' as const, description: 'Loyalty bonus push for returning guests' },
+  { title: 'Churn Prevention End', type: 'campaign_end' as const, description: 'Closing re-engagement campaign' },
+  { title: 'Upsell Campaign End', type: 'campaign_end' as const, description: 'Premium tier offer wrap-up' },
+  { title: 'National Holiday', type: 'holiday' as const, description: 'Public holiday — no outreach' },
+  { title: 'New Year Holiday', type: 'holiday' as const, description: 'Schedule adjusted for holiday' },
+  { title: 'Team Sync', type: 'meeting' as const, description: 'Weekly marketing review' },
+  { title: 'Stakeholder Meeting', type: 'meeting' as const, description: 'Monthly performance review' },
+  { title: 'Strategy Session', type: 'meeting' as const, description: 'Q3 planning session' },
+  { title: 'Team Gathering', type: 'gathering' as const, description: 'Quarterly team get-together' },
+  { title: 'Partner Gathering', type: 'gathering' as const, description: 'Hotel partner networking event' },
+  { title: 'Annual Summit', type: 'gathering' as const, description: 'Company-wide annual summit' },
+];
+
+function toYMD(date: Date) {
+  return date.toISOString().split('T')[0];
+}
+
+function generateMockEvents(days: number): CalendarEvent[] {
+  const count = Math.min(4 + Math.floor(days / 7) * 2, 20);
+  const events: CalendarEvent[] = [];
+  const usedDays = new Set<number>();
+
+  for (let i = 0; i < count; i++) {
+    let dayOffset: number;
+    do { dayOffset = Math.floor(Math.random() * days) + 1; } while (usedDays.has(dayOffset));
+    usedDays.add(dayOffset);
+
+    const template = EVENT_TEMPLATES[i % EVENT_TEMPLATES.length];
+    const date = new Date();
+    date.setDate(date.getDate() + dayOffset);
+
+    events.push({
+      id: `fetched-${Date.now()}-${i}`,
+      title: template.title,
+      type: template.type,
+      description: template.description,
+      date: toYMD(date),
+    });
+  }
+
+  return events.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+interface Props {
+  open: boolean;
+  onClose: () => void;
+  onAddEvents: (events: CalendarEvent[]) => void;
+}
+
+type Step = 'configure' | 'fetching' | 'results';
+
+export function FetchEventsDialog({ open, onClose, onAddEvents }: Props) {
+  const [step, setStep] = React.useState<Step>('configure');
+  const [selectedTimeframe, setSelectedTimeframe] = React.useState(TIMEFRAMES[1]);
+  const [customDays, setCustomDays] = React.useState(60);
+  const [fetchedEvents, setFetchedEvents] = React.useState<CalendarEvent[]>([]);
+  const [selected, setSelected] = React.useState<Set<string>>(new Set());
+  const [added, setAdded] = React.useState(false);
+
+  const days = selectedTimeframe.days || customDays;
+
+  function handleFetch() {
+    setStep('fetching');
+    setTimeout(() => {
+      const events = generateMockEvents(days);
+      setFetchedEvents(events);
+      setSelected(new Set(events.map(e => e.id)));
+      setStep('results');
+    }, 1800);
+  }
+
+  function handleAdd() {
+    onAddEvents(fetchedEvents.filter(e => selected.has(e.id)));
+    setAdded(true);
+    setTimeout(() => {
+      onClose();
+      resetState();
+    }, 1000);
+  }
+
+  function resetState() {
+    setStep('configure');
+    setSelectedTimeframe(TIMEFRAMES[1]);
+    setCustomDays(60);
+    setFetchedEvents([]);
+    setSelected(new Set());
+    setAdded(false);
+  }
+
+  function handleClose() {
+    onClose();
+    setTimeout(resetState, 300);
+  }
+
+  function toggleEvent(id: string) {
+    setSelected(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={handleClose} />
+      <div className="relative bg-white border border-neutral-200 rounded-2xl shadow-2xl w-full max-w-lg mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100">
+          <div>
+            <h2 className="display-header text-lg italic">Fetch Events</h2>
+            <p className="technical-label text-[9px] text-neutral-400 mt-0.5">
+              {step === 'configure' && 'Configure your fetch timeframe'}
+              {step === 'fetching' && 'Retrieving events...'}
+              {step === 'results' && `${fetchedEvents.length} events found — select to add`}
+            </p>
+          </div>
+          <button onClick={handleClose} className="p-1.5 rounded-lg hover:bg-neutral-100 transition-colors">
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Configure step */}
+        {step === 'configure' && (
+          <div className="p-6 flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
+              <span className="technical-label text-[10px] text-neutral-500">TIMEFRAME</span>
+              <div className="grid grid-cols-2 gap-2">
+                {TIMEFRAMES.map(tf => (
+                  <button
+                    key={tf.label}
+                    onClick={() => setSelectedTimeframe(tf)}
+                    className={cn(
+                      'px-4 py-3 rounded-xl border text-sm font-black italic uppercase tracking-tight transition-all',
+                      selectedTimeframe.label === tf.label
+                        ? 'bg-black text-white border-black'
+                        : 'border-neutral-200 hover:border-neutral-400 text-neutral-700'
+                    )}
+                  >
+                    {tf.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {selectedTimeframe.label === 'Custom' && (
+              <div className="flex flex-col gap-2">
+                <span className="technical-label text-[10px] text-neutral-500">CUSTOM DAYS</span>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min={7}
+                    max={180}
+                    value={customDays}
+                    onChange={e => setCustomDays(Number(e.target.value))}
+                    className="flex-1 accent-black"
+                  />
+                  <span className="text-sm font-black italic w-20 text-right">{customDays} days</span>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-neutral-50 rounded-xl p-4 border border-neutral-100">
+              <p className="text-xs text-neutral-500">
+                Will fetch events for the next <span className="font-black text-black">{days} days</span> from today.
+                Estimated <span className="font-black text-black">{Math.min(4 + Math.floor(days / 7) * 2, 20)}</span> events.
+              </p>
+            </div>
+
+            <button
+              onClick={handleFetch}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white rounded-xl font-black italic uppercase tracking-tight text-sm hover:bg-neutral-800 transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              Fetch Events
+            </button>
+          </div>
+        )}
+
+        {/* Fetching step */}
+        {step === 'fetching' && (
+          <div className="p-12 flex flex-col items-center gap-4">
+            <Loader2 className="w-10 h-10 animate-spin text-neutral-400" />
+            <p className="technical-label text-[10px] text-neutral-400">Fetching events for next {days} days...</p>
+          </div>
+        )}
+
+        {/* Results step */}
+        {step === 'results' && (
+          <div className="flex flex-col">
+            <div className="px-6 py-3 border-b border-neutral-100 flex items-center justify-between">
+              <span className="technical-label text-[9px] text-neutral-400">{selected.size} of {fetchedEvents.length} selected</span>
+              <button
+                onClick={() => setSelected(selected.size === fetchedEvents.length ? new Set() : new Set(fetchedEvents.map(e => e.id)))}
+                className="technical-label text-[9px] underline text-neutral-500 hover:text-black transition-colors"
+              >
+                {selected.size === fetchedEvents.length ? 'Deselect all' : 'Select all'}
+              </button>
+            </div>
+
+            <ul className="max-h-72 overflow-y-auto divide-y divide-neutral-50">
+              {fetchedEvents.map(event => (
+                <li
+                  key={event.id}
+                  onClick={() => toggleEvent(event.id)}
+                  className={cn(
+                    'flex items-center gap-3 px-6 py-3 cursor-pointer transition-colors',
+                    selected.has(event.id) ? 'bg-neutral-50' : 'opacity-40'
+                  )}
+                >
+                  <span className={cn('w-2 h-2 rounded-full shrink-0', TYPE_COLORS[event.type])} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-black italic uppercase tracking-tight truncate">{event.title}</p>
+                    <p className="technical-label text-[9px] text-neutral-400">
+                      {new Date(event.date + 'T00:00:00').toLocaleDateString('default', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {event.description && ` · ${event.description}`}
+                    </p>
+                  </div>
+                  <div className={cn(
+                    'w-4 h-4 rounded border-2 shrink-0 flex items-center justify-center transition-colors',
+                    selected.has(event.id) ? 'bg-black border-black' : 'border-neutral-300'
+                  )}>
+                    {selected.has(event.id) && <span className="w-2 h-2 bg-white rounded-sm" />}
+                  </div>
+                </li>
+              ))}
+            </ul>
+
+            <div className="px-6 py-4 border-t border-neutral-100">
+              <button
+                onClick={handleAdd}
+                disabled={selected.size === 0 || added}
+                className={cn(
+                  'flex items-center justify-center gap-2 w-full py-3 rounded-xl font-black italic uppercase tracking-tight text-sm transition-all',
+                  added
+                    ? 'bg-accent-green text-white border-accent-green'
+                    : selected.size === 0
+                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                    : 'bg-black text-white hover:bg-neutral-800'
+                )}
+              >
+                {added ? (
+                  <><CheckCircle2 className="w-4 h-4" /> Added to Calendar</>
+                ) : (
+                  <><CalendarPlus className="w-4 h-4" /> Add {selected.size} Event{selected.size !== 1 ? 's' : ''} to Calendar</>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

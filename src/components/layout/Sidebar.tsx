@@ -8,24 +8,24 @@ import {
   Users, 
   Zap, 
   MessageSquare, 
-  BarChart3, 
   FileUp, 
   Settings, 
-  Cpu, 
   Share2,
-  ChevronRight
+  ChevronRight,
+  CalendarDays,
+  Megaphone
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
-  { label: 'Leads', icon: Users, href: '/leads' },
+  { label: 'Calendar', icon: CalendarDays, href: '/calendar' },
   { label: 'Campaigns', icon: Zap, href: '/campaigns' },
+  { label: 'Campaign ADs', icon: Megaphone, href: '/campaign-ads' },
+  { label: 'Leads', icon: Users, href: '/leads' },
   { label: 'Messages', icon: MessageSquare, href: '/messages' },
-  { label: 'Analytics', icon: BarChart3, href: '/analytics' },
   { label: 'Data Import', icon: FileUp, href: '/data-import' },
   { label: 'Integrations', icon: Share2, href: '/integrations' },
-  { label: 'AI Hub', icon: Cpu, href: '/ai-insights' },
   { label: 'Settings', icon: Settings, href: '/settings' },
 ];
 
@@ -70,30 +70,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Account / Settings Summary */}
-      <div className="p-4 m-4 rounded-xl bg-white/5 border border-white/10 mt-auto">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-8 h-8 rounded-full bg-utopia flex items-center justify-center font-bold text-xs italic">
-            JD
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-black italic tracking-tight uppercase">John Doe</span>
-            <span className="text-[9px] technical-label text-neutral-500">Administrator</span>
-          </div>
-        </div>
-        <div className="w-full bg-white/5 h-1 rounded-full overflow-hidden">
-          <div className="bg-utopia w-3/4 h-full" />
-        </div>
-        <div className="flex justify-between items-center mt-2">
-          <span className="text-[9px] technical-label text-neutral-500">Usage</span>
-          <span className="text-[9px] font-bold text-white tracking-widest">75%</span>
-        </div>
-      </div>
 
-      {/* Footer Branding */}
-      <div className="p-8 border-t border-white/5">
-        <span className="text-[8px] technical-label text-neutral-600">Enterprise Scale CMS</span>
-      </div>
     </aside>
   );
 }
