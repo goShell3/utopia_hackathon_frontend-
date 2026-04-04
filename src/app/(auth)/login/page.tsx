@@ -33,7 +33,7 @@ export default function LoginPage() {
     setServerError('');
     try {
       await login(data);
-      router.replace('/');
+      router.replace('/dashboard');
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : 'Login failed. Please try again.');
     }
@@ -44,7 +44,7 @@ export default function LoginPage() {
     setLoadingDemo(email);
     try {
       await login({ email, password });
-      router.replace('/');
+      router.replace('/dashboard');
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : 'Login failed.');
     } finally {

@@ -34,7 +34,7 @@ export default function RegisterPage() {
     try {
       await register({ full_name: data.full_name, email: data.email, password: data.password, hotel_id: data.hotel_id, role: data.role });
       await login({ email: data.email, password: data.password });
-      router.replace('/');
+      router.replace('/dashboard');
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : 'Registration failed. Please try again.');
     }

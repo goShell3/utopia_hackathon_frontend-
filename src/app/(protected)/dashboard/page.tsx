@@ -1,17 +1,7 @@
 'use client';
 
 import React from 'react';
-import { 
-  Users, 
-  Zap, 
-  MessageSquare, 
-  BarChart3, 
-  Plus, 
-  Send, 
-  TrendingUp, 
-  Search,
-  ChevronRight
-} from 'lucide-react';
+import { Users, Zap, MessageSquare, BarChart3, Plus, Send, TrendingUp } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { LeadsTrendChart } from '@/components/dashboard/LeadsTrendChart';
 import { SourceDonutChart } from '@/components/dashboard/SourceDonutChart';
@@ -19,7 +9,6 @@ import { CampaignBarChart } from '@/components/dashboard/CampaignBarChart';
 import { ActivityFeed } from '@/components/dashboard/ActivityFeed';
 import { Button } from '@/components/shared/Button';
 
-// Mock Data
 const kpiData = [
   { label: 'Total Leads', value: '28,492', icon: Users, variant: 'black' as const, active: true },
   { label: 'Active Campaigns', value: '12', icon: Zap },
@@ -28,19 +17,13 @@ const kpiData = [
 ];
 
 const trendData = [
-  { date: 'Oct', value: 400 },
-  { date: 'Nov', value: 300 },
-  { date: 'Dec', value: 500 },
-  { date: 'Jan', value: 450 },
-  { date: 'Feb', value: 700 },
-  { date: 'Mar', value: 600 },
+  { date: 'Oct', value: 400 }, { date: 'Nov', value: 300 }, { date: 'Dec', value: 500 },
+  { date: 'Jan', value: 450 }, { date: 'Feb', value: 700 }, { date: 'Mar', value: 600 },
 ];
 
 const sourceData = [
-  { name: 'PMS Integration', value: 12400 },
-  { name: 'CSV Upload', value: 8200 },
-  { name: 'Meta Ads', value: 4900 },
-  { name: 'Data Broker', value: 2992 },
+  { name: 'PMS Integration', value: 12400 }, { name: 'CSV Upload', value: 8200 },
+  { name: 'Meta Ads', value: 4900 }, { name: 'Data Broker', value: 2992 },
 ];
 
 const campaignData = [
