@@ -35,6 +35,7 @@ export default function CalendarPage() {
   const [events, setEvents] = React.useState<CalendarEvent[]>(INITIAL_EVENTS);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [showFilter, setShowFilter] = React.useState(false);
+  const [selectedEventId, setSelectedEventId] = React.useState<string | null>(null);
   const filterRef = React.useRef<HTMLDivElement>(null);
   const [activeTypes, setActiveTypes] = React.useState<Set<CalendarEvent['type']>>(
     new Set(Object.keys(TYPE_COLORS) as CalendarEvent['type'][])
@@ -137,10 +138,15 @@ export default function CalendarPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <CalendarView events={filteredEvents} selectedDate={selectedDate} onSelectDate={setSelectedDate} />
+          <CalendarView
+            events={filteredEvents}
+            selectedDate={selectedDate}
+            onSelectDate={(date) => { setSelectedDate(date); setSelectedEventId(null); }}
+            onSelectEvent={(e) => setSelectedEventId(e.id)}
+          />
         </div>
         <div>
-          <EventList date={selectedDate} events={selectedEvents} />
+          <EventList date={selectedDate} events={selectedEvents} selectedEventId={selectedEventId ?? undefined} />
         </div>
       </div>
 
