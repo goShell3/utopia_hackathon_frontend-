@@ -160,7 +160,7 @@ export default function CampaignsPage() {
               setFormData({ name: '', campaign_type: 'trigger', channels: ['sms'], enable_ab_test: false });
               setShowDialog('create');
             }}
-          >Initialize Protocol</Button>
+          >Create a Campaign</Button>
         </div>
       </div>
 
