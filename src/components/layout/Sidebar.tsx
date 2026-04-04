@@ -25,7 +25,7 @@ const navItems = [
   { label: 'Analytics', icon: BarChart3, href: '/analytics' },
   { label: 'Data Import', icon: FileUp, href: '/data-import' },
   { label: 'Integrations', icon: Share2, href: '/integrations' },
-  { label: 'AI Insights', icon: Cpu, href: '/ai-insights' },
+  { label: 'AI Hub', icon: Cpu, href: '/ai-insights' },
   { label: 'Settings', icon: Settings, href: '/settings' },
 ];
 

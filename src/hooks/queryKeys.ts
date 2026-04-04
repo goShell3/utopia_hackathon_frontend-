@@ -23,9 +23,10 @@ export const queryKeys = {
     detail: (id: string) => ['templates', 'detail', id] as const,
   },
   ai: {
+    health: () => ['ai', 'health'] as const,
+    usage: () => ['ai', 'usage'] as const,
     score: (leadId: string) => ['ai', 'score', leadId] as const,
     enrichment: (leadId: string) => ['ai', 'enrichment', leadId] as const,
     recommendations: (params?: CampaignAdvisorRequest) => ['ai', 'recommendations', params] as const,
-    usage: () => ['ai', 'usage'] as const,
   },
 };
