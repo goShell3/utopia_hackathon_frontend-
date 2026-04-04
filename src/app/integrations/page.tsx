@@ -8,10 +8,7 @@ import {
   ExternalLink, 
   RefreshCcw, 
   ShieldCheck, 
-  AlertCircle,
-  MoreVertical,
   Layers,
-  Search,
   MessageCircle,
   BarChart3,
   Globe
@@ -111,7 +108,7 @@ export default function IntegrationsPage() {
 
             <div className="p-6 bg-neutral-50/50 flex-1">
                <p className="text-sm text-neutral-600 font-bold italic leading-relaxed mb-6">
-                  "{node.desc}"
+                  &quot;{node.desc}&quot;
                </p>
                <div className="flex items-center gap-6">
                   <div className="flex flex-col">
@@ -163,7 +160,7 @@ export default function IntegrationsPage() {
             </div>
          </div>
          {/* Background Decoration */}
-         <div className="absolute top-0 right-0 w-64 h-32 bg-utopia/5 -skew-x-12 translate-x-12 translate-y-[-2rem]" />
+         <div className="absolute top-0 right-0 w-64 h-32 bg-utopia/5 -skew-x-12 translate-x-12 -translate-y-8" />
          <div className="absolute top-0 right-1/4 w-32 h-full bg-white/5 -skew-x-12" />
       </div>
     </div>

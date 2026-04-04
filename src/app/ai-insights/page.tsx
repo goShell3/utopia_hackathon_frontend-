@@ -2,12 +2,6 @@
 
 import React from 'react';
 import { 
-  Sparkles, 
-  TrendingUp, 
-  Target, 
-  Zap, 
-  MessageCircle, 
-  Users, 
   ArrowUpRight, 
   ChevronRight,
   BrainCircuit,
@@ -99,7 +93,7 @@ export default function AIInsightsPage() {
                       )}
                    </div>
                    <p className="text-xs font-bold italic text-neutral-600 leading-relaxed max-w-md">
-                      "{item.desc}"
+                      &quot;{item.desc}&quot;
                    </p>
                    <div className="flex justify-end mt-6">
                       <Button variant={item.urgency ? "primary" : "outline"} size="sm" icon={ChevronRight} className="technical-label text-[10px]">
@@ -116,7 +110,7 @@ export default function AIInsightsPage() {
            {/* Accuracy Metric */}
            <div className="industrial-card p-8 flex flex-col items-center justify-center text-center bg-black text-white">
               <div className="relative mb-6">
-                 <svg className="w-24 h-24 rotate-[-90deg]">
+                 <svg className="w-24 h-24 -rotate-90">
                     <circle cx="48" cy="48" r="40" className="stroke-neutral-800 fill-none" strokeWidth="8" />
                     <circle cx="48" cy="48" r="40" className="stroke-utopia fill-none" strokeWidth="8" strokeDasharray="251" strokeDashoffset="25" />
                  </svg>

@@ -7,9 +7,7 @@ import {
   Send, 
   Calendar, 
   BarChart3, 
-  Clock, 
   BellRing,
-  Settings,
   MoreVertical,
   ChevronRight,
   Sparkles,
@@ -141,7 +139,7 @@ export default function CampaignsPage() {
                  </div>
                  <div className="text-center">
                     <span className="text-[10px] font-black italic uppercase">Action</span>
-                    <p className="text-xs font-bold bg-white px-3 py-1 border border-neutral-200 mt-1 shadow-sm uppercase italic">Send "VIP Loyalty" SMS</p>
+                    <p className="text-xs font-bold bg-white px-3 py-1 border border-neutral-200 mt-1 shadow-sm uppercase italic">Send &quot;VIP Loyalty&quot; SMS</p>
                  </div>
               </div>
 
@@ -180,10 +178,10 @@ export default function CampaignsPage() {
                  />
                  <div className="absolute bottom-4 left-4 flex gap-2">
                     <span className="px-2 py-0.5 bg-neutral-100 text-[10px] text-neutral-500 font-bold uppercase italic border border-neutral-200 rounded-[1px] cursor-pointer hover:bg-neutral-200">
-                       {{name}}
+                       {"{{name}}"}
                     </span>
                     <span className="px-2 py-0.5 bg-neutral-100 text-[10px] text-neutral-500 font-bold uppercase italic border border-neutral-200 rounded-[1px] cursor-pointer hover:bg-neutral-200">
-                       {{last_stay}}
+                       {"{{last_stay}}"}
                     </span>
                  </div>
                  <div className="absolute bottom-4 right-4 text-[10px] technical-label text-neutral-400">
@@ -194,13 +192,13 @@ export default function CampaignsPage() {
 
            <div className="space-y-4">
               <h4 className="text-sm font-black italic tracking-tight uppercase">Live Preview (Mobile)</h4>
-              <div className="w-full max-w-[280px] mx-auto border-4 border-black rounded-[2.5rem] p-3 aspect-[9/16] bg-neutral-100 relative overflow-hidden">
+              <div className="w-full max-w-[280px] mx-auto border-4 border-black rounded-[2.5rem] p-3 aspect-9/16 bg-neutral-100 relative overflow-hidden">
                  <div className="h-6 w-full flex justify-center mb-4">
                     <div className="w-20 h-4 bg-black rounded-b-xl" />
                  </div>
                  <div className="bg-white rounded-2xl p-4 shadow-sm border border-neutral-200 relative mb-2">
                     <p className="text-[11px] font-bold text-black italic leading-tight">
-                       Hello Almaz Belay, thank you for choosing Utopia! As a VIP guest, we've credited your account with 200 Loyalty points for your recent stay.
+                       Hello Almaz Belay, thank you for choosing Utopia! As a VIP guest, we&apos;ve credited your account with 200 Loyalty points for your recent stay.
                     </p>
                     <div className="absolute top-half left-[-10px] w-4 h-4 bg-white rotate-45 border-l border-b border-neutral-200" />
                  </div>
