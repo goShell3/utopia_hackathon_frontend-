@@ -62,7 +62,7 @@ export default function LoginPage() {
             <div className="w-12 h-12 bg-white text-black flex items-center justify-center font-black italic text-2xl">U</div>
             <div>
               <h1 className="text-2xl font-black italic tracking-tighter uppercase text-white">Utopia</h1>
-              <p className="text-[10px] technical-label text-neutral-500">Enterprise Hotel CRM</p>
+              <p className="text-[10px] technical-label text-neutral-500">Enterprise Hotel Lead Generator</p>
             </div>
           </div>
 
