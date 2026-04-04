@@ -2,47 +2,47 @@
 
 import React, { useState } from 'react';
 import {
-  MessageSquare, Send, Search, MoreVertical, CheckCheck,
-  Zap, Filter, Paperclip, Sparkles,
-  TrendingUp, AlertTriangle, Target, Brain, Loader2
+  Send, Search, Sparkles, Filter, Target, Loader2, Workflow, Globe, Box
 } from 'lucide-react';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
-import { useLeads, useLead } from '@/hooks/useLeads';
-import { useAIScore, useAIEnrichment, useGenerateMessage } from '@/hooks/useAI';
-import { useSendSMS } from '@/hooks/useSMS';
-import type { Lead, MessageGenerationRequest } from '@/types';
+import { useCampaigns, useCampaignTargetLeads, useExecuteCampaign } from '@/hooks/useCampaigns';
+import { useGenerateMessage } from '@/hooks/useAI';
+import type { Campaign, Lead, MessageGenerationRequest } from '@/types';
 
 export default function MessagesPage() {
-  const [activeLeadId, setActiveLeadId] = useState<string | null>(null);
+  const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
   const [aiSuggestions, setAiSuggestions] = useState<string | null>(null);
 
   // Queries
-  const { data: leads, isLoading: leadsLoading } = useLeads();
-  const { data: activeLead } = useLead(activeLeadId ?? '');
-  const { data: aiScore } = useAIScore(activeLeadId ?? '', { include_explanation: true });
-  const { data: aiEnrichment } = useAIEnrichment(activeLeadId ?? '', { include_predictions: true });
+  const { data: campaigns, isLoading: campaignsLoading } = useCampaigns();
+  const { data: targetLeads, isLoading: leadsLoading } = useCampaignTargetLeads(activeCampaignId ?? '');
 
   // Mutations
-  const sendSms = useSendSMS();
+  const executeCampaign = useExecuteCampaign();
   const generateAI = useGenerateMessage();
 
-  const handleSend = async () => {
-    if (!message || !activeLeadId || !activeLead?.phone) return;
+  const activeCampaign = campaigns?.items.find((c: Campaign) => c.id === activeCampaignId);
 
-    await sendSms.mutateAsync({
-      to: activeLead.phone,
-      message: message
+  const handleSendBroadcast = async () => {
+    if (!message || !activeCampaignId) return;
+
+    await executeCampaign.mutateAsync({
+      id: activeCampaignId,
+      // In a real app we'd pass lead IDs or just let the backend resolve them from the campaign target
+      leadIds: (targetLeads as Lead[])?.map((l: Lead) => l.id)
     });
+    
     setMessage('');
+    setAiSuggestions(null);
   };
 
-  const handleSuggest = async () => {
-    if (!activeLeadId) return;
+  const handleGenerateTemplate = async () => {
+    if (!activeCampaignId || !activeCampaign) return;
 
     const request: MessageGenerationRequest = {
-      lead_id: activeLeadId,
+      lead_id: (targetLeads as Lead[])?.[0]?.id || 'campaign_bulk',
       campaign_goal: 're_engagement',
       tone: 'professional',
       channel: 'sms',
@@ -65,44 +65,48 @@ export default function MessagesPage() {
 
   return (
     <div className="h-[calc(100vh-140px)] flex gap-6 animate-in fade-in duration-500">
-      {/* Sidebar / Conversation List */}
+      {/* Sidebar / Campaign List */}
       <div className="w-80 flex flex-col industrial-card p-0 h-full overflow-hidden">
         <div className="p-6 border-b border-neutral-200">
-          <h2 className="display-header text-xl italic uppercase tracking-tighter mb-4">Inbox Stream</h2>
+          <h2 className="display-header text-xl italic uppercase tracking-tighter mb-4">Campaign Broadcasts</h2>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400" />
             <input
               type="text"
-              placeholder="Search conversations..."
+              placeholder="Search campaigns..."
               className="w-full bg-neutral-100 border border-neutral-200 py-2 pl-9 pr-3 text-[10px] technical-label focus:outline-none focus:ring-1 focus:ring-utopia/30"
             />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto divide-y divide-neutral-100 italic">
-          {leadsLoading ? (
+          {campaignsLoading ? (
             <div className="flex items-center justify-center h-20"><Loader2 className="w-5 h-5 animate-spin text-neutral-300" /></div>
+          ) : campaigns?.items?.length === 0 ? (
+            <div className="p-8 text-center text-[10px] technical-label text-neutral-400 uppercase">No active campaigns found.</div>
           ) : (
-            leads?.items.map((lead: Lead) => (
+            campaigns?.items.map((campaign: Campaign) => (
               <div
-                key={lead.id}
-                onClick={() => setActiveLeadId(lead.id)}
+                key={campaign.id}
+                onClick={() => setActiveCampaignId(campaign.id)}
                 className={cn(
                   "p-4 cursor-pointer transition-all hover:bg-neutral-50",
-                  activeLeadId === lead.id ? "bg-black text-white" : "text-black"
+                  activeCampaignId === campaign.id ? "bg-black text-white" : "text-black"
                 )}
               >
                 <div className="flex justify-between items-start mb-1">
-                  <span className="text-xs font-black italic tracking-tight">{lead.first_name} {lead.last_name}</span>
-                  <span className={cn("text-[8px] technical-label", activeLeadId === lead.id ? "text-neutral-500" : "text-neutral-400")}>Recent</span>
+                  <span className="text-xs font-black italic tracking-tight">{campaign.name}</span>
+                  <span className={cn("text-[8px] technical-label", activeCampaignId === campaign.id ? "text-neutral-500" : "text-neutral-400")}>
+                    {campaign.status}
+                  </span>
                 </div>
-                <p className={cn("text-[10px] truncate max-w-[180px]", activeLeadId === lead.id ? "text-neutral-400" : "text-neutral-500")}>
-                  {lead.phone}
+                <p className={cn("text-[10px] truncate max-w-[180px]", activeCampaignId === campaign.id ? "text-neutral-400" : "text-neutral-500")}>
+                  {campaign.description || "No description"}
                 </p>
                 <div className="flex items-center justify-between mt-2">
                   <div className="flex items-center gap-1">
-                    <div className={cn("w-1.5 h-1.5 rounded-full", lead.segment === 'hot' ? "bg-utopia" : "bg-emerald-500")} />
-                    <span className="text-[8px] technical-label uppercase">{lead.segment ?? 'New Lead'}</span>
+                    <div className={cn("w-1.5 h-1.5 rounded-full", campaign.status === 'active' ? "bg-utopia" : "bg-neutral-500")} />
+                    <span className="text-[8px] technical-label uppercase">{campaign.campaign_type}</span>
                   </div>
                 </div>
               </div>
@@ -111,84 +115,78 @@ export default function MessagesPage() {
         </div>
       </div>
 
-      {/* Main Chat View */}
+      {/* Main Broadcast Editor View */}
       <div className="flex-1 flex flex-col industrial-card p-0 overflow-hidden relative">
-        {!activeLeadId ? (
+        {!activeCampaignId ? (
           <div className="flex-1 flex flex-col items-center justify-center text-center p-12">
-            <MessageSquare className="w-12 h-12 text-neutral-200 mb-4" />
-            <h3 className="display-header text-xl italic uppercase text-neutral-400">Secure Protocol Pending</h3>
-            <p className="technical-label text-neutral-300 mt-2 max-w-xs">Select a verified identity from the stream to establish an encrypted signal.</p>
+            <Workflow className="w-12 h-12 text-neutral-200 mb-4" />
+            <h3 className="display-header text-xl italic uppercase text-neutral-400">Broadcast Protocol Pending</h3>
+            <p className="technical-label text-neutral-300 mt-2 max-w-xs">Select a campaign to formulate and dispatch a bulk operational signal.</p>
           </div>
         ) : (
           <>
             <div className="p-4 border-b border-neutral-200 flex items-center justify-between bg-white/50 backdrop-blur-sm sticky top-0 z-10">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-black text-white flex items-center justify-center rounded-[1px] font-black italic shadow-md uppercase">
-                  {activeLead?.first_name?.[0]}{activeLead?.last_name?.[0]}
+                  {activeCampaign?.name?.substring(0, 2)}
                 </div>
                 <div>
-                  <h3 className="text-sm font-black italic uppercase tracking-tight">{activeLead?.first_name} {activeLead?.last_name}</h3>
-                  <span className="text-[9px] technical-label text-emerald-500 uppercase flex items-center gap-1">
-                    <CheckCheck size={10} /> Identity Verified · E.164 Secure
+                  <h3 className="text-sm font-black italic uppercase tracking-tight">{activeCampaign?.name}</h3>
+                  <span className="text-[9px] technical-label text-utopia uppercase flex items-center gap-1">
+                     Signal Target Acquired · {(targetLeads as Lead[])?.length || 0} Contacts
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button variant="outline" size="sm" icon={Zap} className="bg-white">Automation</Button>
-                <button className="p-2 hover:bg-neutral-100 rounded-full transition-colors"><MoreVertical size={18} /></button>
-              </div>
+              <Button variant="outline" size="sm" icon={Sparkles} className="bg-white" onClick={handleGenerateTemplate} disabled={generateAI.isPending}>
+                {generateAI.isPending ? 'Processing...' : 'AI Template'}
+              </Button>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-neutral-50/30 italic">
-              {/* Simplified feed for demo */}
-              <div className="flex flex-col items-start space-y-1">
-                <div className="p-4 bg-white text-black border border-neutral-200 rounded-r-2xl rounded-tl-2xl shadow-sm">
-                  <p className="text-xs font-bold leading-relaxed italic">Hello, I have a question about my booking.</p>
+            <div className="flex-1 overflow-y-auto p-6 bg-neutral-50/30 flex items-center justify-center">
+              {/* Preview Area */}
+              <div className="w-full max-w-sm">
+                <div className="text-center mb-6">
+                   <h4 className="technical-label text-[10px] text-neutral-400 uppercase tracking-widest">Live Broadcast Preview</h4>
                 </div>
-                <span className="text-[8px] technical-label text-neutral-400 uppercase tracking-widest">Received</span>
+                
+                <div className="p-6 bg-white text-black border border-neutral-200 rounded-xl shadow-xl shadow-black/5 mx-auto relative group">
+                  <div className="absolute top-2 left-1/2 -translate-x-1/2 w-8 h-1 bg-neutral-200 rounded-full" />
+                  <p className="text-sm font-bold leading-relaxed italic mt-4 text-neutral-700 min-h-[60px]">
+                    {message || "Enter your broadcast message below or generate an AI template to see the preview..."}
+                  </p>
+                  
+                  {aiSuggestions && (
+                    <div
+                      onClick={applySuggestion}
+                      className="mt-6 p-4 bg-black text-white rounded-lg cursor-pointer hover:bg-neutral-900 transition-all border-l-2 border-utopia animate-in slide-in-from-bottom-4 group relative overflow-hidden"
+                    >
+                      <Sparkles size={60} className="absolute -right-4 -bottom-4 opacity-5 text-utopia" />
+                      <div className="flex items-center gap-1 mb-2">
+                        <Sparkles size={12} className="text-utopia" />
+                        <span className="text-[9px] font-black italic uppercase tracking-widest text-utopia">Suggested AI Template</span>
+                      </div>
+                      <p className="text-xs font-bold italic group-hover:text-neutral-300 transition-colors">&quot;{aiSuggestions}&quot;</p>
+                      <p className="text-[8px] technical-label text-neutral-500 mt-2">Click to apply to broadcast</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
             <div className="p-6 bg-white border-t border-neutral-200">
-              {aiSuggestions && (
-                <div
-                  onClick={applySuggestion}
-                  className="mb-4 p-4 bg-black text-white rounded-xl cursor-pointer hover:bg-neutral-900 transition-all border-l-4 border-utopia animate-in slide-in-from-bottom-4 duration-300 group"
-                >
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Sparkles size={14} className="text-amber-500" />
-                      <span className="text-[10px] font-black italic uppercase tracking-widest">AI Strategy Suggestion</span>
-                    </div>
-                    <span className="text-[9px] technical-label text-neutral-500">Click to apply protocol</span>
-                  </div>
-                  <p className="text-xs font-bold italic group-hover:text-utopia transition-colors">&quot;{aiSuggestions}&quot;</p>
-                </div>
-              )}
-
               <div className="bg-neutral-100 border border-neutral-200 rounded-xl p-2 focus-within:ring-2 focus-within:ring-utopia/10 transition-all flex items-end gap-2">
-                <div className="flex items-center gap-1 mb-1">
-                  <button className="p-1.5 text-neutral-400 hover:text-black hover:bg-white rounded-lg transition-colors"><Paperclip size={18} /></button>
-                  <button
-                    onClick={handleSuggest}
-                    disabled={generateAI.isPending}
-                    className="p-1.5 text-neutral-400 hover:text-amber-500 hover:bg-white rounded-lg transition-colors disabled:opacity-50"
-                  >
-                    <Sparkles size={18} />
-                  </button>
-                </div>
                 <textarea
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Protocol: Enter secure SMS content..."
-                  className="flex-1 bg-transparent border-none outline-none text-xs font-bold italic resize-none py-2 min-h-[40px] max-h-32"
+                  placeholder="Protocol: Enter bulk broadcast message..."
+                  className="flex-1 bg-transparent border-none outline-none text-xs font-bold italic resize-none py-2 px-2 min-h-[40px] max-h-32"
                 />
                 <button
-                  onClick={handleSend}
-                  disabled={sendSms.isPending || !message}
-                  className="bg-utopia text-white p-3 rounded-lg hover:bg-utopia/90 transition-all shadow-lg shadow-utopia/20 -translate-y-0.5 disabled:opacity-50"
+                  onClick={handleSendBroadcast}
+                  disabled={executeCampaign.isPending || !message}
+                  className="bg-black text-white px-6 py-3 rounded-lg hover:bg-neutral-900 transition-all shadow-lg shadow-black/20 disabled:opacity-50 flex items-center gap-2 font-black italic uppercase text-[10px]"
                 >
-                  {sendSms.isPending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                  {executeCampaign.isPending ? <Loader2 size={16} className="animate-spin" /> : <><Send size={16} /> Deploy to {(targetLeads as Lead[])?.length || 0}</>}
                 </button>
               </div>
             </div>
@@ -196,98 +194,62 @@ export default function MessagesPage() {
         )}
       </div>
 
-      {/* Intelligence Profile Sidebar */}
+      {/* Target Audience Sidebar */}
       <div className="w-80 flex flex-col space-y-6">
-        <div className="industrial-card p-6 bg-black text-white border-none shadow-xl shadow-black/20 relative overflow-hidden group">
+        <div className="industrial-card p-6 bg-black text-white border-none shadow-xl shadow-black/20 relative overflow-hidden group min-h-[160px]">
           <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Brain size={80} />
+            <Target size={80} />
           </div>
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-6">
-              <Zap size={24} className="text-utopia" />
-              <h3 className="display-header text-xl italic uppercase font-black">Strategic Intelligence</h3>
+              <Globe size={24} className="text-utopia" />
+              <h3 className="display-header text-xl italic uppercase font-black">Target Audience</h3>
             </div>
 
-            {!activeLeadId ? (
-              <p className="text-[10px] technical-label text-neutral-500 font-bold uppercase tracking-widest leading-relaxed">Select identity to generate predictive enrichment</p>
+            {!activeCampaignId ? (
+              <p className="text-[10px] technical-label text-neutral-500 font-bold uppercase tracking-widest leading-relaxed">Select a campaign to intercept signal targets</p>
             ) : (
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <div>
-                  <div className="flex justify-between items-end mb-2">
-                    <span className="text-[10px] technical-label text-neutral-400 uppercase">Conversion Probability</span>
-                    <span className="text-xl font-black italic text-utopia">{aiScore?.conversion_probability ?? '--'}%</span>
-                  </div>
-                  <div className="h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-utopia transition-all duration-1000"
-                      style={{ width: `${aiScore?.conversion_probability ?? 0}%` }}
-                    />
-                  </div>
+                  <span className="text-[10px] technical-label text-neutral-400 uppercase block mb-1">Total Audience Reach</span>
+                  <span className="text-3xl font-black italic text-utopia">
+                     {leadsLoading ? <Loader2 size={18} className="animate-spin inline text-utopia" /> : (targetLeads as Lead[])?.length || 0}
+                  </span>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-lg">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Target size={12} className="text-emerald-500" />
-                      <span className="text-[8px] technical-label text-neutral-500 uppercase">Quality</span>
-                    </div>
-                    <span className="text-xs font-black italic uppercase">{aiScore?.quality_score ?? '--'} / 10</span>
-                  </div>
-                  <div className="p-3 bg-neutral-900 border border-neutral-800 rounded-lg">
-                    <div className="flex items-center gap-2 mb-1">
-                      <TrendingUp size={12} className="text-utopia" />
-                      <span className="text-[8px] technical-label text-neutral-500 uppercase">LTV Pred.</span>
-                    </div>
-                    <span className="text-xs font-black italic uppercase">High</span>
-                  </div>
-                </div>
-
-                {aiScore?.ai_reasoning && (
-                  <div className="p-3 border-l-2 border-utopia bg-neutral-900/50">
-                    <p className="text-[9px] font-bold italic text-neutral-400 leading-relaxed uppercase tracking-tighter">
-                      {aiScore.ai_reasoning}
-                    </p>
-                  </div>
-                )}
               </div>
             )}
           </div>
         </div>
 
-        <div className="industrial-card p-6 flex-1 flex flex-col">
-          <h3 className="text-sm font-black italic uppercase tracking-tight mb-4">Guest Preferences</h3>
-          {!activeLeadId ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center">
-              <Filter className="w-8 h-8 text-neutral-100 mb-2" />
-              <p className="text-[10px] technical-label text-neutral-300 uppercase">Awaiting Signal</p>
-            </div>
-          ) : (
-            <div className="space-y-4 flex-1">
-              <div className="space-y-2">
-                <span className="text-[9px] technical-label text-neutral-400 uppercase">Predicted Preferences</span>
-                <div className="flex flex-wrap gap-2">
-                  {(aiEnrichment?.predicted_preferences?.amenities ?? ['SPA', 'LATE CHECKOUT', 'FAMILY SUITE']).map((tag: string) => (
-                    <span key={tag} className="px-2 py-1 bg-neutral-100 border border-neutral-200 text-[8px] font-black italic uppercase tracking-widest">{tag}</span>
-                  ))}
+        <div className="industrial-card p-0 flex-1 flex flex-col overflow-hidden">
+          <div className="p-4 border-b border-neutral-100 flex items-center justify-between bg-neutral-50">
+             <h3 className="text-sm font-black italic uppercase tracking-tight">Active Contacts</h3>
+             <Filter size={14} className="text-neutral-400" />
+          </div>
+          <div className="flex-1 overflow-y-auto p-4 space-y-3">
+             {!activeCampaignId ? (
+                <div className="flex flex-col items-center justify-center text-center h-full opacity-50">
+                   <Box size={24} className="text-neutral-300 mb-2" />
+                   <p className="text-[10px] technical-label uppercase">No contacts resolved</p>
                 </div>
-              </div>
-
-              {aiEnrichment?.engagement_tips?.[0] && (
-                <div className="p-4 bg-orange-50 border border-orange-100 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2 text-orange-600">
-                    <AlertTriangle size={14} />
-                    <span className="text-[10px] font-black italic uppercase tracking-widest">Engagement Tip</span>
-                  </div>
-                  <p className="text-[10px] font-bold italic text-orange-800 leading-tight">
-                    {aiEnrichment.engagement_tips[0]}
-                  </p>
+             ) : leadsLoading ? (
+                 <div className="flex flex-col items-center justify-center text-center h-full">
+                   <Loader2 size={24} className="text-neutral-300 mb-2 animate-spin" />
                 </div>
-              )}
-            </div>
-          )}
-          <Button variant="primary" size="md" className="w-full mt-auto" icon={Zap}>
-            Trigger Retention
-          </Button>
+             ) : (targetLeads as Lead[])?.length === 0 ? (
+                 <div className="text-[10px] technical-label text-neutral-400 uppercase text-center mt-10">Target audience is empty.</div>
+             ) : (
+                 (targetLeads as Lead[])?.map((l: Lead) => (
+                    <div key={l.id} className="p-3 bg-neutral-50 border border-neutral-100 rounded-lg flex justify-between items-center">
+                       <div>
+                          <p className="text-xs font-black italic uppercase">{l.first_name} {l.last_name}</p>
+                          <p className="text-[9px] technical-label text-neutral-400 mt-0.5">{l.phone}</p>
+                       </div>
+                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+                    </div>
+                 ))
+             )}
+          </div>
         </div>
       </div>
     </div>

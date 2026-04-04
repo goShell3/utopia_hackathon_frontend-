@@ -48,8 +48,8 @@ export default function CalendarEventPage() {
     try {
       await createCampaign.mutateAsync({
         name: event.title,
-        campaign_type: event.type === 'sms' ? 'manual' : event.type === 'campaign' ? 'scheduled' : 'manual',
-        channels: [event.type === 'sms' ? 'sms' : 'email'],
+        campaign_type: event.type === 'campaign_start' ? 'scheduled' : 'manual',
+        channels: ['email'],
         enable_ab_test: false,
         description: event.description ?? undefined,
       });
