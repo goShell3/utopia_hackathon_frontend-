@@ -1,39 +1,40 @@
 'use client';
 
 import React from 'react';
-import { Download, Filter, ChevronDown } from 'lucide-react';
+import { Download, Filter, ChevronDown, Search } from 'lucide-react';
 import { CalendarView } from '@/components/calendar/CalendarView';
 import { EventList } from '@/components/calendar/EventList';
 import { FetchEventsDialog } from '@/components/calendar/FetchEventsDialog';
 import type { CalendarEvent } from '@/components/calendar/CalendarView';
 import { TYPE_COLORS } from '@/components/calendar/CalendarView';
 import { cn } from '@/lib/utils';
+import { useEvents } from '@/hooks/useCalendar';
+import type { EventResponse } from '@/types';
 
 function toYMD(date: Date) {
   return date.toISOString().split('T')[0];
 }
 
-function daysFromNow(n: number) {
-  const d = new Date();
-  d.setDate(d.getDate() + n);
-  return toYMD(d);
+function toCalendarEvent(e: EventResponse): CalendarEvent {
+  return {
+    id: e.id,
+    title: e.title,
+    date: e.start_time ? e.start_time.split('T')[0] : toYMD(new Date()),
+    type: 'gathering',
+    description: e.description ?? undefined,
+  };
 }
 
-const INITIAL_EVENTS: CalendarEvent[] = [
-  { id: '1', title: 'Welcome Campaign', date: toYMD(new Date()), type: 'campaign_start', description: 'Onboarding campaign for new leads' },
-  { id: '2', title: 'Q2 Campaign Launch', date: toYMD(new Date()), type: 'campaign_start', description: 'Loyalty bonus push' },
-  { id: '3', title: 'Team Sync', date: daysFromNow(1), type: 'meeting', description: 'Weekly marketing review' },
-  { id: '4', title: 'National Holiday', date: daysFromNow(1), type: 'holiday', description: 'Public holiday — no outreach' },
-  { id: '5', title: 'Churn Prevention End', date: daysFromNow(3), type: 'campaign_end', description: 'Re-engagement campaign wrap-up' },
-  { id: '6', title: 'Partner Gathering', date: daysFromNow(5), type: 'gathering', description: 'Hotel partner networking event' },
-  { id: '7', title: 'Stakeholder Meeting', date: daysFromNow(7), type: 'meeting', description: 'Monthly performance review' },
-  { id: '8', title: 'Upsell Campaign End', date: daysFromNow(7), type: 'campaign_end', description: 'Premium tier offer wrap-up' },
-];
-
 export default function CalendarPage() {
+  const { data: remoteEvents = [] } = useEvents();
   const [selectedDate, setSelectedDate] = React.useState(toYMD(new Date()));
-  const [events, setEvents] = React.useState<CalendarEvent[]>(INITIAL_EVENTS);
+  const [extraEvents, setExtraEvents] = React.useState<CalendarEvent[]>([]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+
+  const events = React.useMemo(
+    () => [...remoteEvents.map(toCalendarEvent), ...extraEvents],
+    [remoteEvents, extraEvents]
+  );
   const [showFilter, setShowFilter] = React.useState(false);
   const [selectedEventId, setSelectedEventId] = React.useState<string | null>(null);
   const filterRef = React.useRef<HTMLDivElement>(null);
@@ -59,12 +60,17 @@ export default function CalendarPage() {
     });
   };
 
-  const filteredEvents = events.filter(e => activeTypes.has(e.type));
+  const [search, setSearch] = React.useState('');
+
+  const filteredEvents = events.filter(e =>
+    activeTypes.has(e.type) &&
+    (!search || e.title.toLowerCase().includes(search.toLowerCase()))
+  );
   const selectedEvents = filteredEvents.filter(e => e.date === selectedDate);
 
   function handleAddEvents(newEvents: CalendarEvent[]) {
-    setEvents(prev => {
-      const existingIds = new Set(prev.map(e => e.id));
+    setExtraEvents(prev => {
+      const existingIds = new Set([...remoteEvents.map(e => e.id), ...prev.map(e => e.id)]);
       return [...prev, ...newEvents.filter(e => !existingIds.has(e.id))];
     });
   }
@@ -77,6 +83,16 @@ export default function CalendarPage() {
           <p className="technical-label text-neutral-500 mt-1">Schedule & event management</p>
         </div>
         <div className="flex items-center gap-3">
+          <div className="relative">
+            <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Search events..."
+              className="h-9 pl-8 pr-3 border border-neutral-200 text-[10px] font-black italic uppercase placeholder:normal-case placeholder:not-italic placeholder:font-normal placeholder:text-neutral-400 focus:outline-none focus:border-black w-48"
+            />
+          </div>
           {/* Filter dropdown */}
           <div ref={filterRef} className="relative">
             <button
