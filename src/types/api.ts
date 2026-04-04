@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/auth/login": {
+    "/signin": {
         parameters: {
             query?: never;
             header?: never;
@@ -13,49 +13,23 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Login
-         * @description Authenticate user and return JWT tokens.
-         */
-        post: operations["login_api_v1_auth_login_post"];
+        /** Sign In */
+        post: operations["sign_in_signin_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/refresh": {
+    "/events": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        /**
-         * Refresh Token
-         * @description Refresh access token using refresh token.
-         */
-        post: operations["refresh_token_api_v1_auth_refresh_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Current User Info
-         * @description Get current authenticated user info.
-         */
-        get: operations["get_current_user_info_api_v1_auth_me_get"];
+        /** List Events */
+        get: operations["list_events_events_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -64,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/register": {
+    "/search-events": {
         parameters: {
             query?: never;
             header?: never;
@@ -74,89 +48,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Register User
-         * @description Register new user (for demo - in production add hotel verification).
+         * Search Events
+         * @description Search for events using AI and save to database
          */
-        post: operations["register_user_api_v1_auth_register_post"];
+        post: operations["search_events_search_events_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/leads": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Leads
-         * @description List leads with filtering and pagination.
-         */
-        get: operations["list_leads_api_v1_leads_get"];
-        put?: never;
-        /**
-         * Create Lead
-         * @description Create new lead with automatic deduplication check.
-         */
-        post: operations["create_lead_api_v1_leads_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/leads/{lead_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Lead
-         * @description Get lead by ID.
-         */
-        get: operations["get_lead_api_v1_leads__lead_id__get"];
-        /**
-         * Update Lead
-         * @description Update lead.
-         */
-        put: operations["update_lead_api_v1_leads__lead_id__put"];
-        post?: never;
-        /**
-         * Delete Lead
-         * @description Delete lead.
-         */
-        delete: operations["delete_lead_api_v1_leads__lead_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/leads/{lead_id}/segment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Update Lead Segment
-         * @description Update lead segment manually.
-         */
-        put: operations["update_lead_segment_api_v1_leads__lead_id__segment_put"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/leads/{lead_id}/score": {
+    "/events/{event_id}/campaigns": {
         parameters: {
             query?: never;
             header?: never;
@@ -446,11 +348,15 @@ export interface paths {
         get: operations["root__get"];
         put?: never;
         post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+         * Generate Campaigns
+    * @description Generate AI ad campaigns for a specific event
+        */
+        post: operations["generate_campaigns_events__event_id__campaigns_post"];
+delete?: never;
+options ?: never;
+head ?: never;
+patch ?: never;
+trace ?: never;
     };
 }
 export type webhooks = Record<string, never>;
@@ -522,420 +428,441 @@ export interface components {
              * Id
              * Format: uuid4
              */
-            id: string;
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** Name */
-            name: string;
-            /** Description */
-            description: string | null;
-            campaign_type: components["schemas"]["CampaignType"];
-            status: components["schemas"]["CampaignStatus"];
-            trigger_event: components["schemas"]["TriggerEvent"] | null;
-            /** Trigger Delay Minutes */
-            trigger_delay_minutes: number | null;
-            /** Schedule Cron */
-            schedule_cron: string | null;
-            /** Schedule Timezone */
-            schedule_timezone: string | null;
-            /** Target Segments */
-            target_segments: string[];
-            /** Target Filters */
-            target_filters: Record<string, never> | null;
-            /** Channels */
-            channels: components["schemas"]["MessageChannel"][];
-            /** Sms Template Id */
-            sms_template_id: string | null;
-            /** Email Template Id */
-            email_template_id: string | null;
-            /** Enable Ab Test */
-            enable_ab_test: boolean;
-            /** Ab Test Split */
-            ab_test_split: number | null;
-            /** Ab Variant Template Id */
-            ab_variant_template_id: string | null;
-            /** Throttle Per Minute */
-            throttle_per_minute: number | null;
-            /** Max Sends Per Lead */
-            max_sends_per_lead: number | null;
-            /** Total Sent */
-            total_sent: number;
-            /** Total Delivered */
-            total_delivered: number;
-            /** Total Failed */
-            total_failed: number;
-            /** Total Opened */
-            total_opened: number;
-            /** Total Clicked */
-            total_clicked: number;
-            /** Total Cost */
-            total_cost: number;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /**
-         * CampaignStatsResponse
-         * @description Schema for campaign statistics.
-         */
-        CampaignStatsResponse: {
-            /**
-             * Campaign Id
-             * Format: uuid4
-             */
-            campaign_id: string;
-            /** Total Sent */
-            total_sent: number;
-            /** Total Delivered */
-            total_delivered: number;
-            /** Total Failed */
-            total_failed: number;
-            /** Total Opened */
-            total_opened: number;
-            /** Total Clicked */
-            total_clicked: number;
-            /** Delivery Rate */
-            delivery_rate: number;
-            /** Open Rate */
-            open_rate: number;
-            /** Click Rate */
-            click_rate: number;
-            /** Total Cost */
-            total_cost: number;
-            /** Avg Cost Per Send */
-            avg_cost_per_send: number;
-            /** By Channel */
-            by_channel: {
-                [key: string]: {
-                    [key: string]: number;
-                };
+            /** AdCampaignResponse */
+            AdCampaignResponse: {
+                /** Id */
+                id: string;
+                /** Event Id */
+                event_id: string;
+                /** Headline */
+                headline: string | null;
+                /** Body Text */
+                body_text: string | null;
+                /** Generated Image Url */
+                generated_image_url: string | null;
+                /** Target Audience */
+                target_audience: Record<string, never> | null;
+                /** Ai Rationale */
+                ai_rationale: string | null;
+                /** Status */
+                status: string;
+                /**
+                 * Created At
+                 * Format: date-time
+                 */
+                created_at: string;
             };
-            /** Ab Test Results */
-            ab_test_results?: Record<string, never> | null;
+            /** EventResponse */
+            EventResponse: {
+                /** Id */
+                id: string;
+                /** Title */
+                title: string;
+                /** Description */
+                description: string | null;
+                campaign_type: components["schemas"]["CampaignType"];
+                status: components["schemas"]["CampaignStatus"];
+                trigger_event: components["schemas"]["TriggerEvent"] | null;
+                /** Trigger Delay Minutes */
+                trigger_delay_minutes: number | null;
+                /** Schedule Cron */
+                schedule_cron: string | null;
+                /** Schedule Timezone */
+                schedule_timezone: string | null;
+                /** Target Segments */
+                target_segments: string[];
+                /** Target Filters */
+                target_filters: Record<string, never> | null;
+                /** Channels */
+                channels: components["schemas"]["MessageChannel"][];
+                /** Sms Template Id */
+                sms_template_id: string | null;
+                /** Email Template Id */
+                email_template_id: string | null;
+                /** Enable Ab Test */
+                enable_ab_test: boolean;
+                /** Ab Test Split */
+                ab_test_split: number | null;
+                /** Ab Variant Template Id */
+                ab_variant_template_id: string | null;
+                /** Throttle Per Minute */
+                throttle_per_minute: number | null;
+                /** Max Sends Per Lead */
+                max_sends_per_lead: number | null;
+                /** Total Sent */
+                total_sent: number;
+                /** Total Delivered */
+                total_delivered: number;
+                /** Total Failed */
+                total_failed: number;
+                /** Total Opened */
+                total_opened: number;
+                /** Total Clicked */
+                total_clicked: number;
+                /** Total Cost */
+                total_cost: number;
+                /** Category */
+                category: string | null;
+                /** Start Time */
+                start_time: string | null;
+                /** End Time */
+                end_time: string | null;
+                /** Location Name */
+                location_name: string | null;
+                /** Source Url */
+                source_url: string | null;
+                /**
+                 * Created At
+                 * Format: date-time
+                 */
+                created_at: string;
+            };
+            /**
+             * CampaignStatsResponse
+             * @description Schema for campaign statistics.
+             */
+            CampaignStatsResponse: {
+                /**
+                 * Campaign Id
+                 * Format: uuid4
+                 */
+                campaign_id: string;
+                /** Total Sent */
+                total_sent: number;
+                /** Total Delivered */
+                total_delivered: number;
+                /** Total Failed */
+                total_failed: number;
+                /** Total Opened */
+                total_opened: number;
+                /** Total Clicked */
+                total_clicked: number;
+                /** Delivery Rate */
+                delivery_rate: number;
+                /** Open Rate */
+                open_rate: number;
+                /** Click Rate */
+                click_rate: number;
+                /** Total Cost */
+                total_cost: number;
+                /** Avg Cost Per Send */
+                avg_cost_per_send: number;
+                /** By Channel */
+                by_channel: {
+                    [key: string]: {
+                        [key: string]: number;
+                    };
+                };
+                /** Ab Test Results */
+                ab_test_results?: Record<string, never> | null;
+            };
+            /**
+             * CampaignStatus
+             * @description Campaign status
+             * @enum {string}
+             */
+            CampaignStatus: "draft" | "active" | "paused" | "completed";
+            /**
+             * CampaignType
+             * @description Campaign types
+             * @enum {string}
+             */
+            CampaignType: "trigger" | "scheduled" | "manual";
+            /**
+             * CampaignUpdate
+             * @description Schema for updating campaign.
+             */
+            CampaignUpdate: {
+                /** Name */
+                name?: string | null;
+                /** Description */
+                description?: string | null;
+                status?: components["schemas"]["CampaignStatus"] | null;
+                /** Trigger Delay Minutes */
+                trigger_delay_minutes?: number | null;
+                /** Schedule Cron */
+                schedule_cron?: string | null;
+                /** Target Segments */
+                target_segments?: string[] | null;
+                /** Target Filters */
+                target_filters?: Record<string, never> | null;
+                /** Channels */
+                channels?: components["schemas"]["MessageChannel"][] | null;
+                /** Sms Template Id */
+                sms_template_id?: string | null;
+                /** Email Template Id */
+                email_template_id?: string | null;
+                /** Enable Ab Test */
+                enable_ab_test?: boolean | null;
+                /** Throttle Per Minute */
+                throttle_per_minute?: number | null;
+            };
+            /**
+             * ConsentStatus
+             * @description Consent status
+             * @enum {string}
+             */
+            ConsentStatus: "opted_in" | "opted_out" | "pending";
+            /** EventSearchRequest */
+            EventSearchRequest: {
+                /** Query */
+                query: string;
+                /** Location */
+                location?: string | null;
+            };
+            /** HTTPValidationError */
+            HTTPValidationError: {
+                /** Detail */
+                detail?: components["schemas"]["ValidationError"][];
+            };
+            /** SignIn */
+            SignIn: {
+                /** Email */
+                email?: string | null;
+                /**
+                 * Country
+                 * @description ISO 3166-1 alpha-2
+                 */
+                country: string;
+                /**
+                 * Language
+                 * @default en
+                 */
+                language: string;
+                source: components["schemas"]["LeadSource"];
+                /** Source Details */
+                source_details?: string | null;
+                /** @default pending */
+                consent_status: components["schemas"]["ConsentStatus"];
+            };
+            /**
+             * LeadListResponse
+             * @description Schema for paginated lead list.
+             */
+            LeadListResponse: {
+                /** Items */
+                items: components["schemas"]["LeadResponse"][];
+                /** Total */
+                total: number;
+                /** Page */
+                page: number;
+                /** Page Size */
+                page_size: number;
+                /** Pages */
+                pages: number;
+            };
+            /**
+             * LeadResponse
+             * @description Schema for lead response.
+             */
+            LeadResponse: {
+                /**
+                 * Id
+                 * Format: uuid4
+                 */
+                id: string;
+                /**
+                 * Hotel Id
+                 * Format: uuid4
+                 */
+                hotel_id: string;
+                /** First Name */
+                first_name: string;
+                /** Last Name */
+                last_name: string;
+                /** Phone */
+                phone: string;
+                /** Email */
+                email?: string | null;
+                /** Country */
+                country: string;
+                /** Language */
+                language: string;
+                source: components["schemas"]["LeadSource"];
+                /** Source Details */
+                source_details?: string | null;
+                segment?: components["schemas"]["LeadSegment"] | null;
+                /** Conversion Score */
+                conversion_score?: number | null;
+                /** Conversion Probability */
+                conversion_probability?: number | null;
+                /** Quality Score */
+                quality_score?: number | null;
+                /** Last Scored At */
+                last_scored_at?: string | null;
+                /**
+                 * Total Bookings
+                 * @default 0
+                 */
+                total_bookings: number;
+                /**
+                 * Total Revenue
+                 * @default 0
+                 */
+                total_revenue: number;
+                /** Last Booking Date */
+                last_booking_date?: string | null;
+                /** Last Contact Date */
+                last_contact_date?: string | null;
+                consent_status: components["schemas"]["ConsentStatus"];
+                /**
+                 * Is Duplicate
+                 * @default false
+                 */
+                is_duplicate: boolean;
+                /** Extra Data */
+                extra_data?: Record<string, never> | null;
+                /**
+                 * Created At
+                 * Format: date-time
+                 */
+                created_at: string;
+                /**
+                 * Updated At
+                 * Format: date-time
+                 */
+                updated_at: string;
+            };
+            /**
+             * LeadScoreResponse
+             * @description Schema for lead scoring result.
+             */
+            LeadScoreResponse: {
+                /**
+                 * Lead Id
+                 * Format: uuid4
+                 */
+                lead_id: string;
+                /** Conversion Score */
+                conversion_score: number;
+                /** Conversion Probability */
+                conversion_probability: number;
+                /** Quality Score */
+                quality_score: number;
+                segment: components["schemas"]["LeadSegment"];
+                /**
+                 * Scored At
+                 * Format: date-time
+                 */
+                scored_at: string;
+                /** Factors */
+                factors: Record<string, never>;
+            };
+            /**
+             * LeadSegment
+             * @description Lead segments
+             * @enum {string}
+             */
+            LeadSegment: "hot" | "warm" | "cold" | "unqualified";
+            /**
+             * LeadSegmentUpdate
+             * @description Schema for updating lead segment.
+             */
+            LeadSegmentUpdate: {
+                segment: components["schemas"]["LeadSegment"];
+                /** Reason */
+                reason?: string | null;
+            };
+            /**
+             * LeadSource
+             * @description Lead source types
+             * @enum {string}
+             */
+            LeadSource: "pms" | "csv" | "meta_ads" | "data_broker" | "manual";
+            /**
+             * LeadUpdate
+             * @description Schema for updating a lead.
+             */
+            LeadUpdate: {
+                /** First Name */
+                first_name?: string | null;
+                /** Last Name */
+                last_name?: string | null;
+                /** Phone */
+                phone?: string | null;
+                /** Email */
+                email?: string | null;
+                /** Country */
+                country?: string | null;
+                /** Language */
+                language?: string | null;
+                consent_status?: components["schemas"]["ConsentStatus"] | null;
+                /** Extra Data */
+                extra_data?: Record<string, never> | null;
+            };
+            /**
+             * MessageChannel
+             * @description Message channels
+             * @enum {string}
+             */
+            MessageChannel: "sms" | "email";
+            /**
+             * MessageTemplateCreate
+             * @description Schema for creating message template.
+             */
+            MessageTemplateCreate: {
+                /** Name */
+                name: string;
+                channel: components["schemas"]["MessageChannel"];
+                /** Subject */
+                subject?: string | null;
+                /** Body */
+                body: string;
+                /** Variables */
+                variables?: string[];
+                /**
+                 * Language
+                 * @default en
+                 */
+                language: string;
+            };
+            /**
+             * MessageTemplateResponse
+             * @description Schema for message template response.
+             */
+            MessageTemplateResponse: {
+                /**
+                 * Id
+                 * Format: uuid4
+                 */
+                id: string;
+                /**
+                 * Hotel Id
+                 * Format: uuid4
+                 */
+                hotel_id: string;
+                /** Name */
+                name: string;
+                channel: components["schemas"]["MessageChannel"];
+                /** Subject */
+                subject: string | null;
+                /** Body */
+                body: string;
+                /** Variables */
+                variables: string[];
+                /** Language */
+                language: string;
+                /**
+                 * Created At
+                 * Format: date-time
+                 */
+                created_at: string;
+            };
+            /**
+             * Role
+             * @description User roles for RBAC
+             * @enum {string}
+             */
+            Role: "owner" | "manager" | "staff" | "api";
+            email: string;
+            /** Password */
+            password: string;
         };
-        /**
-         * CampaignStatus
-         * @description Campaign status
-         * @enum {string}
-         */
-        CampaignStatus: "draft" | "active" | "paused" | "completed";
-        /**
-         * CampaignType
-         * @description Campaign types
-         * @enum {string}
-         */
-        CampaignType: "trigger" | "scheduled" | "manual";
-        /**
-         * CampaignUpdate
-         * @description Schema for updating campaign.
-         */
-        CampaignUpdate: {
-            /** Name */
-            name?: string | null;
-            /** Description */
-            description?: string | null;
-            status?: components["schemas"]["CampaignStatus"] | null;
-            /** Trigger Delay Minutes */
-            trigger_delay_minutes?: number | null;
-            /** Schedule Cron */
-            schedule_cron?: string | null;
-            /** Target Segments */
-            target_segments?: string[] | null;
-            /** Target Filters */
-            target_filters?: Record<string, never> | null;
-            /** Channels */
-            channels?: components["schemas"]["MessageChannel"][] | null;
-            /** Sms Template Id */
-            sms_template_id?: string | null;
-            /** Email Template Id */
-            email_template_id?: string | null;
-            /** Enable Ab Test */
-            enable_ab_test?: boolean | null;
-            /** Throttle Per Minute */
-            throttle_per_minute?: number | null;
-        };
-        /**
-         * ConsentStatus
-         * @description Consent status
-         * @enum {string}
-         */
-        ConsentStatus: "opted_in" | "opted_out" | "pending";
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /**
-         * LeadCreate
-         * @description Schema for creating a new lead.
-         */
-        LeadCreate: {
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /**
-             * Phone
-             * @description E.164 format: +251911234567
-             */
-            phone: string;
-            /** Email */
-            email?: string | null;
-            /**
-             * Country
-             * @description ISO 3166-1 alpha-2
-             */
-            country: string;
-            /**
-             * Language
-             * @default en
-             */
-            language: string;
-            source: components["schemas"]["LeadSource"];
-            /** Source Details */
-            source_details?: string | null;
-            /** @default pending */
-            consent_status: components["schemas"]["ConsentStatus"];
-        };
-        /**
-         * LeadListResponse
-         * @description Schema for paginated lead list.
-         */
-        LeadListResponse: {
-            /** Items */
-            items: components["schemas"]["LeadResponse"][];
-            /** Total */
-            total: number;
-            /** Page */
-            page: number;
-            /** Page Size */
-            page_size: number;
-            /** Pages */
-            pages: number;
-        };
-        /**
-         * LeadResponse
-         * @description Schema for lead response.
-         */
-        LeadResponse: {
-            /**
-             * Id
-             * Format: uuid4
-             */
-            id: string;
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Phone */
-            phone: string;
-            /** Email */
-            email?: string | null;
-            /** Country */
-            country: string;
-            /** Language */
-            language: string;
-            source: components["schemas"]["LeadSource"];
-            /** Source Details */
-            source_details?: string | null;
-            segment?: components["schemas"]["LeadSegment"] | null;
-            /** Conversion Score */
-            conversion_score?: number | null;
-            /** Conversion Probability */
-            conversion_probability?: number | null;
-            /** Quality Score */
-            quality_score?: number | null;
-            /** Last Scored At */
-            last_scored_at?: string | null;
-            /**
-             * Total Bookings
-             * @default 0
-             */
-            total_bookings: number;
-            /**
-             * Total Revenue
-             * @default 0
-             */
-            total_revenue: number;
-            /** Last Booking Date */
-            last_booking_date?: string | null;
-            /** Last Contact Date */
-            last_contact_date?: string | null;
-            consent_status: components["schemas"]["ConsentStatus"];
-            /**
-             * Is Duplicate
-             * @default false
-             */
-            is_duplicate: boolean;
-            /** Extra Data */
-            extra_data?: Record<string, never> | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /**
-         * LeadScoreResponse
-         * @description Schema for lead scoring result.
-         */
-        LeadScoreResponse: {
-            /**
-             * Lead Id
-             * Format: uuid4
-             */
-            lead_id: string;
-            /** Conversion Score */
-            conversion_score: number;
-            /** Conversion Probability */
-            conversion_probability: number;
-            /** Quality Score */
-            quality_score: number;
-            segment: components["schemas"]["LeadSegment"];
-            /**
-             * Scored At
-             * Format: date-time
-             */
-            scored_at: string;
-            /** Factors */
-            factors: Record<string, never>;
-        };
-        /**
-         * LeadSegment
-         * @description Lead segments
-         * @enum {string}
-         */
-        LeadSegment: "hot" | "warm" | "cold" | "unqualified";
-        /**
-         * LeadSegmentUpdate
-         * @description Schema for updating lead segment.
-         */
-        LeadSegmentUpdate: {
-            segment: components["schemas"]["LeadSegment"];
-            /** Reason */
-            reason?: string | null;
-        };
-        /**
-         * LeadSource
-         * @description Lead source types
-         * @enum {string}
-         */
-        LeadSource: "pms" | "csv" | "meta_ads" | "data_broker" | "manual";
-        /**
-         * LeadUpdate
-         * @description Schema for updating a lead.
-         */
-        LeadUpdate: {
-            /** First Name */
-            first_name?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Phone */
-            phone?: string | null;
-            /** Email */
-            email?: string | null;
-            /** Country */
-            country?: string | null;
-            /** Language */
-            language?: string | null;
-            consent_status?: components["schemas"]["ConsentStatus"] | null;
-            /** Extra Data */
-            extra_data?: Record<string, never> | null;
-        };
-        /**
-         * MessageChannel
-         * @description Message channels
-         * @enum {string}
-         */
-        MessageChannel: "sms" | "email";
-        /**
-         * MessageTemplateCreate
-         * @description Schema for creating message template.
-         */
-        MessageTemplateCreate: {
-            /** Name */
-            name: string;
-            channel: components["schemas"]["MessageChannel"];
-            /** Subject */
-            subject?: string | null;
-            /** Body */
-            body: string;
-            /** Variables */
-            variables?: string[];
-            /**
-             * Language
-             * @default en
-             */
-            language: string;
-        };
-        /**
-         * MessageTemplateResponse
-         * @description Schema for message template response.
-         */
-        MessageTemplateResponse: {
-            /**
-             * Id
-             * Format: uuid4
-             */
-            id: string;
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** Name */
-            name: string;
-            channel: components["schemas"]["MessageChannel"];
-            /** Subject */
-            subject: string | null;
-            /** Body */
-            body: string;
-            /** Variables */
-            variables: string[];
-            /** Language */
-            language: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-        };
-        /**
-         * Role
-         * @description User roles for RBAC
-         * @enum {string}
-         */
-        Role: "owner" | "manager" | "staff" | "api";
         /** Token */
         Token: {
             /** Access Token */
             access_token: string;
-            /** Refresh Token */
-            refresh_token: string;
-            /**
-             * Token Type
-             * @default bearer
-             */
+            /** Token Type */
             token_type: string;
         };
         /**
@@ -1018,7 +945,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    login_api_v1_auth_login_post: {
+    sign_in_signin_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -1027,7 +954,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UserLogin"];
+                "application/json": components["schemas"]["SignIn"];
             };
         };
         responses: {
@@ -1051,38 +978,7 @@ export interface operations {
             };
         };
     };
-    refresh_token_api_v1_auth_refresh_post: {
-        parameters: {
-            query: {
-                refresh_token: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Token"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_current_user_info_api_v1_auth_me_get: {
+    list_events_events_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -1097,12 +993,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponse"];
+                    "application/json": components["schemas"]["EventResponse"][];
                 };
             };
         };
     };
-    register_user_api_v1_auth_register_post: {
+    search_events_search_events_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -1111,49 +1007,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UserCreate"];
+                "application/json": components["schemas"]["EventSearchRequest"];
             };
         };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_leads_api_v1_leads_get: {
-        parameters: {
-            query?: {
-                page?: number;
-                page_size?: number;
-                segment?: components["schemas"]["LeadSegment"] | null;
-                source?: string | null;
-                country?: string | null;
-                consent_status?: string | null;
-                min_conversion_score?: number | null;
-                max_conversion_score?: number | null;
-                is_duplicate?: boolean | null;
-                search?: string | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -1161,7 +1017,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LeadListResponse"];
+                    "application/json": components["schemas"]["EventResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -1175,45 +1031,12 @@ export interface operations {
             };
         };
     };
-    create_lead_api_v1_leads_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LeadCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_lead_api_v1_leads__lead_id__get: {
+    generate_campaigns_events__event_id__campaigns_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                lead_id: string;
+                event_id: string;
             };
             cookie?: never;
         };
@@ -1225,7 +1048,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LeadResponse"];
+                    "application/json": components["schemas"]["AdCampaignResponse"][];
                 };
             };
             /** @description Validation Error */
