@@ -6,10 +6,13 @@ import { useMe } from '@/hooks/useAuth';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { TopBar } from '@/components/layout/TopBar';
 import { IntegrationProvider } from '@/contexts/IntegrationContext';
+import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
+import { cn } from '@/lib/utils';
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+function ProtectedLayoutInner({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const { data: user, isLoading, isError } = useMe();
+  const { collapsed } = useSidebar();
 
   useEffect(() => {
     if (!isLoading && isError) {
@@ -30,15 +33,23 @@ export default function ProtectedLayout({ children }: { children: React.ReactNod
 
   return (
     <IntegrationProvider>
-      <div className="flex h-screen overflow-hidden">
-        <Sidebar />
-        <div className="flex-1 flex flex-col min-w-0 pl-64">
-          <TopBar />
-          <main className="flex-1 overflow-y-auto p-8">
-            {children}
-          </main>
+        <div className="flex h-screen overflow-hidden">
+          <Sidebar />
+          <div className={cn('flex-1 flex flex-col min-w-0 transition-all duration-300', collapsed ? 'pl-16' : 'pl-64')}>
+            <TopBar />
+            <main className="flex-1 overflow-y-auto p-8">
+              {children}
+            </main>
+          </div>
         </div>
-      </div>
     </IntegrationProvider>
+  );
+}
+
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <SidebarProvider>
+      <ProtectedLayoutInner>{children}</ProtectedLayoutInner>
+    </SidebarProvider>
   );
 }
