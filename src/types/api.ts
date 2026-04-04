@@ -1729,12 +1729,6 @@ export interface components {
             preferred_contact_time?: string | null;
         };
         /**
-         * Role
-         * @description User roles for RBAC
-         * @enum {string}
-         */
-        Role: "owner" | "manager" | "staff" | "api";
-        /**
          * SMSResponse
          * @description SMS sending response.
          */
@@ -1889,8 +1883,6 @@ export interface components {
             full_name: string;
             /** Hotel Id */
             hotel_id: string;
-            /** @default staff */
-            role: components["schemas"]["Role"];
         };
         /** UserLogin */
         UserLogin: {
@@ -1916,7 +1908,6 @@ export interface components {
             email: string;
             /** Full Name */
             full_name: string;
-            role: components["schemas"]["Role"];
             /**
              * Hotel Id
              * Format: uuid4

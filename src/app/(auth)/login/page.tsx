@@ -12,18 +12,17 @@ import { ApiError } from '@/lib/api/client';
 import { loginSchema, type LoginFormData } from '@/lib/validation/auth';
 import { cn } from '@/lib/utils';
 
-const DEMO_ACCOUNTS = [
-  { role: 'Owner', description: 'Full access', email: 'test@utopia.com', password: 'password123', color: 'border-l-utopia' },
-  { role: 'Manager', description: 'Campaign management', email: 'manager@utopia.com', password: 'manager123', color: 'border-l-amber-400' },
-  { role: 'Staff', description: 'View only', email: 'staff@utopia.com', password: 'staff123', color: 'border-l-neutral-400' },
-];
+const DEMO_INFO = {
+  title: 'Demo Access',
+  description: 'Use any email and password to authenticate',
+  color: 'border-l-utopia',
+};
 
 export default function LoginPage() {
   const router = useRouter();
   const { mutateAsync: login, isPending } = useLogin();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
-  const [loadingDemo, setLoadingDemo] = useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -36,19 +35,6 @@ export default function LoginPage() {
       router.replace('/dashboard');
     } catch (err) {
       setServerError(err instanceof ApiError ? err.message : 'Login failed. Please try again.');
-    }
-  }
-
-  async function handleDemoLogin(email: string, password: string) {
-    setServerError('');
-    setLoadingDemo(email);
-    try {
-      await login({ email, password });
-      router.replace('/dashboard');
-    } catch (err) {
-      setServerError(err instanceof ApiError ? err.message : 'Login failed.');
-    } finally {
-      setLoadingDemo(null);
     }
   }
 
@@ -126,35 +112,24 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Demo Accounts */}
+        {/* Demo Info */}
         <div className="w-56 shrink-0 flex flex-col">
-          {/* Invisible spacer matching the brand header height */}
           <div className="mb-12 h-12 flex items-center">
-            <p className="text-[10px] technical-label text-neutral-600 uppercase">Demo Accounts</p>
+            <p className="text-[10px] technical-label text-neutral-600 uppercase">Demo Access</p>
           </div>
-
-          <div className="flex flex-col gap-3 flex-1">
-            {DEMO_ACCOUNTS.map((account) => (
-              <div key={account.email} className={cn("bg-neutral-900 border-l-4 p-4 flex flex-col gap-3 flex-1", account.color)}>
-                <div>
-                  <p className="text-xs font-black italic uppercase text-white tracking-tight">{account.role}</p>
-                  <p className="text-[10px] technical-label text-neutral-500 mt-0.5">{account.description}</p>
-                </div>
-                <div className="space-y-0.5">
-                  <p className="text-[10px] font-mono text-neutral-400">{account.email}</p>
-                  <p className="text-[10px] font-mono text-neutral-500">{account.password}</p>
-                </div>
-                <div className="flex justify-end mt-auto">
-                  <button
-                    onClick={() => handleDemoLogin(account.email, account.password)}
-                    disabled={!!loadingDemo}
-                    className="text-[10px] font-black italic uppercase text-utopia hover:text-white transition-colors disabled:opacity-40"
-                  >
-                    {loadingDemo === account.email ? 'Signing in...' : 'Use this →'}
-                  </button>
-                </div>
-              </div>
-            ))}
+          <div className={cn("bg-neutral-900 border-l-4 p-4 flex flex-col gap-3 flex-1", DEMO_INFO.color)}>
+            <div>
+              <p className="text-xs font-black italic uppercase text-white tracking-tight">{DEMO_INFO.title}</p>
+              <p className="text-[10px] technical-label text-neutral-400 mt-1 leading-relaxed">{DEMO_INFO.description}</p>
+            </div>
+            <div className="flex justify-end mt-auto">
+              <button
+                onClick={() => handleSubmit(onSubmit)()}
+                className="text-[10px] font-black italic uppercase text-utopia hover:text-white transition-colors"
+              >
+                Continue to dashboard →
+              </button>
+            </div>
           </div>
         </div>
 
