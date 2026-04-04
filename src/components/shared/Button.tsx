@@ -5,14 +5,14 @@ import { LucideIcon } from 'lucide-react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-interface ButtonProps extends HTMLMotionProps<"button"> {
+interface ButtonProps extends Omit<HTMLMotionProps<"button">, 'onDrag' | 'onDragStart' | 'onDragEnd' | 'onAnimationStart'> {
   variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'ghost';
   size?: 'sm' | 'md' | 'lg';
   icon?: LucideIcon;
   isLoading?: boolean;
 }
 
-export function Button({
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({
   children,
   variant = 'primary',
   size = 'md',
@@ -20,7 +20,7 @@ export function Button({
   className,
   isLoading,
   ...props
-}: ButtonProps) {
+}, ref) => {
   const variants = {
     primary: 'bg-black text-white hover:bg-neutral-800 border-black',
     secondary: 'bg-white text-black hover:bg-neutral-50 border-neutral-200',
@@ -37,6 +37,7 @@ export function Button({
 
   return (
     <motion.button
+      ref={ref}
       whileHover={{ scale: 1.01 }}
       whileTap={{ scale: 0.98 }}
       className={cn(
@@ -48,7 +49,7 @@ export function Button({
       {...props}
     >
       {Icon && <Icon className={cn('w-4 h-4', size === 'lg' && 'w-5 h-5')} strokeWidth={2.5} />}
-      <span className="relative z-10">{children}</span>
+      <span className="relative z-10">{children as React.ReactNode}</span>
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-inherit rounded-[inherit]">
           <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
@@ -60,4 +61,6 @@ export function Button({
       )}
     </motion.button>
   );
-}
+});
+
+Button.displayName = 'Button';
