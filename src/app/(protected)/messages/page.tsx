@@ -58,7 +58,7 @@ export default function MessagesPage() {
   const executeCampaign = useExecuteCampaign();
   const generateAI = useGenerateMessage();
 
-  const activeCampaign = campaigns?.items.find((c: Campaign) => c.id === activeCampaignId);
+  const activeCampaign = (campaigns as Campaign[] | undefined)?.find((c: Campaign) => c.id === activeCampaignId);
 
   const handleSendBroadcast = async () => {
     if (!message || !activeCampaignId) return;
@@ -196,10 +196,10 @@ export default function MessagesPage() {
         <div className="flex-1 overflow-y-auto divide-y divide-neutral-100 italic">
           {campaignsLoading ? (
             <div className="flex items-center justify-center h-20"><Loader2 className="w-5 h-5 animate-spin text-neutral-300" /></div>
-          ) : campaigns?.items?.length === 0 ? (
+          ) : (campaigns as Campaign[] | undefined)?.length === 0 ? (
             <div className="p-8 text-center text-[10px] technical-label text-neutral-400 uppercase">No active campaigns found.</div>
           ) : (
-            campaigns?.items.map((campaign: Campaign) => (
+            (campaigns as Campaign[] | undefined)?.map((campaign: Campaign) => (
               <div
                 key={campaign.id}
                 onClick={() => setActiveCampaignId(campaign.id)}

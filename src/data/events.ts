@@ -9,6 +9,8 @@ export type EventCategory =
   | 'sports'
   | 'music';
 
+export type EventType = any;
+
 export const EVENT_CATEGORY_COLORS: Record<EventCategory, string> = {
   religious: '#10b981',
   conference: '#3b82f6',
