@@ -1,22 +1,26 @@
-import { client } from './client';
+import { tokenStorage } from './client';
+import { getHospitalityApiBaseUrl } from './hospitalityClient';
+import { hospitalityRequest } from './hospitalityClient';
 
 export const customersService = {
-  list: () =>
-    client.get<unknown[]>('/customers', { skipPrefix: true }),
+  list: () => hospitalityRequest<unknown[]>('/customers'),
 
-  import: (file: File) => {
+  import: async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return fetch(
-      `${process.env.NEXT_PUBLIC_API_URL }/customers/import`,
-      {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('utopia_access_token') ?? ''}`,
-          'ngrok-skip-browser-warning': 'true',
-        },
-      }
-    ).then(r => r.json());
+    const token = tokenStorage.getAccess();
+    const res = await fetch(`${getHospitalityApiBaseUrl()}/customers/import`, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'ngrok-skip-browser-warning': 'true',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(typeof body?.detail === 'string' ? body.detail : res.statusText);
+    }
+    return res.json();
   },
 };

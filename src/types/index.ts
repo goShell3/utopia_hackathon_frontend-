@@ -1,4 +1,7 @@
 import type { components } from './api';
+import type { HospitalityEventSearchRequest } from './hospitalityApi';
+
+export type { HospitalityEventSearchRequest };
 
 // Auth
 export type Token = components['schemas']['Token'];
@@ -130,12 +133,53 @@ export type ListLeadsParams = { page?: number; page_size?: number; search?: stri
 export type ListCampaignsParams = { page?: number; page_size?: number; status?: string; campaign_type?: string; };
 export type ListTemplatesParams = { page?: number; page_size?: number; };
 
-// Events
-export type EventResponse = components['schemas']['EventResponse'];
-export type AdCampaignResponse = components['schemas']['AdCampaignResponse'];
-export type AdTemplateResponse = components['schemas']['AdTemplateResponse'];
-export type EventSearchRequest = components['schemas']['EventSearchRequest'];
-export type SMSTemplateResponse = components['schemas']['SMSTemplateResponse'];
+// Events & hospitality API (`api.json` / mock) — not all present in generated OpenAPI components
+
+export interface EventResponse {
+  id: string;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  location_name?: string | null;
+  source_url?: string | null;
+  created_at: string;
+}
+
+export interface AdCampaignResponse {
+  id: string;
+  event_id?: string;
+  headline: string;
+  body_text: string;
+  generated_image_url?: string | null;
+  target_audience?: Record<string, unknown>;
+  ai_rationale?: string;
+  status: string;
+  created_at: string;
+}
+
+export interface AdTemplateResponse {
+  id: string;
+  [key: string]: unknown;
+}
+
+/** Older mock shape; prefer `HospitalityEventSearchRequest` from `api.json`. */
+export interface LegacyEventSearchRequest {
+  query: string;
+  location?: string | null;
+}
+
+export type EventSearchRequest = HospitalityEventSearchRequest | LegacyEventSearchRequest;
+
+export interface SMSTemplateResponse {
+  id: string;
+  segment: string;
+  message_body: string;
+  discount_code: string | null;
+  landing_page_url: string | null;
+  created_at: string;
+}
 
 // Shared
 export type ValidationError = components['schemas']['ValidationError'];
