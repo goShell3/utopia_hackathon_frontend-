@@ -1,10 +1,20 @@
 'use client';
 
 import React from 'react';
-import { X, Download, CalendarPlus, Loader2, CheckCircle2 } from 'lucide-react';
+import { X, Sparkles, CalendarPlus, Loader2, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CalendarEvent } from './CalendarView';
 import { TYPE_COLORS } from './CalendarView';
+import { events } from '../../../events';
+import type { EventCategory } from '../../../events';
+
+const CATEGORY_TO_TYPE: Record<EventCategory, CalendarEvent['type']> = {
+  religious:  'holiday',
+  conference: 'meeting',
+  festival:   'gathering',
+  diaspora:   'gathering',
+  education:  'gathering',
+};
 
 const TIMEFRAMES = [
   { label: '2 Weeks', days: 14 },
@@ -13,49 +23,31 @@ const TIMEFRAMES = [
   { label: 'Custom', days: 0 },
 ];
 
-const EVENT_TEMPLATES = [
-  { title: 'Welcome Campaign', type: 'campaign_start' as const, description: 'Onboarding campaign for new leads' },
-  { title: 'Q2 Campaign Launch', type: 'campaign_start' as const, description: 'Loyalty bonus push for returning guests' },
-  { title: 'Churn Prevention End', type: 'campaign_end' as const, description: 'Closing re-engagement campaign' },
-  { title: 'Upsell Campaign End', type: 'campaign_end' as const, description: 'Premium tier offer wrap-up' },
-  { title: 'National Holiday', type: 'holiday' as const, description: 'Public holiday — no outreach' },
-  { title: 'New Year Holiday', type: 'holiday' as const, description: 'Schedule adjusted for holiday' },
-  { title: 'Team Sync', type: 'meeting' as const, description: 'Weekly marketing review' },
-  { title: 'Stakeholder Meeting', type: 'meeting' as const, description: 'Monthly performance review' },
-  { title: 'Strategy Session', type: 'meeting' as const, description: 'Q3 planning session' },
-  { title: 'Team Gathering', type: 'gathering' as const, description: 'Quarterly team get-together' },
-  { title: 'Partner Gathering', type: 'gathering' as const, description: 'Hotel partner networking event' },
-  { title: 'Annual Summit', type: 'gathering' as const, description: 'Company-wide annual summit' },
-];
-
 function toYMD(date: Date) {
   return date.toISOString().split('T')[0];
 }
 
 function generateMockEvents(days: number): CalendarEvent[] {
-  const count = Math.min(4 + Math.floor(days / 7) * 2, 20);
-  const events: CalendarEvent[] = [];
+  const count = Math.min(events.length, Math.min(4 + Math.floor(days / 7) * 2, 20));
+  const pool = [...events].sort(() => Math.random() - 0.5).slice(0, count);
   const usedDays = new Set<number>();
 
-  for (let i = 0; i < count; i++) {
+  return pool.map((e, i) => {
     let dayOffset: number;
     do { dayOffset = Math.floor(Math.random() * days) + 1; } while (usedDays.has(dayOffset));
     usedDays.add(dayOffset);
 
-    const template = EVENT_TEMPLATES[i % EVENT_TEMPLATES.length];
     const date = new Date();
     date.setDate(date.getDate() + dayOffset);
 
-    events.push({
+    return {
       id: `fetched-${Date.now()}-${i}`,
-      title: template.title,
-      type: template.type,
-      description: template.description,
+      title: e.name,
+      type: CATEGORY_TO_TYPE[e.category],
+      description: e.description,
       date: toYMD(date),
-    });
-  }
-
-  return events.sort((a, b) => a.date.localeCompare(b.date));
+    };
+  }).sort((a, b) => a.date.localeCompare(b.date));
 }
 
 interface Props {
@@ -190,7 +182,7 @@ export function FetchEventsDialog({ open, onClose, onAddEvents }: Props) {
               onClick={handleFetch}
               className="flex items-center justify-center gap-2 w-full py-3 bg-black text-white rounded-xl font-black italic uppercase tracking-tight text-sm hover:bg-neutral-800 transition-colors"
             >
-              <Download className="w-4 h-4" />
+              <Sparkles className="w-4 h-4" />
               Fetch Events
             </button>
           </div>

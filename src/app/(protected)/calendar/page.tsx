@@ -1,10 +1,11 @@
 'use client';
 
 import React from 'react';
-import { Download, Filter, ChevronDown, Search } from 'lucide-react';
+import { Sparkles, Plus, Filter, ChevronDown, Search } from 'lucide-react';
 import { CalendarView } from '@/components/calendar/CalendarView';
 import { EventList } from '@/components/calendar/EventList';
 import { FetchEventsDialog } from '@/components/calendar/FetchEventsDialog';
+import { AddEventDialog } from '@/components/calendar/AddEventDialog';
 import type { CalendarEvent } from '@/components/calendar/CalendarView';
 import { TYPE_COLORS } from '@/components/calendar/CalendarView';
 import { cn } from '@/lib/utils';
@@ -30,6 +31,7 @@ export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = React.useState(toYMD(new Date()));
   const [extraEvents, setExtraEvents] = React.useState<CalendarEvent[]>([]);
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [addDialogOpen, setAddDialogOpen] = React.useState(false);
 
   const events = React.useMemo(
     () => [...remoteEvents.map(toCalendarEvent), ...extraEvents],
@@ -146,8 +148,15 @@ export default function CalendarPage() {
             onClick={() => setDialogOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-black text-white font-black italic uppercase tracking-tight text-xs hover:bg-neutral-800 transition-colors shrink-0"
           >
-            <Download className="w-3.5 h-3.5" />
+            <Sparkles className="w-3.5 h-3.5" />
             Fetch Events
+          </button>
+          <button
+            onClick={() => setAddDialogOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-black text-white font-black italic uppercase tracking-tight text-xs hover:bg-neutral-800 transition-colors shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Add Event
           </button>
         </div>
       </div>
@@ -170,6 +179,12 @@ export default function CalendarPage() {
         open={dialogOpen}
         onClose={() => setDialogOpen(false)}
         onAddEvents={handleAddEvents}
+      />
+      <AddEventDialog
+        open={addDialogOpen}
+        onClose={() => setAddDialogOpen(false)}
+        onAdd={(event) => handleAddEvents([event])}
+        defaultDate={selectedDate}
       />
     </div>
   );
