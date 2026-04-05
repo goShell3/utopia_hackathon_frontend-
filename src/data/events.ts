@@ -32,6 +32,7 @@ export interface EventLocations {
 
 export interface StaticEvent {
   id: string;
+  slug?: string;
   name: string;
   description?: string;
   category: EventCategory;
