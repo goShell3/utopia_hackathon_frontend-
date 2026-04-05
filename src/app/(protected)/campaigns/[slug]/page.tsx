@@ -9,7 +9,7 @@ import {
   useCampaigns, useCampaignStats, useCampaignTargetLeads,
   useActivateCampaign, usePauseCampaign, useExecuteCampaign,
 } from '@/hooks/useCampaigns';
-import type { Lead } from '@/types';
+import type { Lead, Campaign } from '@/types';
 import { toSlug } from '@/lib/utils';
 
 export default function CampaignDetailPage() {
@@ -18,7 +18,7 @@ export default function CampaignDetailPage() {
   const [activeTab, setActiveTab] = useState<'workflow' | 'stats' | 'leads'>('workflow');
 
   const { data: campaigns, isLoading } = useCampaigns();
-  const campaign = campaigns?.items.find(c => toSlug(c.name) === slug);
+  const campaign = campaigns?.items.find((c: Campaign) => toSlug(c.name) === slug);
 
   const { data: stats, isLoading: statsLoading } = useCampaignStats(campaign?.id ?? '');
   const { data: targets, isLoading: targetsLoading } = useCampaignTargetLeads(campaign?.id ?? '');
