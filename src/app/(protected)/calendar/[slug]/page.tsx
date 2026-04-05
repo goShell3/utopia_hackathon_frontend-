@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, CalendarDays, Clock, MapPin, Link, FileText, Zap, Loader2 } from 'lucide-react';
+import { ArrowLeft, CalendarDays, Clock, MapPin, Link, FileText, Zap, Loader2, RefreshCw, Tag, TrendingUp, Timer, Megaphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEvents, useEventCampaigns, useGenerateCampaigns } from '@/hooks/useCalendar';
 
@@ -103,6 +103,70 @@ export default function CalendarEventPage() {
               <div>
                 <p className="technical-label text-[9px] text-neutral-400">Description</p>
                 <p className="text-sm text-neutral-600 mt-0.5">{event.description}</p>
+              </div>
+            </div>
+          )}
+
+          {(event as any).recurrence && (
+            <div className="flex items-center gap-3">
+              <RefreshCw className="w-4 h-4 text-neutral-400 shrink-0" />
+              <div>
+                <p className="technical-label text-[9px] text-neutral-400">Recurrence</p>
+                <p className="text-sm font-black italic uppercase tracking-tight">{(event as any).recurrence}</p>
+              </div>
+            </div>
+          )}
+
+          {(event as any).leadTimeDays && (
+            <div className="flex items-center gap-3">
+              <Timer className="w-4 h-4 text-neutral-400 shrink-0" />
+              <div>
+                <p className="technical-label text-[9px] text-neutral-400">Lead Time</p>
+                <p className="text-sm font-black italic uppercase tracking-tight">{(event as any).leadTimeDays} days</p>
+              </div>
+            </div>
+          )}
+
+          {(event as any).demandImpact && (
+            <div className="flex items-center gap-3">
+              <TrendingUp className="w-4 h-4 text-neutral-400 shrink-0" />
+              <div>
+                <p className="technical-label text-[9px] text-neutral-400">Demand Impact</p>
+                <p className="text-sm font-black italic uppercase tracking-tight">
+                  {(event as any).demandImpact.level}
+                  <span className="text-neutral-400 font-normal not-italic normal-case text-xs ml-2">
+                    · {(event as any).demandImpact.travelerType.join(', ')}
+                  </span>
+                </p>
+              </div>
+            </div>
+          )}
+
+          {(event as any).tags?.length > 0 && (
+            <div className="flex items-start gap-3">
+              <Tag className="w-4 h-4 text-neutral-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="technical-label text-[9px] text-neutral-400">Tags</p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {(event as any).tags.map((tag: string) => (
+                    <span key={tag} className="px-2 py-0.5 text-[9px] font-black italic uppercase bg-neutral-100 text-neutral-500 rounded-[1px]">{tag}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {(event as any).hotelStrategy && (
+            <div className="flex items-start gap-3">
+              <Megaphone className="w-4 h-4 text-neutral-400 shrink-0 mt-0.5" />
+              <div>
+                <p className="technical-label text-[9px] text-neutral-400">Hotel Strategy</p>
+                <p className="text-sm font-black italic uppercase tracking-tight">
+                  {(event as any).hotelStrategy.campaignType.join(', ')}
+                </p>
+                <p className="text-xs text-neutral-400 mt-0.5">
+                  Audience: {(event as any).hotelStrategy.suggestedAudience.join(', ')}
+                </p>
               </div>
             </div>
           )}
