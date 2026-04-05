@@ -7,38 +7,41 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useLogin } from '@/hooks/useAuth';
 import { Button } from '@/components/shared/Button';
-import { ApiError } from '@/lib/api/client';
 import { loginSchema, type LoginFormData } from '@/lib/validation/auth';
 import { queryKeys } from '@/hooks/queryKeys';
 import { cn } from '@/lib/utils';
 
-const DEMO_INFO = {
-  title: 'Demo Access',
-  description: 'Use any email and password to authenticate',
-  color: 'border-l-utopia',
+const DEMO_USER = {
+  id: 'demo-001',
+  email: 'selam@utopiahotels.com',
+  password: 'utopia2026',
+  hotelId: 'HTL-ETH-0042',
+  location: 'Addis Ababa',
 };
 
 export default function LoginPage() {
   const router = useRouter();
-  const { mutateAsync: login, isPending } = useLogin();
   const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [isPending] = useState(false);
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
-  async function onSubmit(data: LoginFormData) {
+  async function onSubmit(_data: LoginFormData) {
     setServerError('');
-    try {
-      await login(data);
-      router.replace('/dashboard');
-    } catch (err) {
-      setServerError(err instanceof ApiError ? err.message : 'Login failed. Please try again.');
-    }
+    localStorage.setItem('utopia_user', JSON.stringify(DEMO_USER));
+    queryClient.setQueryData(queryKeys.auth.me(), DEMO_USER);
+    router.replace('/dashboard');
+  }
+
+  function handleDemoContinue() {
+    localStorage.setItem('utopia_user', JSON.stringify(DEMO_USER));
+    queryClient.setQueryData(queryKeys.auth.me(), DEMO_USER);
+    router.push('/dashboard');
   }
 
   return (
@@ -120,20 +123,27 @@ export default function LoginPage() {
           <div className="mb-12 h-12 flex items-center">
             <p className="text-[10px] technical-label text-neutral-600 uppercase">Demo Access</p>
           </div>
-          <div className={cn("bg-neutral-900 border-l-4 p-4 flex flex-col gap-3 flex-1", DEMO_INFO.color)}>
-            <div>
-              <p className="text-xs font-black italic uppercase text-white tracking-tight">{DEMO_INFO.title}</p>
-              <p className="text-[10px] technical-label text-neutral-400 mt-1 leading-relaxed">{DEMO_INFO.description}</p>
+          <div className="bg-neutral-900 border-l-4 border-l-utopia p-4 flex flex-col gap-4 flex-1">
+            <p className="text-xs font-black italic uppercase text-white tracking-tight">Demo Account</p>
+            <div className="space-y-3">
+              {([
+                ['Email', DEMO_USER.email],
+                ['Password', 'utopia2•••6'],
+                ['Hotel ID', DEMO_USER.hotelId],
+                ['Location', DEMO_USER.location],
+              ] as [string, string][]).map(([label, value]) => (
+                <div key={label}>
+                  <p className="text-[9px] technical-label text-neutral-500 uppercase">{label}</p>
+                  <p className="text-[11px] font-black italic text-white tracking-tight mt-0.5">{value}</p>
+                </div>
+              ))}
             </div>
             <div className="flex justify-end mt-auto">
               <button
-                onClick={() => {
-                  queryClient.setQueryData(queryKeys.auth.me(), { id: 'demo', email: 'demo@hotel.com', name: 'Demo User' });
-                  router.push('/dashboard');
-                }}
+                onClick={handleDemoContinue}
                 className="text-[10px] font-black italic uppercase text-utopia hover:text-white transition-colors"
               >
-                Continue to dashboard →
+                Continue →
               </button>
             </div>
           </div>
