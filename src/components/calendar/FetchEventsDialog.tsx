@@ -5,8 +5,8 @@ import { X, Sparkles, CalendarPlus, Loader2, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CalendarEvent } from './CalendarView';
 import { TYPE_COLORS } from './CalendarView';
-import { events } from '../../../events';
-import type { EventCategory } from '../../../events';
+import { events } from '@/data/events';
+import type { EventCategory } from '@/data/events';
 
 const CATEGORY_TO_TYPE: Record<EventCategory, CalendarEvent['type']> = {
   religious:  'holiday',

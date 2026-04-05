@@ -80,7 +80,7 @@ export function EventMap({ venues, hotel }: Props) {
 
   return (
     <div className="space-y-3">
-      <div className="border border-neutral-100 overflow-hidden" style={{ height: 320 }}>
+      <div className="border border-neutral-100 overflow-hidden" style={{ height: 320, isolation: 'isolate' }}>
         <MapContainer
           center={[hotel.lat, hotel.lng]}
           zoom={7}

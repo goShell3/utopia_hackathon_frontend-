@@ -4,8 +4,8 @@ import React, { useState } from 'react';
 import { User, Building2, Bell, Shield, Trash2, Save, Eye, EyeOff, Check, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMe } from '@/hooks/useAuth';
-import { EVENT_CATEGORY_COLORS } from '../../../../events';
-import type { EventCategory } from '../../../../events';
+import { EVENT_CATEGORY_COLORS } from '@/data/events';
+import type { EventCategory } from '@/data/events';
 
 const ALL_CATEGORIES = Object.keys(EVENT_CATEGORY_COLORS) as EventCategory[];
 const DEMAND_LEVELS = ['extreme', 'high', 'medium', 'low'] as const;

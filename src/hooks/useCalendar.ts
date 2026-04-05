@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { eventsService } from '@/lib/api/calendar';
-import { events as staticEvents } from '../../events';
+import { events as staticEvents } from '@/data/events';
 import type { EventSearchRequest } from '@/types';
 
 export const EVENTS_KEY = ['events'] as const;
