@@ -133,7 +133,9 @@ export type ListTemplatesParams = { page?: number; page_size?: number; };
 // Events
 export type EventResponse = components['schemas']['EventResponse'];
 export type AdCampaignResponse = components['schemas']['AdCampaignResponse'];
+export type AdTemplateResponse = components['schemas']['AdTemplateResponse'];
 export type EventSearchRequest = components['schemas']['EventSearchRequest'];
+export type SMSTemplateResponse = components['schemas']['SMSTemplateResponse'];
 
 // Shared
 export type ValidationError = components['schemas']['ValidationError'];

@@ -47,10 +47,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Search Events
-         * @description Search for events using AI and save to database
-         */
+        /** Search Events */
         post: operations["search_events_search_events_post"];
         delete?: never;
         options?: never;
@@ -67,11 +64,110 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Generate Campaigns
-         * @description Generate AI ad campaigns for a specific event
-         */
+        /** Generate Campaigns */
         post: operations["generate_campaigns_events__event_id__campaigns_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/campaigns/{campaign_id}/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Generate Template */
+        post: operations["generate_template_campaigns__campaign_id__templates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sms-templates/existing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Sms Template Existing */
+        post: operations["create_sms_template_existing_sms_templates_existing_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sms-templates/lead": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create Sms Template Lead */
+        post: operations["create_sms_template_lead_sms_templates_lead_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sms-templates/{template_id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send Bulk Sms */
+        post: operations["send_bulk_sms_sms_templates__template_id__send_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Customers */
+        get: operations["list_customers_customers_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/customers/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import Customers */
+        post: operations["import_customers_customers_import_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -106,6 +202,31 @@ export interface components {
              */
             created_at: string;
         };
+        /** AdTemplateResponse */
+        AdTemplateResponse: {
+            /** Id */
+            id: string;
+            /** Campaign Id */
+            campaign_id: string;
+            /** Primary Text */
+            primary_text: string;
+            /** Headline */
+            headline: string;
+            /** Image Prompt */
+            image_prompt: string | null;
+            /** Image Url */
+            image_url: string | null;
+            /** Meta Form Id */
+            meta_form_id: string | null;
+        };
+        /** Body_import_customers_customers_import_post */
+        Body_import_customers_customers_import_post: {
+            /**
+             * File
+             * Format: binary
+             */
+            file: string;
+        };
         /** EventResponse */
         EventResponse: {
             /** Id */
@@ -132,15 +253,34 @@ export interface components {
         };
         /** EventSearchRequest */
         EventSearchRequest: {
-            /** Query */
-            query: string;
-            /** Location */
-            location?: string | null;
+            /**
+             * Days
+             * @default 7
+             */
+            days: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** SMSTemplateResponse */
+        SMSTemplateResponse: {
+            /** Id */
+            id: string;
+            /** Segment */
+            segment: string;
+            /** Message Body */
+            message_body: string;
+            /** Discount Code */
+            discount_code: string | null;
+            /** Landing Page Url */
+            landing_page_url: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** SignIn */
         SignIn: {
@@ -278,6 +418,161 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdCampaignResponse"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_template_campaigns__campaign_id__templates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                campaign_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdTemplateResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_sms_template_existing_sms_templates_existing_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SMSTemplateResponse"];
+                };
+            };
+        };
+    };
+    create_sms_template_lead_sms_templates_lead_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SMSTemplateResponse"];
+                };
+            };
+        };
+    };
+    send_bulk_sms_sms_templates__template_id__send_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_customers_customers_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    import_customers_customers_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_customers_customers_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
                 };
             };
             /** @description Validation Error */
