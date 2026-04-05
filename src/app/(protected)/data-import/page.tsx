@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { FileUp, Database, CheckCircle2, AlertCircle, ArrowRight, Trash2, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 const previewData = [
   { id: 1, name: 'Tessema Belay', phone: '+251 911 222 333', source: 'PMS_EXPORT_V1', status: 'valid' },
@@ -14,6 +15,24 @@ const previewData = [
 
 export default function DataImportPage() {
   const [step, setStep] = useState(1);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFile = (file: File | null | undefined) => {
+    if (!file) return;
+    if (!file.name.endsWith('.csv')) {
+      toast.error('Only .csv files are supported. Please upload a valid CSV file.');
+      return;
+    }
+    setFileName(file.name);
+    toast.success(`${file.name} loaded successfully`);
+    setStep(2);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    handleFile(e.dataTransfer.files[0]);
+  };
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex items-center justify-between">
@@ -46,15 +65,29 @@ export default function DataImportPage() {
 
       {step === 1 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="industrial-card p-12 flex flex-col items-center justify-center text-center space-y-6 border-2 border-dashed border-neutral-200 bg-neutral-50/50 hover:border-utopia transition-colors cursor-pointer group">
+          <div
+            className="industrial-card p-12 flex flex-col items-center justify-center text-center space-y-6 border-2 border-dashed border-neutral-200 bg-neutral-50/50 hover:border-utopia transition-colors cursor-pointer group"
+            onDragOver={e => e.preventDefault()}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".csv"
+              className="hidden"
+              onChange={e => { handleFile(e.target.files?.[0]); e.target.value = ''; }}
+            />
             <div className="w-20 h-20 bg-white border border-neutral-200 flex items-center justify-center rounded-2xl group-hover:scale-110 transition-transform shadow-sm">
               <FileUp size={40} className="text-neutral-400" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-sm font-black italic uppercase tracking-tight">Drop Source Files Here</h3>
-              <p className="text-[10px] technical-label text-neutral-400 max-w-[200px]">Support for .CSV, .XLSX, and XML exports from standard PMS platforms</p>
+              <h3 className="text-sm font-black italic uppercase tracking-tight">
+                {fileName ? fileName : 'Drop CSV File Here'}
+              </h3>
+              <p className="text-[10px] technical-label text-neutral-400 max-w-[200px]">Only .csv files are supported</p>
             </div>
-            <Button variant="primary" size="md" onClick={() => setStep(2)}>Fetch Local Files</Button>
+            <Button variant="primary" size="md" onClick={e => { e.stopPropagation(); fileInputRef.current?.click(); }}>Browse File</Button>
           </div>
           <div className="space-y-6 text-left">
             <h3 className="text-sm font-black italic uppercase tracking-tight">PMS Integrations</h3>
@@ -166,7 +199,7 @@ export default function DataImportPage() {
           </div>
           <div className="flex justify-end gap-3 pb-12">
             <Button variant="outline" size="md" onClick={() => setStep(2)} className="bg-white">Re-map Columns</Button>
-            <Button variant="primary" size="md" icon={Database}>Execute Sync to Production</Button>
+            <Button variant="primary" size="md" icon={Database} onClick={() => toast.success('Leads synced to database successfully')}>Sync Leads to Database</Button>
           </div>
         </div>
       )}

@@ -3,8 +3,8 @@ import type { Token, UserLogin, UserCreate, UserResponse } from '@/types';
 
 export const authService = {
   login: async (credentials: UserLogin): Promise<Token> => {
-    const token = await client.post<Token>('/auth/login', credentials);
-    tokenStorage.set(token.access_token, token.refresh_token);
+    const token = await client.post<Token>('/signin', credentials, { skipPrefix: true });
+    tokenStorage.set(token.access_token);
     return token;
   },
 

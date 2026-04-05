@@ -62,12 +62,10 @@ export type ListLeadsParams = operations['list_leads_api_v1_leads_get']['paramet
 export type ListCampaignsParams = operations['list_campaigns_api_v1_campaigns_get']['parameters']['query'];
 export type ListTemplatesParams = operations['list_templates_api_v1_templates_get']['parameters']['query'];
 
-// Calendar
-export type CalendarEventType = 'campaign' | 'meeting' | 'sms' | 'reminder';
-export type CalendarEventCreate = { title: string; date: string; type: CalendarEventType; description?: string | null };
-export type CalendarEventResponse = { id: string; hotel_id: string; title: string; date: string; type: CalendarEventType; description?: string | null; created_at: string };
-export type CalendarEventListResponse = { items: CalendarEventResponse[]; total: number };
-export type ListCalendarEventsParams = { from_date?: string; to_date?: string };
+// Events (AI-powered event discovery)
+export type EventResponse = components['schemas']['EventResponse'];
+export type AdCampaignResponse = components['schemas']['AdCampaignResponse'];
+export type EventSearchRequest = components['schemas']['EventSearchRequest'];
 
 // Shared
 export type ValidationError = components['schemas']['ValidationError'];
