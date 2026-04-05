@@ -8,7 +8,7 @@ import { LeadsTable } from '@/components/leads/LeadsTable';
 import { LeadsPagination } from '@/components/leads/LeadsPagination';
 import { CreateLeadModal } from '@/components/leads/CreateLeadModal';
 import { useLeads } from '@/hooks/useLeads';
-import type { LeadSegment, LeadSource } from '@/types';
+import type { Lead, LeadSegment, LeadSource } from '@/types';
 import { cn } from '@/lib/utils';
 
 const PAGE_SIZE = 10;
@@ -40,7 +40,7 @@ export default function LeadsPage() {
       URL.revokeObjectURL(url);
     } else {
       const headers = ['id', 'first_name', 'last_name', 'phone', 'email', 'country', 'source', 'segment', 'consent_status'];
-      const rows = items.map(l => headers.map(h => (l as any)[h] ?? '').join(','));
+      const rows = items.map((l: Lead) => headers.map(h => (l as unknown as Record<string, unknown>)[h] ?? '').join(','));
       const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a'); a.href = url; a.download = 'leads.csv'; a.click();
