@@ -1,12 +1,12 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { campaignsService } from '@/lib/api/campaigns';
 import { queryKeys } from './queryKeys';
-import type { CampaignCreate, CampaignUpdate, ListCampaignsParams } from '@/types';
+import type { Campaign, CampaignCreate, CampaignUpdate, CampaignListResponse, ListCampaignsParams } from '@/types';
 
 export function useCampaigns(params?: ListCampaignsParams) {
-  return useQuery({
+  return useQuery<CampaignListResponse & { items: Campaign[] }>({
     queryKey: queryKeys.campaigns.list(params),
-    queryFn: () => campaignsService.list(params),
+    queryFn: () => campaignsService.list(params) as Promise<CampaignListResponse & { items: Campaign[] }>,
   });
 }
 
