@@ -68,18 +68,73 @@ export type MessageTemplate = components['schemas']['MessageTemplateResponse'];
 export type MessageTemplateCreate = components['schemas']['MessageTemplateCreate'];
 
 // AI
-// export type AIUsageStats = components['schemas']['AIUsageStats'];
-// export type MessageGenerationRequest = components['schemas']['MessageGenerationRequest'];
-// export type MessageGenerationResponse = components['schemas']['MessageGenerationResponse'];
-// export type MessageVariant = components['schemas']['MessageVariant'];
-// export type MessageTone = components['schemas']['MessageTone'];
-// export type CampaignGoal = components['schemas']['CampaignGoal'];
-// export type BatchMessageRequest = components['schemas']['BatchMessageRequest'];
-// export type AILeadScoringResponse = components['schemas']['LeadScoringResponse'];
-// export type CampaignAdvisorRequest = components['schemas']['CampaignAdvisorRequest'];
-// export type CampaignAdvisorResponse = components['schemas']['CampaignAdvisorResponse'];
-// export type CampaignRecommendation = components['schemas']['CampaignRecommendation'];
-// export type LeadEnrichmentResponse = components['schemas']['LeadEnrichmentResponse'];
+export type MessageTone = 'professional' | 'friendly' | 'casual' | 'urgent';
+export type CampaignGoal = 'booking' | 'upsell' | 'loyalty' | 're_engagement' | 'feedback';
+
+export interface MessageVariant {
+  text: string;
+  tone: MessageTone;
+  score?: number;
+}
+
+export interface MessageGenerationRequest {
+  lead_id: string;
+  campaign_goal: CampaignGoal;
+  tone: MessageTone;
+  channel: string;
+  language?: string;
+  max_length?: number;
+  personalization_data?: Record<string, unknown>;
+}
+
+export interface MessageGenerationResponse {
+  variants: MessageVariant[];
+  model?: string;
+  tokens_used?: number;
+}
+
+export interface BatchMessageRequest {
+  lead_ids: string[];
+  campaign_goal: CampaignGoal;
+  tone: MessageTone;
+  channel: string;
+  language?: string;
+}
+
+export interface AILeadScoringResponse {
+  lead_id: string;
+  score: number;
+  explanation?: string;
+  recommendations?: string[];
+}
+
+export interface CampaignAdvisorRequest {
+  hotel_id: string;
+  context?: Record<string, unknown>;
+}
+
+export interface CampaignRecommendation {
+  title: string;
+  description: string;
+  campaign_type: CampaignType;
+  goal: CampaignGoal;
+}
+
+export interface CampaignAdvisorResponse {
+  recommendations: CampaignRecommendation[];
+}
+
+export interface LeadEnrichmentResponse {
+  lead_id: string;
+  predictions?: Record<string, unknown>;
+  preferences?: Record<string, unknown>;
+}
+
+export interface AIUsageStats {
+  total_requests: number;
+  tokens_used: number;
+  cost_estimate?: number;
+}
 
 // SMS
 // export type SendSMSRequest = components['schemas']['SendSMSRequest'];
