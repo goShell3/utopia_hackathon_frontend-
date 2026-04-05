@@ -1,17 +1,30 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Building2, Bell, Shield, Trash2, Save, Eye, EyeOff, Check } from 'lucide-react';
+import { User, Building2, Bell, Shield, Trash2, Save, Eye, EyeOff, Check, CalendarDays } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useMe } from '@/hooks/useAuth';
+import { EVENT_CATEGORY_COLORS } from '../../../../events';
+import type { EventCategory } from '../../../../events';
 
-type Tab = 'profile' | 'hotel' | 'notifications' | 'security' | 'danger';
+const ALL_CATEGORIES = Object.keys(EVENT_CATEGORY_COLORS) as EventCategory[];
+const DEMAND_LEVELS = ['extreme', 'high', 'medium', 'low'] as const;
+type DemandLevel = typeof DEMAND_LEVELS[number];
+const DEMAND_COLORS: Record<DemandLevel, string> = {
+  extreme: 'bg-rose-500',
+  high:    'bg-orange-400',
+  medium:  'bg-yellow-400',
+  low:     'bg-neutral-300',
+};
+
+type Tab = 'profile' | 'hotel' | 'notifications' | 'security' | 'events' | 'danger';
 
 const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
   { id: 'profile', label: 'Profile', icon: User },
   { id: 'hotel', label: 'Hotel', icon: Building2 },
   { id: 'notifications', label: 'Notifications', icon: Bell },
   { id: 'security', label: 'Security', icon: Shield },
+  { id: 'events', label: 'Events', icon: CalendarDays },
   { id: 'danger', label: 'Danger Zone', icon: Trash2 },
 ];
 
@@ -75,6 +88,161 @@ function Toggle({ label, description, defaultChecked = false }: { label: string;
           on ? 'left-5' : 'left-0.5'
         )} />
       </button>
+    </div>
+  );
+}
+
+function EventsSettingsPanel() {
+  const [activeCategories, setActiveCategories] = useState<Set<EventCategory>>(new Set(ALL_CATEGORIES));
+  const [visibleDemandLevels, setVisibleDemandLevels] = useState<Set<DemandLevel>>(new Set(DEMAND_LEVELS));
+  const [leadTimeMultiplier, setLeadTimeMultiplier] = useState(1);
+  const [showImpactRadius, setShowImpactRadius] = useState(true);
+  const [autoFetchOnOpen, setAutoFetchOnOpen] = useState(false);
+  const [defaultTimeframe, setDefaultTimeframe] = useState<'14' | '30' | '90'>('30');
+
+  function toggleCategory(cat: EventCategory) {
+    setActiveCategories(prev => {
+      const next = new Set(prev);
+      next.has(cat) ? next.delete(cat) : next.add(cat);
+      return next;
+    });
+  }
+
+  function toggleDemand(level: DemandLevel) {
+    setVisibleDemandLevels(prev => {
+      const next = new Set(prev);
+      next.has(level) ? next.delete(level) : next.add(level);
+      return next;
+    });
+  }
+
+  return (
+    <div className="industrial-card p-8 space-y-8">
+      <div>
+        <h2 className="display-header text-xl italic">Events</h2>
+        <p className="technical-label text-[9px] text-neutral-400 mt-0.5">Configure event display and behaviour across the calendar</p>
+      </div>
+
+      {/* Categories */}
+      <div className="space-y-3">
+        <p className="text-[9px] font-black italic uppercase text-neutral-400 tracking-widest">Active Categories</p>
+        <div className="flex flex-col gap-1">
+          {ALL_CATEGORIES.map(cat => {
+            const active = activeCategories.has(cat);
+            return (
+              <button
+                key={cat}
+                onClick={() => toggleCategory(cat)}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left',
+                  active ? 'border-neutral-200 bg-neutral-50' : 'border-transparent opacity-40'
+                )}
+              >
+                <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: EVENT_CATEGORY_COLORS[cat] }} />
+                <span className="text-[11px] font-black italic uppercase tracking-tight flex-1">{cat}</span>
+                <span className={cn(
+                  'w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors',
+                  active ? 'bg-black border-black' : 'border-neutral-300'
+                )}>
+                  {active && <span className="w-2 h-2 bg-white rounded-sm" />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="h-px bg-neutral-100" />
+
+      {/* Demand levels */}
+      <div className="space-y-3">
+        <p className="text-[9px] font-black italic uppercase text-neutral-400 tracking-widest">Visible Demand Levels</p>
+        <div className="flex flex-col gap-1">
+          {DEMAND_LEVELS.map(level => {
+            const active = visibleDemandLevels.has(level);
+            return (
+              <button
+                key={level}
+                onClick={() => toggleDemand(level)}
+                className={cn(
+                  'flex items-center gap-3 px-3 py-2.5 rounded-xl border transition-all text-left',
+                  active ? 'border-neutral-200 bg-neutral-50' : 'border-transparent opacity-40'
+                )}
+              >
+                <span className={cn('w-2.5 h-2.5 rounded-full shrink-0', DEMAND_COLORS[level])} />
+                <span className="text-[11px] font-black italic uppercase tracking-tight flex-1">{level}</span>
+                <span className={cn(
+                  'w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors',
+                  active ? 'bg-black border-black' : 'border-neutral-300'
+                )}>
+                  {active && <span className="w-2 h-2 bg-white rounded-sm" />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="h-px bg-neutral-100" />
+
+      {/* Lead time multiplier */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="text-[9px] font-black italic uppercase text-neutral-400 tracking-widest">Lead Time Multiplier</p>
+          <span className="text-sm font-black italic">{leadTimeMultiplier}×</span>
+        </div>
+        <input
+          type="range"
+          min={0.5} max={3} step={0.5}
+          value={leadTimeMultiplier}
+          onChange={e => setLeadTimeMultiplier(Number(e.target.value))}
+          className="w-full accent-black"
+        />
+        <div className="flex justify-between">
+          <span className="technical-label text-[9px] text-neutral-400">0.5×</span>
+          <span className="technical-label text-[9px] text-neutral-400">3×</span>
+        </div>
+        <p className="text-[10px] text-neutral-400">
+          At <span className="font-black text-black">{leadTimeMultiplier}×</span>, a 30-day lead becomes <span className="font-black text-black">{30 * leadTimeMultiplier} days</span>.
+        </p>
+      </div>
+
+      <div className="h-px bg-neutral-100" />
+
+      {/* Fetch defaults */}
+      <div className="space-y-3">
+        <p className="text-[9px] font-black italic uppercase text-neutral-400 tracking-widest">Fetch Defaults</p>
+        <div className="space-y-1">
+          <p className="text-[9px] font-black italic uppercase text-neutral-400 tracking-widest mb-2">Default Timeframe</p>
+          <div className="flex gap-2">
+            {(['14', '30', '90'] as const).map(d => (
+              <button
+                key={d}
+                onClick={() => setDefaultTimeframe(d)}
+                className={cn(
+                  'flex-1 py-2 rounded-xl border text-xs font-black italic uppercase tracking-tight transition-all',
+                  defaultTimeframe === d ? 'bg-black text-white border-black' : 'border-neutral-200 text-neutral-600 hover:border-neutral-400'
+                )}
+              >
+                {d === '14' ? '2 Weeks' : d === '30' ? '1 Month' : '3 Months'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <Toggle label="Auto-fetch on Calendar Open" description="Automatically fetch events when opening the calendar" defaultChecked={autoFetchOnOpen} />
+      </div>
+
+      <div className="h-px bg-neutral-100" />
+
+      {/* Map options */}
+      <div className="space-y-1">
+        <p className="text-[9px] font-black italic uppercase text-neutral-400 tracking-widest mb-3">Map Options</p>
+        <Toggle label="Show Impact Radius" description="Display km radius overlay on the event map" defaultChecked={showImpactRadius} />
+      </div>
+
+      <div className="flex justify-end pt-2">
+        <SaveButton />
+      </div>
     </div>
   );
 }
@@ -272,6 +440,11 @@ export default function SettingsPage() {
                 <SaveButton />
               </div>
             </div>
+          )}
+
+          {/* Events */}
+          {tab === 'events' && (
+            <EventsSettingsPanel />
           )}
 
           {/* Danger Zone */}
