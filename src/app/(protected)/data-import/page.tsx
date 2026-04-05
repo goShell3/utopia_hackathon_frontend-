@@ -5,6 +5,7 @@ import { FileUp, Database, CheckCircle2, AlertCircle, ArrowRight, Trash2, Chevro
 import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useImportCustomers, useCustomers } from '@/hooks/useCustomers';
 
 const previewData = [
   { id: 1, name: 'Tessema Belay', phone: '+251 911 222 333', source: 'PMS_EXPORT_V1', status: 'valid' },
@@ -17,16 +18,23 @@ export default function DataImportPage() {
   const [step, setStep] = useState(1);
   const [fileName, setFileName] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const importMut = useImportCustomers();
+  const { data: customers } = useCustomers();
 
-  const handleFile = (file: File | null | undefined) => {
+  const handleFile = async (file: File | null | undefined) => {
     if (!file) return;
     if (!file.name.endsWith('.csv')) {
       toast.error('Only .csv files are supported. Please upload a valid CSV file.');
       return;
     }
     setFileName(file.name);
-    toast.success(`${file.name} loaded successfully`);
-    setStep(2);
+    try {
+      await importMut.mutateAsync(file);
+      toast.success(`${file.name} loaded and uploaded successfully`);
+      setStep(2);
+    } catch (err: any) {
+      toast.error(err.message || 'Error occurred while uploading CSV');
+    }
   };
 
   const handleDrop = (e: React.DragEvent) => {

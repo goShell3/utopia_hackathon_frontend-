@@ -1,4 +1,5 @@
 import { client } from './client';
+import { hospitalityRequest } from './hospitalityClient';
 import type {
   Campaign,
   CampaignCreate,
@@ -9,16 +10,11 @@ import type {
 } from '@/types';
 
 export const campaignsService = {
-  list: (params?: ListCampaignsParams) => {
-    const query = new URLSearchParams(
-      Object.entries(params ?? {})
-        .filter(([, v]) => v != null)
-        .map(([k, v]) => [k, String(v)])
-    ).toString();
-    return client.get<CampaignListResponse>(`/campaigns${query ? `?${query}` : ''}`);
+  list: () => {
+    return hospitalityRequest<Campaign[]>('/campaigns');
   },
 
-  get: (id: string) => client.get<Campaign>(`/campaigns/${id}`),
+  get: (id: string) => hospitalityRequest<Campaign>(`/campaigns/${id}`),
 
   create: (data: CampaignCreate) => client.post<Campaign>('/campaigns', data),
 

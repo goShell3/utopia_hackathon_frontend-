@@ -170,6 +170,68 @@
       "status": "active",
       "created_at": "2026-04-04T21:31:06.944Z",
       "updated_at": "2026-04-04T21:31:06.945Z"
+    },
+    {
+      "id": "cmp_1775404632951",
+      "name": "Easter",
+      "goal": "bookings",
+      "purpose": "activation",
+      "startDate": "2026-04-05",
+      "endDate": "2026-04-16",
+      "status": "active",
+      "target": {},
+      "ads": [
+        {
+          "id": "3c499e35-9983-462d-a785-be92ae02fb5d",
+          "campaignId": "e3169fd5-abc4-47c0-a926-4a2d1f0e901b",
+          "purpose": "activation",
+          "channel": "sms",
+          "message": "Hi {{name}}, we have a special offer for your next stay. Reply to learn more.",
+          "status": "draft"
+        },
+        {
+          "id": "5ac05525-7c59-4694-a1ba-6a59448c199a",
+          "campaignId": "e3169fd5-abc4-47c0-a926-4a2d1f0e901b",
+          "purpose": "activation",
+          "channel": "email",
+          "title": "Easter — Email Outreach",
+          "message": "Dear {{name}}, enjoy an exclusive rate and book your next stay with us today.",
+          "status": "draft"
+        }
+      ],
+      "created_at": "2026-04-05T15:57:12.952Z",
+      "updated_at": "2026-04-05T15:57:12.953Z"
+    },
+    {
+      "id": "cmp_1775404655041",
+      "name": "Timkat",
+      "goal": "bookings",
+      "purpose": "activation",
+      "startDate": "2026-04-05",
+      "endDate": "2026-04-05",
+      "status": "active",
+      "target": {},
+      "ads": [
+        {
+          "id": "e7c696f3-daab-4edd-a61b-22a714e8144a",
+          "campaignId": "64d73ec4-374e-4968-91f1-f881ef593d5a",
+          "purpose": "activation",
+          "channel": "sms",
+          "message": "Hi {{name}}, we have a special offer for your next stay. Reply to learn more.",
+          "status": "draft"
+        },
+        {
+          "id": "79c6ec28-130b-4fab-b2ab-995b512a3ff8",
+          "campaignId": "64d73ec4-374e-4968-91f1-f881ef593d5a",
+          "purpose": "activation",
+          "channel": "email",
+          "title": "Timkat — Email Outreach",
+          "message": "Dear {{name}}, enjoy an exclusive rate and book your next stay with us today.",
+          "status": "draft"
+        }
+      ],
+      "created_at": "2026-04-05T15:57:35.041Z",
+      "updated_at": "2026-04-05T15:57:35.041Z"
     }
   ],
   "events": [

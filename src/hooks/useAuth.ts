@@ -1,5 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from './queryKeys';
+import { authService } from '@/lib/api/auth';
+import type { UserLogin } from '@/types';
 
 const USER_KEY = 'utopia_user';
 
@@ -21,4 +23,10 @@ export function useLogout() {
     localStorage.removeItem(USER_KEY);
     queryClient.clear();
   };
+}
+
+export function useLogin() {
+  return useMutation({
+    mutationFn: (credentials: UserLogin) => authService.login(credentials),
+  });
 }

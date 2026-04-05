@@ -3,10 +3,10 @@ import { campaignsService } from '@/lib/api/campaigns';
 import { queryKeys } from './queryKeys';
 import type { CampaignCreate, CampaignUpdate, CampaignListResponse, ListCampaignsParams } from '@/types';
 
-export function useCampaigns(params?: ListCampaignsParams) {
+export function useCampaigns() {
   return useQuery({
-    queryKey: queryKeys.campaigns.list(params),
-    queryFn: () => campaignsService.list(params),
+    queryKey: queryKeys.campaigns.list(),
+    queryFn: () => campaignsService.list(),
   });
 }
 

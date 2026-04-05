@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
+import { useLogin } from '@/hooks/useAuth';
 
 const HotelMiniMap = dynamic(() => import('@/components/auth/HotelMiniMap').then(m => m.HotelMiniMap), { ssr: false });
 import { useRouter } from 'next/navigation';
@@ -33,18 +34,22 @@ export default function LoginPage() {
   const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
-  const [isPending] = useState(false);
+  const loginMutation = useLogin();
 
   const { register, handleSubmit, formState: { errors } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
   });
 
-  async function onSubmit(_data: LoginFormData) {
+  async function onSubmit(data: LoginFormData) {
     setServerError('');
-    localStorage.setItem('utopia_user', JSON.stringify(DEMO_USER));
-    queryClient.setQueryData(queryKeys.auth.me(), DEMO_USER);
-    tokenStorage.set('mock_token_123');
-    router.replace('/dashboard');
+    try {
+      await loginMutation.mutateAsync({ email: data.email, password: data.password });
+      localStorage.setItem('utopia_user', JSON.stringify(DEMO_USER));
+      queryClient.setQueryData(queryKeys.auth.me(), DEMO_USER);
+      router.replace('/dashboard');
+    } catch (err: any) {
+      setServerError(err.message || 'Authentication failed. Please verify your credentials.');
+    }
   }
 
   function handleDemoContinue() {
@@ -116,8 +121,8 @@ export default function LoginPage() {
                 </div>
               )}
 
-              <Button type="submit" variant="primary" size="lg" icon={LogIn} className="w-full mt-2" isLoading={isPending}>
-                {isPending ? 'Authenticating...' : 'Sign In'}
+              <Button type="submit" variant="primary" size="lg" icon={LogIn} className="w-full mt-2" isLoading={loginMutation.isPending}>
+                {loginMutation.isPending ? 'Authenticating...' : 'Sign In'}
               </Button>
             </form>
 

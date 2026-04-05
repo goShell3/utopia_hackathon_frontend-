@@ -11,7 +11,7 @@ import {
 import { toSlug, cn } from '@/lib/utils';
 import { Button } from '@/components/shared/Button';
 import { CampaignTimeline } from '@/components/campaigns/CampaignTimeline';
-import { CAMPAIGNS as INITIAL_CAMPAIGNS } from '@/data/campaign';
+import { useCampaigns, useCreateCampaign, usePauseCampaign, useActivateCampaign } from '@/hooks/useCampaigns';
 import type { Campaign, CampaignStatus, CampaignGoal, CampaignPurpose } from '@/data/campaign';
 
 // ─── Wizard types ─────────────────────────────────────────────────────────────
@@ -47,7 +47,14 @@ const SEGMENTS = [
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function CampaignsPage() {
-  const [campaigns, setCampaigns] = useState<Campaign[]>(INITIAL_CAMPAIGNS);
+  const { data: remoteCampaigns = [], isLoading } = useCampaigns();
+  const createCampaign = useCreateCampaign();
+  const pauseCampaign = usePauseCampaign();
+  const activateCampaign = useActivateCampaign();
+  const [campaignsLocal, setCampaignsLocal] = useState<any[]>([]); // for optimistic/local fallback if needed
+  
+  // Use remote items + any local mocked campaigns
+  const campaigns: any[] = [...campaignsLocal, ...remoteCampaigns];
   const [showWizard, setShowWizard] = useState(false);
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterGoal, setFilterGoal] = useState('all');
@@ -63,10 +70,12 @@ export default function CampaignsPage() {
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const toggleStatus = (id: string, current: CampaignStatus) => {
-    setCampaigns(prev => prev.map(c =>
-      c.id === id ? { ...c, status: current === 'active' ? 'paused' : 'active' } : c
-    ));
+  const toggleStatus = async (id: string, current: CampaignStatus) => {
+    if (current === 'active') {
+      await pauseCampaign.mutateAsync(id);
+    } else {
+      await activateCampaign.mutateAsync(id);
+    }
     setOpenMenuId(null);
   };
 
@@ -78,7 +87,7 @@ export default function CampaignsPage() {
 
   const activeFilterCount = (filterStatus !== 'all' ? 1 : 0) + (filterGoal !== 'all' ? 1 : 0);
 
-  const handleCreate = (wizard: WizardState) => {
+  const handleCreate = async (wizard: WizardState) => {
     const campaignId = crypto.randomUUID();
     const purpose: CampaignPurpose =
       wizard.purpose.activation && wizard.purpose.acquisition ? 'both'
@@ -150,7 +159,8 @@ export default function CampaignsPage() {
       } : undefined,
       ads,
     };
-    setCampaigns(prev => [newCampaign, ...prev]);
+    const created = await createCampaign.mutateAsync(newCampaign as any);
+    setCampaignsLocal(prev => [created, ...prev]);
     setShowWizard(false);
   };
 
