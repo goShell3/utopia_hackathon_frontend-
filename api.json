@@ -1,19 +1,24 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Hospitality Event Search API",
-    "version": "0.1.0"
+    "title": "Utopia",
+    "description": "AI-Driven Hotel Marketing Intelligence Platform",
+    "version": "1.0.0"
   },
   "paths": {
-    "/signin": {
+    "/api/v1/auth/login": {
       "post": {
-        "summary": "Sign In",
-        "operationId": "sign_in_signin_post",
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Login",
+        "description": "Authenticate user and return JWT tokens.",
+        "operationId": "login_api_v1_auth_login_post",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignIn"
+                "$ref": "#/components/schemas/UserLogin"
               }
             }
           },
@@ -43,82 +48,22 @@
         }
       }
     },
-    "/events": {
-      "get": {
-        "summary": "List Events",
-        "operationId": "list_events_events_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/EventResponse"
-                  },
-                  "type": "array",
-                  "title": "Response List Events Events Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/search-events": {
+    "/api/v1/auth/refresh": {
       "post": {
-        "summary": "Search Events",
-        "operationId": "search_events_search_events_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/EventSearchRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "items": {
-                    "$ref": "#/components/schemas/EventResponse"
-                  },
-                  "type": "array",
-                  "title": "Response Search Events Search Events Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/events/{event_id}/campaigns": {
-      "post": {
-        "summary": "Generate Campaigns",
-        "operationId": "generate_campaigns_events__event_id__campaigns_post",
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Refresh Token",
+        "description": "Refresh access token using refresh token.",
+        "operationId": "refresh_token_api_v1_auth_refresh_post",
         "parameters": [
           {
-            "name": "event_id",
-            "in": "path",
+            "name": "refresh_token",
+            "in": "query",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Event Id"
+              "title": "Refresh Token"
             }
           }
         ],
@@ -128,11 +73,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AdCampaignResponse"
-                  },
-                  "title": "Response Generate Campaigns Events  Event Id  Campaigns Post"
+                  "$ref": "#/components/schemas/Token"
                 }
               }
             }
@@ -150,10 +91,778 @@
         }
       }
     },
-    "/campaigns/{campaign_id}/templates": {
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Get Current User Info",
+        "description": "Get current authenticated user info.",
+        "operationId": "get_current_user_info_api_v1_auth_me_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/auth/register": {
       "post": {
-        "summary": "Generate Template",
-        "operationId": "generate_template_campaigns__campaign_id__templates_post",
+        "tags": [
+          "authentication"
+        ],
+        "summary": "Register User",
+        "description": "Register new user (for demo - in production add hotel verification).",
+        "operationId": "register_user_api_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leads": {
+      "post": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Create Lead",
+        "description": "Create new lead with automatic deduplication check.",
+        "operationId": "create_lead_api_v1_leads_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "List Leads",
+        "description": "List leads with filtering and pagination.",
+        "operationId": "list_leads_api_v1_leads_get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "segment",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LeadSegment"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Segment"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Source"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Country"
+            }
+          },
+          {
+            "name": "consent_status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Consent Status"
+            }
+          },
+          {
+            "name": "min_conversion_score",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 100,
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Conversion Score"
+            }
+          },
+          {
+            "name": "max_conversion_score",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number",
+                  "maximum": 100,
+                  "minimum": 0
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Conversion Score"
+            }
+          },
+          {
+            "name": "is_duplicate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Is Duplicate"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Search"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{lead_id}": {
+      "get": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Get Lead",
+        "description": "Get lead by ID.",
+        "operationId": "get_lead_api_v1_leads__lead_id__get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Update Lead",
+        "description": "Update lead.",
+        "operationId": "update_lead_api_v1_leads__lead_id__put",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Delete Lead",
+        "description": "Delete lead.",
+        "operationId": "delete_lead_api_v1_leads__lead_id__delete",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{lead_id}/segment": {
+      "put": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Update Lead Segment",
+        "description": "Update lead segment manually.",
+        "operationId": "update_lead_segment_api_v1_leads__lead_id__segment_put",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LeadSegmentUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leads/{lead_id}/score": {
+      "post": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Score Lead",
+        "description": "Score individual lead.",
+        "operationId": "score_lead_api_v1_leads__lead_id__score_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "lead_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Lead Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeadScoreResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leads/score/bulk": {
+      "post": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Bulk Score Leads",
+        "description": "Score multiple leads in batch (async operation).",
+        "operationId": "bulk_score_leads_api_v1_leads_score_bulk_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/leads/stats/summary": {
+      "get": {
+        "tags": [
+          "leads"
+        ],
+        "summary": "Get Leads Summary",
+        "description": "Get lead statistics summary.",
+        "operationId": "get_leads_summary_api_v1_leads_stats_summary_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ]
+      }
+    },
+    "/api/v1/campaigns": {
+      "post": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Create Campaign",
+        "description": "Create new campaign.",
+        "operationId": "create_campaign_api_v1_campaigns_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "List Campaigns",
+        "description": "List campaigns with filtering and pagination.",
+        "operationId": "list_campaigns_api_v1_campaigns_get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1,
+              "title": "Page"
+            }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 50,
+              "title": "Page Size"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CampaignStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignListResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}": {
+      "get": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Get Campaign",
+        "description": "Get campaign by ID.",
+        "operationId": "get_campaign_api_v1_campaigns__campaign_id__get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
         "parameters": [
           {
             "name": "campaign_id",
@@ -161,6 +870,7 @@
             "required": true,
             "schema": {
               "type": "string",
+              "format": "uuid4",
               "title": "Campaign Id"
             }
           }
@@ -171,7 +881,153 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/AdTemplateResponse"
+                  "$ref": "#/components/schemas/CampaignResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Update Campaign",
+        "description": "Update campaign.",
+        "operationId": "update_campaign_api_v1_campaigns__campaign_id__put",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CampaignUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Delete Campaign",
+        "description": "Delete campaign.",
+        "operationId": "delete_campaign_api_v1_campaigns__campaign_id__delete",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/activate": {
+      "post": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Activate Campaign",
+        "description": "Activate campaign.",
+        "operationId": "activate_campaign_api_v1_campaigns__campaign_id__activate_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResponse"
                 }
               }
             }
@@ -189,18 +1045,28 @@
         }
       }
     },
-    "/customers/{customer_id}/sms/existing": {
+    "/api/v1/campaigns/{campaign_id}/pause": {
       "post": {
-        "summary": "Sms Existing Customer",
-        "operationId": "sms_existing_customer_customers__customer_id__sms_existing_post",
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Pause Campaign",
+        "description": "Pause campaign.",
+        "operationId": "pause_campaign_api_v1_campaigns__campaign_id__pause_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
         "parameters": [
           {
-            "name": "customer_id",
+            "name": "campaign_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Customer Id"
+              "format": "uuid4",
+              "title": "Campaign Id"
             }
           }
         ],
@@ -210,7 +1076,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SMSCampaignResponse"
+                  "$ref": "#/components/schemas/CampaignResponse"
                 }
               }
             }
@@ -228,18 +1094,96 @@
         }
       }
     },
-    "/customers/{customer_id}/sms/lead": {
+    "/api/v1/campaigns/{campaign_id}/execute": {
       "post": {
-        "summary": "Sms Lead Customer",
-        "operationId": "sms_lead_customer_customers__customer_id__sms_lead_post",
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Execute Campaign",
+        "description": "Execute campaign (queue messages for sending).",
+        "operationId": "execute_campaign_api_v1_campaigns__campaign_id__execute_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
         "parameters": [
           {
-            "name": "customer_id",
+            "name": "campaign_id",
             "in": "path",
             "required": true,
             "schema": {
               "type": "string",
-              "title": "Customer Id"
+              "format": "uuid4",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "uuid4"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Lead Ids"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/stats": {
+      "get": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Get Campaign Stats",
+        "description": "Get campaign statistics.",
+        "operationId": "get_campaign_stats_api_v1_campaigns__campaign_id__stats_get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Campaign Id"
             }
           }
         ],
@@ -249,7 +1193,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SMSCampaignResponse"
+                  "$ref": "#/components/schemas/CampaignStatsResponse"
                 }
               }
             }
@@ -261,6 +1205,246 @@
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/campaigns/{campaign_id}/leads": {
+      "get": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Get Campaign Target Leads",
+        "description": "Get leads matching campaign targeting criteria.",
+        "operationId": "get_campaign_target_leads_api_v1_campaigns__campaign_id__leads_get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "campaign_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Campaign Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/templates": {
+      "post": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Create Template",
+        "description": "Create message template.",
+        "operationId": "create_template_api_v1_templates_post",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageTemplateCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageTemplateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "List Templates",
+        "description": "List message templates.",
+        "operationId": "list_templates_api_v1_templates_get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "channel",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/MessageChannel"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Channel"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageTemplateResponse"
+                  },
+                  "title": "Response List Templates Api V1 Templates Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/templates/{template_id}": {
+      "get": {
+        "tags": [
+          "campaigns"
+        ],
+        "summary": "Get Template",
+        "description": "Get message template.",
+        "operationId": "get_template_api_v1_templates__template_id__get",
+        "security": [
+          {
+            "HTTPBearer": [ ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid4",
+              "title": "Template Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageTemplateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "health"
+        ],
+        "summary": "Health Check",
+        "description": "Health check endpoint.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "root"
+        ],
+        "summary": "Root",
+        "description": "Root endpoint.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": { }
               }
             }
           }
@@ -270,168 +1454,13 @@
   },
   "components": {
     "schemas": {
-      "AdCampaignResponse": {
+      "CampaignCreate": {
         "properties": {
-          "id": {
+          "name": {
             "type": "string",
-            "title": "Id"
-          },
-          "event_id": {
-            "type": "string",
-            "title": "Event Id"
-          },
-          "headline": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Headline"
-          },
-          "body_text": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Body Text"
-          },
-          "generated_image_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Generated Image Url"
-          },
-          "target_audience": {
-            "anyOf": [
-              {
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Target Audience"
-          },
-          "ai_rationale": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Ai Rationale"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status"
-          },
-          "created_at": {
-            "type": "string",
-            "format": "date-time",
-            "title": "Created At"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "event_id",
-          "headline",
-          "body_text",
-          "generated_image_url",
-          "target_audience",
-          "ai_rationale",
-          "status",
-          "created_at"
-        ],
-        "title": "AdCampaignResponse"
-      },
-      "AdTemplateResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "campaign_id": {
-            "type": "string",
-            "title": "Campaign Id"
-          },
-          "primary_text": {
-            "type": "string",
-            "title": "Primary Text"
-          },
-          "headline": {
-            "type": "string",
-            "title": "Headline"
-          },
-          "image_prompt": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Prompt"
-          },
-          "image_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Image Url"
-          },
-          "meta_form_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Meta Form Id"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "campaign_id",
-          "primary_text",
-          "headline",
-          "image_prompt",
-          "image_url",
-          "meta_form_id"
-        ],
-        "title": "AdTemplateResponse"
-      },
-      "EventResponse": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "title": "Id"
-          },
-          "title": {
-            "type": "string",
-            "title": "Title"
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
           },
           "description": {
             "anyOf": [
@@ -444,7 +1473,32 @@
             ],
             "title": "Description"
           },
-          "category": {
+          "campaign_type": {
+            "$ref": "#/components/schemas/CampaignType"
+          },
+          "trigger_event": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TriggerEvent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trigger_delay_minutes": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trigger Delay Minutes"
+          },
+          "schedule_cron": {
             "anyOf": [
               {
                 "type": "string"
@@ -453,33 +1507,186 @@
                 "type": "null"
               }
             ],
-            "title": "Category"
+            "title": "Schedule Cron"
           },
-          "start_time": {
+          "schedule_timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Timezone"
+          },
+          "target_segments": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Target Segments"
+          },
+          "target_filters": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Filters"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/MessageChannel"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "sms_template_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "uuid4"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Start Time"
+            "title": "Sms Template Id"
           },
-          "end_time": {
+          "email_template_id": {
             "anyOf": [
               {
                 "type": "string",
-                "format": "date-time"
+                "format": "uuid4"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "End Time"
+            "title": "Email Template Id"
           },
-          "location_name": {
+          "enable_ab_test": {
+            "type": "boolean",
+            "title": "Enable Ab Test",
+            "default": false
+          },
+          "ab_test_split": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 0.9,
+                "minimum": 0.1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ab Test Split"
+          },
+          "ab_variant_template_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid4"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ab Variant Template Id"
+          },
+          "throttle_per_minute": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Throttle Per Minute"
+          },
+          "max_sends_per_lead": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Sends Per Lead"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "campaign_type",
+          "channels"
+        ],
+        "title": "CampaignCreate",
+        "description": "Schema for creating campaign."
+      },
+      "CampaignListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CampaignResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "pages"
+        ],
+        "title": "CampaignListResponse",
+        "description": "Schema for paginated campaign list."
+      },
+      "CampaignResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Id"
+          },
+          "hotel_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Hotel Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
             "anyOf": [
               {
                 "type": "string"
@@ -488,9 +1695,36 @@
                 "type": "null"
               }
             ],
-            "title": "Location Name"
+            "title": "Description"
           },
-          "source_url": {
+          "campaign_type": {
+            "$ref": "#/components/schemas/CampaignType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/CampaignStatus"
+          },
+          "trigger_event": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TriggerEvent"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trigger_delay_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trigger Delay Minutes"
+          },
+          "schedule_cron": {
             "anyOf": [
               {
                 "type": "string"
@@ -499,38 +1733,451 @@
                 "type": "null"
               }
             ],
-            "title": "Source Url"
+            "title": "Schedule Cron"
+          },
+          "schedule_timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Timezone"
+          },
+          "target_segments": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Target Segments"
+          },
+          "target_filters": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Filters"
+          },
+          "channels": {
+            "items": {
+              "$ref": "#/components/schemas/MessageChannel"
+            },
+            "type": "array",
+            "title": "Channels"
+          },
+          "sms_template_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid4"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Template Id"
+          },
+          "email_template_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid4"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Template Id"
+          },
+          "enable_ab_test": {
+            "type": "boolean",
+            "title": "Enable Ab Test"
+          },
+          "ab_test_split": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ab Test Split"
+          },
+          "ab_variant_template_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid4"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ab Variant Template Id"
+          },
+          "throttle_per_minute": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Throttle Per Minute"
+          },
+          "max_sends_per_lead": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Sends Per Lead"
+          },
+          "total_sent": {
+            "type": "integer",
+            "title": "Total Sent"
+          },
+          "total_delivered": {
+            "type": "integer",
+            "title": "Total Delivered"
+          },
+          "total_failed": {
+            "type": "integer",
+            "title": "Total Failed"
+          },
+          "total_opened": {
+            "type": "integer",
+            "title": "Total Opened"
+          },
+          "total_clicked": {
+            "type": "integer",
+            "title": "Total Clicked"
+          },
+          "total_cost": {
+            "type": "number",
+            "title": "Total Cost"
           },
           "created_at": {
             "type": "string",
             "format": "date-time",
             "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
           }
         },
         "type": "object",
         "required": [
           "id",
-          "title",
+          "hotel_id",
+          "name",
           "description",
-          "category",
-          "start_time",
-          "end_time",
-          "location_name",
-          "source_url",
-          "created_at"
+          "campaign_type",
+          "status",
+          "trigger_event",
+          "trigger_delay_minutes",
+          "schedule_cron",
+          "schedule_timezone",
+          "target_segments",
+          "target_filters",
+          "channels",
+          "sms_template_id",
+          "email_template_id",
+          "enable_ab_test",
+          "ab_test_split",
+          "ab_variant_template_id",
+          "throttle_per_minute",
+          "max_sends_per_lead",
+          "total_sent",
+          "total_delivered",
+          "total_failed",
+          "total_opened",
+          "total_clicked",
+          "total_cost",
+          "created_at",
+          "updated_at"
         ],
-        "title": "EventResponse"
+        "title": "CampaignResponse",
+        "description": "Schema for campaign response."
       },
-      "EventSearchRequest": {
+      "CampaignStatsResponse": {
         "properties": {
-          "days": {
+          "campaign_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Campaign Id"
+          },
+          "total_sent": {
             "type": "integer",
-            "title": "Days",
-            "default": 7
+            "title": "Total Sent"
+          },
+          "total_delivered": {
+            "type": "integer",
+            "title": "Total Delivered"
+          },
+          "total_failed": {
+            "type": "integer",
+            "title": "Total Failed"
+          },
+          "total_opened": {
+            "type": "integer",
+            "title": "Total Opened"
+          },
+          "total_clicked": {
+            "type": "integer",
+            "title": "Total Clicked"
+          },
+          "delivery_rate": {
+            "type": "number",
+            "title": "Delivery Rate"
+          },
+          "open_rate": {
+            "type": "number",
+            "title": "Open Rate"
+          },
+          "click_rate": {
+            "type": "number",
+            "title": "Click Rate"
+          },
+          "total_cost": {
+            "type": "number",
+            "title": "Total Cost"
+          },
+          "avg_cost_per_send": {
+            "type": "number",
+            "title": "Avg Cost Per Send"
+          },
+          "by_channel": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "By Channel"
+          },
+          "ab_test_results": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ab Test Results"
           }
         },
         "type": "object",
-        "title": "EventSearchRequest"
+        "required": [
+          "campaign_id",
+          "total_sent",
+          "total_delivered",
+          "total_failed",
+          "total_opened",
+          "total_clicked",
+          "delivery_rate",
+          "open_rate",
+          "click_rate",
+          "total_cost",
+          "avg_cost_per_send",
+          "by_channel"
+        ],
+        "title": "CampaignStatsResponse",
+        "description": "Schema for campaign statistics."
+      },
+      "CampaignStatus": {
+        "type": "string",
+        "enum": [
+          "draft",
+          "active",
+          "paused",
+          "completed"
+        ],
+        "title": "CampaignStatus",
+        "description": "Campaign status"
+      },
+      "CampaignType": {
+        "type": "string",
+        "enum": [
+          "trigger",
+          "scheduled",
+          "manual"
+        ],
+        "title": "CampaignType",
+        "description": "Campaign types"
+      },
+      "CampaignUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CampaignStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "trigger_delay_minutes": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trigger Delay Minutes"
+          },
+          "schedule_cron": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Schedule Cron"
+          },
+          "target_segments": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Segments"
+          },
+          "target_filters": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Filters"
+          },
+          "channels": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MessageChannel"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Channels"
+          },
+          "sms_template_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid4"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sms Template Id"
+          },
+          "email_template_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid4"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email Template Id"
+          },
+          "enable_ab_test": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enable Ab Test"
+          },
+          "throttle_per_minute": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Throttle Per Minute"
+          }
+        },
+        "type": "object",
+        "title": "CampaignUpdate",
+        "description": "Schema for updating campaign."
+      },
+      "ConsentStatus": {
+        "type": "string",
+        "enum": [
+          "opted_in",
+          "opted_out",
+          "pending"
+        ],
+        "title": "ConsentStatus",
+        "description": "Consent status"
       },
       "HTTPValidationError": {
         "properties": {
@@ -545,24 +2192,147 @@
         "type": "object",
         "title": "HTTPValidationError"
       },
-      "SMSCampaignResponse": {
+      "LeadCreate": {
+        "properties": {
+          "first_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "First Name"
+          },
+          "last_name": {
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "title": "Last Name"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone",
+            "description": "E.164 format: +251911234567"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "country": {
+            "type": "string",
+            "maxLength": 2,
+            "minLength": 2,
+            "title": "Country",
+            "description": "ISO 3166-1 alpha-2"
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 5,
+            "minLength": 2,
+            "title": "Language",
+            "default": "en"
+          },
+          "source": {
+            "$ref": "#/components/schemas/LeadSource"
+          },
+          "source_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Details"
+          },
+          "consent_status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ConsentStatus"
+              }
+            ],
+            "default": "pending"
+          }
+        },
+        "type": "object",
+        "required": [
+          "first_name",
+          "last_name",
+          "phone",
+          "country",
+          "source"
+        ],
+        "title": "LeadCreate",
+        "description": "Schema for creating a new lead."
+      },
+      "LeadListResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LeadResponse"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "page": {
+            "type": "integer",
+            "title": "Page"
+          },
+          "page_size": {
+            "type": "integer",
+            "title": "Page Size"
+          },
+          "pages": {
+            "type": "integer",
+            "title": "Pages"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total",
+          "page",
+          "page_size",
+          "pages"
+        ],
+        "title": "LeadListResponse",
+        "description": "Schema for paginated lead list."
+      },
+      "LeadResponse": {
         "properties": {
           "id": {
             "type": "string",
+            "format": "uuid4",
             "title": "Id"
           },
-          "customer_id": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Customer Id"
+          "hotel_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Hotel Id"
           },
-          "ad_campaign_id": {
+          "first_name": {
+            "type": "string",
+            "title": "First Name"
+          },
+          "last_name": {
+            "type": "string",
+            "title": "Last Name"
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone"
+          },
+          "email": {
             "anyOf": [
               {
                 "type": "string"
@@ -571,60 +2341,577 @@
                 "type": "null"
               }
             ],
-            "title": "Ad Campaign Id"
+            "title": "Email"
+          },
+          "country": {
+            "type": "string",
+            "title": "Country"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "source": {
+            "$ref": "#/components/schemas/LeadSource"
+          },
+          "source_details": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Details"
           },
           "segment": {
-            "type": "string",
-            "title": "Segment"
-          },
-          "message_body": {
-            "type": "string",
-            "title": "Message Body"
-          },
-          "discount_code": {
             "anyOf": [
               {
-                "type": "string"
+                "$ref": "#/components/schemas/LeadSegment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "conversion_score": {
+            "anyOf": [
+              {
+                "type": "number"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Discount Code"
+            "title": "Conversion Score"
           },
-          "landing_page_url": {
+          "conversion_probability": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "number"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Landing Page Url"
+            "title": "Conversion Probability"
           },
-          "is_delivered": {
+          "quality_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quality Score"
+          },
+          "last_scored_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Scored At"
+          },
+          "total_bookings": {
+            "type": "integer",
+            "title": "Total Bookings",
+            "default": 0
+          },
+          "total_revenue": {
+            "type": "number",
+            "title": "Total Revenue",
+            "default": 0
+          },
+          "last_booking_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Booking Date"
+          },
+          "last_contact_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Contact Date"
+          },
+          "consent_status": {
+            "$ref": "#/components/schemas/ConsentStatus"
+          },
+          "is_duplicate": {
             "type": "boolean",
-            "title": "Is Delivered"
+            "title": "Is Duplicate",
+            "default": false
+          },
+          "extra_data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extra Data"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
           }
         },
         "type": "object",
         "required": [
           "id",
-          "customer_id",
-          "ad_campaign_id",
-          "segment",
-          "message_body",
-          "discount_code",
-          "landing_page_url",
-          "is_delivered"
+          "hotel_id",
+          "first_name",
+          "last_name",
+          "phone",
+          "country",
+          "language",
+          "source",
+          "consent_status",
+          "created_at",
+          "updated_at"
         ],
-        "title": "SMSCampaignResponse"
+        "title": "LeadResponse",
+        "description": "Schema for lead response."
       },
-      "SignIn": {
+      "LeadScoreResponse": {
+        "properties": {
+          "lead_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Lead Id"
+          },
+          "conversion_score": {
+            "type": "number",
+            "title": "Conversion Score"
+          },
+          "conversion_probability": {
+            "type": "number",
+            "title": "Conversion Probability"
+          },
+          "quality_score": {
+            "type": "number",
+            "title": "Quality Score"
+          },
+          "segment": {
+            "$ref": "#/components/schemas/LeadSegment"
+          },
+          "scored_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Scored At"
+          },
+          "factors": {
+            "type": "object",
+            "title": "Factors"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lead_id",
+          "conversion_score",
+          "conversion_probability",
+          "quality_score",
+          "segment",
+          "scored_at",
+          "factors"
+        ],
+        "title": "LeadScoreResponse",
+        "description": "Schema for lead scoring result."
+      },
+      "LeadSegment": {
+        "type": "string",
+        "enum": [
+          "hot",
+          "warm",
+          "cold",
+          "unqualified"
+        ],
+        "title": "LeadSegment",
+        "description": "Lead segments"
+      },
+      "LeadSegmentUpdate": {
+        "properties": {
+          "segment": {
+            "$ref": "#/components/schemas/LeadSegment"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "segment"
+        ],
+        "title": "LeadSegmentUpdate",
+        "description": "Schema for updating lead segment."
+      },
+      "LeadSource": {
+        "type": "string",
+        "enum": [
+          "pms",
+          "csv",
+          "meta_ads",
+          "data_broker",
+          "manual"
+        ],
+        "title": "LeadSource",
+        "description": "Lead source types"
+      },
+      "LeadUpdate": {
+        "properties": {
+          "first_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Name"
+          },
+          "last_name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 100,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Name"
+          },
+          "phone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "email"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 2,
+                "minLength": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Country"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 5,
+                "minLength": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "consent_status": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ConsentStatus"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "extra_data": {
+            "anyOf": [
+              {
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Extra Data"
+          }
+        },
+        "type": "object",
+        "title": "LeadUpdate",
+        "description": "Schema for updating a lead."
+      },
+      "MessageChannel": {
+        "type": "string",
+        "enum": [
+          "sms",
+          "email"
+        ],
+        "title": "MessageChannel",
+        "description": "Message channels"
+      },
+      "MessageTemplateCreate": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/MessageChannel"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 200
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "title": "Body"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Variables"
+          },
+          "language": {
+            "type": "string",
+            "maxLength": 5,
+            "minLength": 2,
+            "title": "Language",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "channel",
+          "body"
+        ],
+        "title": "MessageTemplateCreate",
+        "description": "Schema for creating message template."
+      },
+      "MessageTemplateResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Id"
+          },
+          "hotel_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Hotel Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/MessageChannel"
+          },
+          "subject": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subject"
+          },
+          "body": {
+            "type": "string",
+            "title": "Body"
+          },
+          "variables": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Variables"
+          },
+          "language": {
+            "type": "string",
+            "title": "Language"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "hotel_id",
+          "name",
+          "channel",
+          "subject",
+          "body",
+          "variables",
+          "language",
+          "created_at"
+        ],
+        "title": "MessageTemplateResponse",
+        "description": "Schema for message template response."
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "owner",
+          "manager",
+          "staff",
+          "api"
+        ],
+        "title": "Role",
+        "description": "User roles for RBAC"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "refresh_token": {
+            "type": "string",
+            "title": "Refresh Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type",
+            "default": "bearer"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "refresh_token"
+        ],
+        "title": "Token"
+      },
+      "TriggerEvent": {
+        "type": "string",
+        "enum": [
+          "lead.created",
+          "checkout.completed",
+          "booking.confirmed",
+          "checkin",
+          "checkout"
+        ],
+        "title": "TriggerEvent",
+        "description": "Trigger events"
+      },
+      "UserCreate": {
         "properties": {
           "email": {
             "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "title": "Password"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "hotel_id": {
+            "type": "string",
+            "title": "Hotel Id"
+          },
+          "role": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Role"
+              }
+            ],
+            "default": "staff"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password",
+          "full_name",
+          "hotel_id"
+        ],
+        "title": "UserCreate"
+      },
+      "UserLogin": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
             "title": "Email"
           },
           "password": {
@@ -637,25 +2924,58 @@
           "email",
           "password"
         ],
-        "title": "SignIn"
+        "title": "UserLogin"
       },
-      "Token": {
+      "UserResponse": {
         "properties": {
-          "access_token": {
+          "id": {
             "type": "string",
-            "title": "Access Token"
+            "format": "uuid4",
+            "title": "Id"
           },
-          "token_type": {
+          "email": {
             "type": "string",
-            "title": "Token Type"
+            "format": "email",
+            "title": "Email"
+          },
+          "full_name": {
+            "type": "string",
+            "title": "Full Name"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "hotel_id": {
+            "type": "string",
+            "format": "uuid4",
+            "title": "Hotel Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "is_verified": {
+            "type": "boolean",
+            "title": "Is Verified"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
           }
         },
         "type": "object",
         "required": [
-          "access_token",
-          "token_type"
+          "id",
+          "email",
+          "full_name",
+          "role",
+          "hotel_id",
+          "is_active",
+          "is_verified",
+          "created_at"
         ],
-        "title": "Token"
+        "title": "UserResponse"
       },
       "ValidationError": {
         "properties": {
@@ -689,6 +3009,12 @@
           "type"
         ],
         "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
       }
     }
   }
