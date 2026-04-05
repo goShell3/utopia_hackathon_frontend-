@@ -24,12 +24,12 @@ export function useEvents() {
         category: e.category,
         start_time: e.startDate + 'T00:00:00',
         end_time: e.endDate + 'T00:00:00',
-        location_name: e.locations.cities.join(', ') + ', ' + e.locations.country,
+        location_name: e.locations.venues.length
+          ? e.locations.venues.map(v => v.city).filter((c, i, a) => a.indexOf(c) === i).join(', ') + ', ' + e.locations.country
+          : e.locations.country,
         source_url: null,
         created_at: new Date().toISOString(),
-        // extra static fields
-        recurrence: e.recurrence,
-        tags: e.tags,
+        venues: e.locations.venues,
         demandImpact: e.demandImpact,
         leadTimeDays: e.leadTimeDays,
         hotelStrategy: e.hotelStrategy,

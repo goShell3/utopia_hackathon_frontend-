@@ -6,21 +6,19 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { UserPlus, Eye, EyeOff } from 'lucide-react';
-import { useRegister, useLogin } from '@/hooks/useAuth';
+import { useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/shared/Button';
-import { ApiError } from '@/lib/api/client';
 import { registerSchema, type RegisterFormData } from '@/lib/validation/auth';
+import { queryKeys } from '@/hooks/queryKeys';
 import { cn } from '@/lib/utils';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { mutateAsync: register, isPending: isRegistering } = useRegister();
-  const { mutateAsync: login, isPending: isLoggingIn } = useLogin();
+  const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [serverError, setServerError] = useState('');
-
-  const isPending = isRegistering || isLoggingIn;
+  const [isPending, setIsPending] = useState(false);
 
   const { register: field, handleSubmit, formState: { errors } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -28,13 +26,16 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterFormData) {
     setServerError('');
-    try {
-      await register({ full_name: data.full_name, email: data.email, password: data.password, hotel_id: data.hotel_id });
-      await login({ email: data.email, password: data.password });
-      router.replace('/dashboard');
-    } catch (err) {
-      setServerError(err instanceof ApiError ? err.message : 'Registration failed. Please try again.');
-    }
+    setIsPending(true);
+    const user = {
+      id: `user-${Date.now()}`,
+      email: data.email,
+      hotelId: data.hotel_id,
+      location: { city: 'Addis Ababa', lat: 9.0320, lng: 38.7469 },
+    };
+    localStorage.setItem('utopia_user', JSON.stringify(user));
+    queryClient.setQueryData(queryKeys.auth.me(), user);
+    router.replace('/dashboard');
   }
 
   const inputClass = (hasError: boolean) => cn(
