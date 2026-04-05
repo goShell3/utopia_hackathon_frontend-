@@ -34,6 +34,7 @@ export type CampaignAd = {
   id: string;
   campaignId: string;
   channel: CampaignAdChannel;
+  purpose: "activation" | "acquisition";
   content: {
     title?: string;
     message?: string;
