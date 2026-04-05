@@ -16,18 +16,12 @@ import { useTemplates } from '@/hooks/useTemplates';
 import { useLeads } from '@/hooks/useLeads';
 import { LeadsTable } from '@/components/leads/LeadsTable';
 import { LeadsPagination } from '@/components/leads/LeadsPagination';
+import { CAMPAIGNS as INITIAL_CAMPAIGNS } from '@/data/campaign';
 import type { Campaign as LocalCampaign } from '@/data/campaign';
 import type { CampaignStats, LeadSegment, LeadSource, Lead } from '@/types';
 
-// ─── Shared mock data (keep in sync with campaigns/page.tsx until API is wired) ─
-const CAMPAIGNS: LocalCampaign[] = [
-  { id: '1', name: 'Summer Bookings Push', goal: 'bookings', startDate: '2025-06-01', endDate: '2025-08-31', status: 'active', target: { source: ['meta', 'website'] } },
-  { id: '2', name: 'Brand Awareness Q3', goal: 'awareness', startDate: '2025-07-01', endDate: '2025-09-30', status: 'draft', target: { source: ['pms'] } },
-  { id: '3', name: 'Lead Gen Winter', goal: 'lead_generation', startDate: '2025-11-01', endDate: '2026-01-31', status: 'paused' },
-];
-
 // ─── Ads mock ─────────────────────────────────────────────────────────────────
-type AdChannel = 'sms' | 'email' | 'meta';
+type AdChannel = 'sms' | 'email' | 'meta' | 'google';
 type AdStatus = 'draft' | 'running' | 'paused';
 
 interface CampaignAd {
@@ -49,6 +43,7 @@ const CHANNEL_COLORS: Record<AdChannel, string> = {
   sms: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   email: 'bg-blue-50 text-blue-700 border-blue-200',
   meta: 'bg-violet-50 text-violet-700 border-violet-200',
+  google: 'bg-indigo-50 text-indigo-700 border-indigo-200',
 };
 
 const AD_STATUS_COLORS: Record<AdStatus, string> = {
@@ -76,21 +71,19 @@ const TRIGGER_LABELS: Record<TriggerType, string> = {
 };
 
 // ─── Tabs ─────────────────────────────────────────────────────────────────────
-type Tab = 'configure' | 'overview' | 'leads' | 'analytics';
+type Tab = 'activation' | 'acquisition';
 
 const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
-  { id: 'configure', label: 'Configure', icon: Settings2 },
-  { id: 'overview', label: 'Overview', icon: Target },
-  { id: 'leads', label: 'Leads', icon: Users },
-  { id: 'analytics', label: 'Analytics', icon: BarChart2 },
+  { id: 'activation', label: 'Activation', icon: MessageSquare },
+  { id: 'acquisition', label: 'Acquisition', icon: Megaphone },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 export default function CampaignDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<Tab>('configure');
-  const [campaigns, setCampaigns] = useState<LocalCampaign[]>(CAMPAIGNS);
+  const [activeTab, setActiveTab] = useState<Tab>('activation');
+  const [campaigns, setCampaigns] = useState<LocalCampaign[]>(INITIAL_CAMPAIGNS);
 
   const campaign = campaigns.find(c => toSlug(c.name) === slug);
 
@@ -165,38 +158,46 @@ export default function CampaignDetailPage() {
 
       {/* Tab Content */}
       <div className="animate-in fade-in duration-300">
-        {activeTab === 'configure' && <ConfigureTab />}
-        {activeTab === 'overview' && <OverviewTab campaign={campaign} />}
-        {activeTab === 'leads' && <LeadsTab campaignId={campaign.id} />}
-        {activeTab === 'analytics' && <AnalyticsTab campaignId={campaign.id} />}
+        {activeTab === 'activation' && <ActivationTab campaign={campaign} />}
+        {activeTab === 'acquisition' && <AcquisitionTab campaign={campaign} />}
       </div>
     </div>
   );
 }
 
-// ─── Overview Tab ─────────────────────────────────────────────────────────────
-function OverviewTab({ campaign }: { campaign: LocalCampaign }) {
+// ─── Activation Tab ───────────────────────────────────────────────────────────
+function ActivationTab({ campaign }: { campaign: LocalCampaign }) {
   const { data: targetLeads } = useCampaignTargetLeads(campaign.id);
   const leadCount = Array.isArray(targetLeads)
     ? targetLeads.length
     : (targetLeads as { total?: number })?.total ?? 0;
+  const activationAds = campaign.ads.filter(ad => ad.purpose === 'activation');
+  const totalSent = activationAds.reduce((sum, ad) => sum + (ad.sentCount ?? 0), 0);
+
+  if (campaign.purpose === 'acquisition') {
+    return (
+      <div className="industrial-card p-8 flex flex-col items-center justify-center gap-2 border-dashed">
+        <Target size={24} className="text-neutral-200" />
+        <p className="text-[10px] technical-label text-neutral-300 uppercase">This campaign is acquisition-only</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <InfoCard label="Goal" value={campaign.goal.replace('_', ' ')} />
-        <InfoCard label="Status" value={campaign.status} />
-        <InfoCard label="Start Date" value={campaign.startDate} />
-        <InfoCard label="End Date" value={campaign.endDate} />
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <StatCard label="Leads Targeted" value={leadCount.toLocaleString()} highlight />
+        <StatCard label="Activation Ads" value={activationAds.length} />
+        <StatCard label="Messages Sent" value={totalSent.toLocaleString()} />
       </div>
 
       <div className="industrial-card p-6 space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-[10px] font-black italic uppercase text-neutral-400 tracking-widest">Targeting</h3>
+          <h3 className="text-[10px] font-black italic uppercase text-neutral-400 tracking-widest">Activation Targeting</h3>
           <div className="flex items-center gap-2 bg-utopia/10 border border-utopia/20 px-3 py-1.5 rounded-[2px]">
             <div className="w-1.5 h-1.5 rounded-full bg-utopia animate-pulse" />
             <span className="text-[11px] font-black italic text-utopia uppercase">
-              Targeting {leadCount.toLocaleString()} leads
+              Targeting {leadCount.toLocaleString()} existing leads
             </span>
           </div>
         </div>
@@ -228,6 +229,44 @@ function OverviewTab({ campaign }: { campaign: LocalCampaign }) {
           </div>
         </div>
       )}
+
+      <div className="space-y-3">
+        <h3 className="text-[10px] font-black italic uppercase text-neutral-400 tracking-widest">Send History</h3>
+        {activationAds.length === 0 && (
+          <div className="industrial-card p-5">
+            <p className="text-[10px] technical-label text-neutral-300 uppercase">No activation ads configured</p>
+          </div>
+        )}
+        {activationAds.map(ad => (
+          <div key={ad.id} className="industrial-card p-5 flex items-start gap-4">
+            <div
+              className={cn(
+                'px-2.5 py-1 text-[9px] font-black italic uppercase border rounded-[2px] shrink-0 mt-0.5',
+                CHANNEL_COLORS[ad.channel as AdChannel]
+              )}
+            >
+              {ad.channel}
+            </div>
+            <div className="flex-1 min-w-0 space-y-1">
+              {ad.title && <p className="text-sm font-black italic uppercase tracking-tight">{ad.title}</p>}
+              <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">{ad.message}</p>
+            </div>
+            <div className="text-right shrink-0 space-y-1">
+              <span className={cn('text-[8px] font-black italic uppercase px-2 py-0.5 rounded-[1px]', AD_STATUS_COLORS[ad.status as AdStatus])}>
+                {ad.status}
+              </span>
+              <p className="text-[9px] font-black uppercase text-neutral-400 tracking-widest">Sent: {(ad.sentCount ?? 0).toLocaleString()}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-[10px] font-black italic uppercase text-neutral-400 tracking-widest">Leads Targeted</h3>
+        <LeadsTab campaignId={campaign.id} />
+      </div>
+
+      <ConfigureTab mode="activation" />
     </div>
   );
 }
@@ -276,7 +315,9 @@ function LeadsTab({ campaignId }: { campaignId: string }) {
     const blob = new Blob([[headers.join(','), ...rows].join('\n')], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `campaign-${campaignId}-leads.csv`; a.click();
+    a.href = url;
+    a.download = `campaign-${campaignId}-leads.csv`;
+    a.click();
     URL.revokeObjectURL(url);
     setShowExport(false);
   };
@@ -294,16 +335,22 @@ function LeadsTab({ campaignId }: { campaignId: string }) {
             className="w-full bg-white border border-neutral-200 py-2.5 pl-10 pr-4 text-sm font-bold placeholder:font-normal placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-utopia/30"
           />
         </div>
-        <select value={segment} onChange={e => setSegment(e.target.value as LeadSegment | '')}
-          className="bg-white border border-neutral-200 py-2.5 px-3 text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-utopia/30">
+        <select
+          value={segment}
+          onChange={e => setSegment(e.target.value as LeadSegment | '')}
+          className="bg-white border border-neutral-200 py-2.5 px-3 text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-utopia/30"
+        >
           <option value="">Segment: All</option>
           <option value="hot">Hot</option>
           <option value="warm">Warm</option>
           <option value="cold">Cold</option>
           <option value="unqualified">Unqualified</option>
         </select>
-        <select value={source} onChange={e => setSource(e.target.value as LeadSource | '')}
-          className="bg-white border border-neutral-200 py-2.5 px-3 text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-utopia/30">
+        <select
+          value={source}
+          onChange={e => setSource(e.target.value as LeadSource | '')}
+          className="bg-white border border-neutral-200 py-2.5 px-3 text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-utopia/30"
+        >
           <option value="">Source: All</option>
           <option value="pms">PMS</option>
           <option value="meta_ads">Meta Ads</option>
@@ -321,7 +368,10 @@ function LeadsTab({ campaignId }: { campaignId: string }) {
           </button>
           {showExport && (
             <div className="absolute right-0 top-full mt-1 z-20 bg-white border border-neutral-200 shadow-xl w-36">
-              <button onClick={handleExportCSV} className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[10px] font-black italic uppercase hover:bg-neutral-50 text-neutral-700">
+              <button
+                onClick={handleExportCSV}
+                className="w-full flex items-center gap-2.5 px-4 py-2.5 text-[10px] font-black italic uppercase hover:bg-neutral-50 text-neutral-700"
+              >
                 <FileDown size={11} /> CSV
               </button>
             </div>
@@ -331,29 +381,122 @@ function LeadsTab({ campaignId }: { campaignId: string }) {
 
       <LeadsTable leads={data?.items ?? []} isLoading={isLoading} />
       <LeadsPagination
-        page={page} pages={data?.pages ?? 1}
-        total={data?.total ?? 0} pageSize={PAGE_SIZE}
+        page={page}
+        pages={data?.pages ?? 1}
+        total={data?.total ?? 0}
+        pageSize={PAGE_SIZE}
         onPageChange={setPage}
       />
     </div>
   );
 }
 
+// ─── Acquisition Tab ──────────────────────────────────────────────────────────
+function AcquisitionTab({ campaign }: { campaign: LocalCampaign }) {
+  const acquisitionAds = campaign.ads.filter(ad => ad.purpose === 'acquisition');
+  const totalBudget = acquisitionAds.reduce((sum, ad) => sum + (ad.budget ?? 0), 0);
+  const totalCaptured = acquisitionAds.reduce((sum, ad) => sum + (ad.leadsCaptured ?? 0), 0);
+  const blendedCPL = totalCaptured > 0 ? totalBudget / totalCaptured : null;
+
+  if (campaign.purpose === 'activation') {
+    return (
+      <div className="industrial-card p-8 flex flex-col items-center justify-center gap-2 border-dashed">
+        <Users size={24} className="text-neutral-200" />
+        <p className="text-[10px] technical-label text-neutral-300 uppercase">This campaign is activation-only</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <StatCard label="Acquisition Ads" value={acquisitionAds.length} highlight />
+        <StatCard label="Leads Captured" value={totalCaptured.toLocaleString()} />
+        <StatCard label="Cost Per Lead" value={blendedCPL != null ? `$${blendedCPL.toFixed(2)}` : '—'} />
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-[10px] font-black italic uppercase text-neutral-400 tracking-widest">Meta / Google Ads</h3>
+        {acquisitionAds.length === 0 && (
+          <div className="industrial-card p-5">
+            <p className="text-[10px] technical-label text-neutral-300 uppercase">No acquisition ads configured</p>
+          </div>
+        )}
+        {acquisitionAds.map(ad => {
+          const adLeads = ad.leadsCaptured ?? 0;
+          const adBudget = ad.budget ?? 0;
+          const adCpl = adLeads > 0 ? adBudget / adLeads : null;
+          return (
+            <div key={ad.id} className="industrial-card p-5 space-y-3">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1 min-w-0">
+                  <div
+                    className={cn(
+                      'inline-flex px-2.5 py-1 text-[9px] font-black italic uppercase border rounded-[2px]',
+                      CHANNEL_COLORS[ad.channel as AdChannel]
+                    )}
+                  >
+                    {ad.channel}
+                  </div>
+                  {ad.title && <p className="text-sm font-black italic uppercase tracking-tight">{ad.title}</p>}
+                  <p className="text-xs text-neutral-500 leading-relaxed line-clamp-2">{ad.message}</p>
+                </div>
+                <span
+                  className={cn(
+                    'text-[8px] font-black italic uppercase px-2 py-0.5 rounded-[1px] shrink-0',
+                    AD_STATUS_COLORS[ad.status as AdStatus]
+                  )}
+                >
+                  {ad.status}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <InfoCard label="Budget" value={adBudget > 0 ? `$${adBudget}` : '—'} />
+                <InfoCard label="Leads Captured" value={adLeads.toLocaleString()} />
+                <InfoCard label="CPL" value={adCpl != null ? `$${adCpl.toFixed(2)}` : '—'} />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <ConfigureTab mode="acquisition" />
+    </div>
+  );
+}
+
 // ─── Configure Tab ────────────────────────────────────────────────────────────
-function ConfigureTab() {
+function ConfigureTab({ mode }: { mode: 'activation' | 'acquisition' }) {
   return (
     <div className="space-y-10">
-      <AdsSection />
-      <SMSWorkflowSection />
+      <div>
+        <h3 className="text-[10px] font-black italic uppercase text-neutral-400 tracking-widest mb-3">
+          Configure {mode}
+        </h3>
+        <AdsSection mode={mode} />
+      </div>
+      {mode === 'activation' && <SMSWorkflowSection />}
     </div>
   );
 }
 
 // ── Ads Section ───────────────────────────────────────────────────────────────
-function AdsSection() {
+function AdsSection({ mode }: { mode: 'activation' | 'acquisition' }) {
   const [ads, setAds] = useState<CampaignAd[]>(MOCK_ADS);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState<Omit<CampaignAd, 'id' | 'status'>>({ channel: 'sms', message: '' });
+  const defaultChannel: AdChannel = mode === 'activation' ? 'sms' : 'meta';
+  const [form, setForm] = useState<Omit<CampaignAd, 'id' | 'status'>>({ channel: defaultChannel, message: '' });
+
+  useEffect(() => {
+    setForm({ channel: defaultChannel, message: '' });
+  }, [defaultChannel]);
+
+  const allowedChannels: AdChannel[] = mode === 'activation'
+    ? ['sms', 'email']
+    : ['meta', 'google'];
+
+  const visibleAds = ads.filter(ad => allowedChannels.includes(ad.channel));
 
   const toggleAdStatus = (id: string) => {
     setAds(prev => prev.map(ad =>
@@ -381,7 +524,7 @@ function AdsSection() {
           <h2 className="text-sm font-black italic uppercase tracking-tight flex items-center gap-2">
             <Megaphone size={14} /> Ads
           </h2>
-          <p className="text-[9px] technical-label text-neutral-400 uppercase mt-0.5">{ads.length} ads configured</p>
+          <p className="text-[9px] technical-label text-neutral-400 uppercase mt-0.5">{visibleAds.length} ads configured</p>
         </div>
         <Button variant="primary" size="sm" icon={Plus} onClick={() => setShowForm(v => !v)}
           className="text-[10px] font-black italic uppercase">
@@ -397,9 +540,17 @@ function AdsSection() {
               <label className="text-[9px] font-black uppercase text-neutral-400">Channel</label>
               <select value={form.channel} onChange={e => setForm(f => ({ ...f, channel: e.target.value as AdChannel }))}
                 className="w-full bg-white border border-neutral-200 py-2 px-3 text-xs font-bold uppercase focus:outline-none focus:ring-1 focus:ring-utopia/30">
-                <option value="sms">SMS</option>
-                <option value="email">Email</option>
-                <option value="meta">Meta</option>
+                {mode === 'activation' ? (
+                  <>
+                    <option value="sms">SMS</option>
+                    <option value="email">Email</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="meta">Meta</option>
+                    <option value="google">Google</option>
+                  </>
+                )}
               </select>
             </div>
             <div className="space-y-1.5">
@@ -409,7 +560,7 @@ function AdsSection() {
                 className="w-full bg-white border border-neutral-200 py-2 px-3 text-xs font-bold placeholder:font-normal placeholder:text-neutral-400 focus:outline-none focus:ring-1 focus:ring-utopia/30" />
             </div>
           </div>
-          {form.channel === 'meta' && (
+          {(form.channel === 'meta' || form.channel === 'google') && (
             <div className="space-y-1.5">
               <label className="text-[9px] font-black uppercase text-neutral-400">Budget ($)</label>
               <input type="number" value={form.budget ?? ''} onChange={e => setForm(f => ({ ...f, budget: Number(e.target.value) }))}
@@ -431,7 +582,7 @@ function AdsSection() {
       )}
 
       <div className="space-y-3">
-        {ads.map(ad => (
+        {visibleAds.map(ad => (
           <div key={ad.id} className="industrial-card p-5 flex items-start gap-4">
             <div className={cn(
               'px-2.5 py-1 text-[9px] font-black italic uppercase border rounded-[2px] shrink-0 mt-0.5',
