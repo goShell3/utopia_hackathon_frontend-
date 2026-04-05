@@ -70,9 +70,9 @@ export default function CampaignsPage() {
       );
 
       if (showDialog === 'create') {
-        await createCampaign.mutateAsync(cleanPayload as CampaignCreate);
+        await createCampaign.mutateAsync(cleanPayload as unknown as CampaignCreate);
       } else if (showDialog === 'edit' && selectedId) {
-        await updateCampaign.mutateAsync({ id: selectedId, data: cleanPayload as CampaignUpdate });
+        await updateCampaign.mutateAsync({ id: selectedId, data: cleanPayload as unknown as CampaignUpdate });
       }
       setShowDialog(false);
       setFormData({ name: '', campaign_type: 'trigger', channels: ['sms'], enable_ab_test: false });
