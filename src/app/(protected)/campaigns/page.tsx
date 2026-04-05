@@ -35,7 +35,7 @@ export default function CampaignsPage() {
   const updateCampaign = useUpdateCampaign();
   const deleteCampaign = useDeleteCampaign();
 
-  const filteredCampaigns = campaigns?.items.filter(c => {
+  const filteredCampaigns = campaigns?.items.filter((c: Campaign) => {
     if (filterStatus !== 'all' && c.status !== filterStatus) return false;
     if (filterType !== 'all' && c.campaign_type !== filterType) return false;
     return true;
