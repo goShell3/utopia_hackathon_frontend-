@@ -1,71 +1,185 @@
-import type { components, operations } from './api';
+import type { components } from './api';
+import type { HospitalityEventSearchRequest } from './hospitalityApi';
+
+export type { HospitalityEventSearchRequest };
 
 // Auth
 export type Token = components['schemas']['Token'];
-export type UserLogin = components['schemas']['UserLogin'];
-export type UserCreate = components['schemas']['UserCreate'];
-export type UserResponse = components['schemas']['UserResponse'];
+export interface UserLogin { email: string; password: string; }
+export interface UserCreate { email: string; password: string; full_name?: string; hotel_id?: string; }
+export interface UserResponse { id: string; email: string; full_name?: string; hotel_id?: string; }
 
 // Leads
-export type Lead = components['schemas']['LeadResponse'];
-export type LeadCreate = components['schemas']['LeadCreate'];
-export type LeadUpdate = components['schemas']['LeadUpdate'];
-export type LeadListResponse = components['schemas']['LeadListResponse'];
-export type LeadScoreResponse = components['schemas']['LeadScoreResponse'];
-export type LeadSegmentUpdate = components['schemas']['LeadSegmentUpdate'];
-export type LeadSegment = components['schemas']['LeadSegment'];
-export type LeadSource = components['schemas']['LeadSource'];
-export type ConsentStatus = components['schemas']['ConsentStatus'];
+export interface Lead {
+  id: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email?: string | null;
+  country?: string | null;
+  source: string;
+  segment?: string | null;
+  consent_status?: string | null;
+  language?: string | null;
+  total_bookings?: number;
+  total_revenue?: number;
+  last_booking_date?: string | null;
+  last_contact_date?: string | null;
+  score?: number | null;
+  conversion_score?: number | null;
+  conversion_probability?: number | null;
+  quality_score?: number | null;
+  is_duplicate?: boolean;
+  created_at?: string;
+}
+export interface LeadCreate { first_name: string; last_name: string; phone: string; email?: string | null; country?: string | null; source?: string; segment?: string | null; consent_status?: string | null; }
+export type LeadUpdate = Partial<LeadCreate>;
+export interface LeadListResponse { items: Lead[]; total: number; pages: number; page: number; }
+export interface LeadScoreResponse { lead_id: string; score: number; }
+export interface LeadSegmentUpdate { segment: string; }
+export type LeadSegment = 'hot' | 'warm' | 'cold' | 'unqualified';
+export type LeadSource = 'pms' | 'meta_ads' | 'website' | 'manual' | string;
+export type ConsentStatus = 'granted' | 'denied' | 'pending';
 
 // Campaigns
-export type Campaign = components['schemas']['CampaignResponse'];
-export type CampaignCreate = components['schemas']['CampaignCreate'];
-export type CampaignUpdate = components['schemas']['CampaignUpdate'];
-export type CampaignListResponse = components['schemas']['CampaignListResponse'];
-export type CampaignStats = components['schemas']['CampaignStatsResponse'];
-export type CampaignStatus = components['schemas']['CampaignStatus'];
-export type CampaignType = components['schemas']['CampaignType'];
-export type TriggerEvent = components['schemas']['TriggerEvent'];
-// export type MessageChannel = components['schemas']['app__models__campaign__MessageChannel'];
-// export type AIMessageChannel = components['schemas']['app__schemas__ai__MessageChannel'];
+export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed';
+export type CampaignType = 'trigger' | 'scheduled' | 'manual';
+export type TriggerEvent = 'lead.created' | 'booking.confirmed' | 'checkin' | 'checkout' | 'checkout.completed';
+export type MessageChannel = 'sms' | 'email' | 'whatsapp';
+
+export interface Campaign {
+  id: string;
+  name: string;
+  description?: string | null;
+  campaign_type: CampaignType;
+  status: CampaignStatus;
+  channels: string[];
+  trigger_event?: TriggerEvent | null;
+  schedule_cron?: string | null;
+  enable_ab_test: boolean;
+  created_at: string;
+  updated_at?: string | null;
+}
+
+export interface CampaignCreate {
+  name: string;
+  description?: string | null;
+  campaign_type: CampaignType;
+  channels: string[];
+  trigger_event?: TriggerEvent | null;
+  schedule_cron?: string | null;
+  enable_ab_test?: boolean;
+}
+
+export type CampaignUpdate = Partial<CampaignCreate>;
+
+export interface CampaignListResponse {
+  items: Campaign[];
+  total: number;
+  page?: number;
+  size?: number;
+}
+
+export interface CampaignStats {
+  total_sent: number;
+  delivery_rate: number;
+  open_rate: number;
+  click_rate: number;
+}
 
 // Templates
-export type MessageTemplate = components['schemas']['MessageTemplateResponse'];
-export type MessageTemplateCreate = components['schemas']['MessageTemplateCreate'];
+export interface MessageTemplate { id: string; name: string; content: string; channel: string; created_at: string; }
+export interface MessageTemplateCreate { name: string; content: string; channel: string; }
 
 // AI
-// export type AIUsageStats = components['schemas']['AIUsageStats'];
-// export type MessageGenerationRequest = components['schemas']['MessageGenerationRequest'];
-// export type MessageGenerationResponse = components['schemas']['MessageGenerationResponse'];
-// export type MessageVariant = components['schemas']['MessageVariant'];
-// export type MessageTone = components['schemas']['MessageTone'];
-// export type CampaignGoal = components['schemas']['CampaignGoal'];
-// export type BatchMessageRequest = components['schemas']['BatchMessageRequest'];
-// export type AILeadScoringResponse = components['schemas']['LeadScoringResponse'];
-// export type CampaignAdvisorRequest = components['schemas']['CampaignAdvisorRequest'];
-// export type CampaignAdvisorResponse = components['schemas']['CampaignAdvisorResponse'];
-// export type CampaignRecommendation = components['schemas']['CampaignRecommendation'];
-// export type LeadEnrichmentResponse = components['schemas']['LeadEnrichmentResponse'];
+export type MessageTone = 'professional' | 'friendly' | 'casual' | 'urgent';
+export type CampaignGoal = 'booking' | 'upsell' | 'loyalty' | 're_engagement' | 'feedback';
 
-// SMS
-// export type SendSMSRequest = components['schemas']['SendSMSRequest'];
-// export type SMSResponse = components['schemas']['SMSResponse'];
-// export type SendBulkSMSRequest = components['schemas']['SendBulkSMSRequest'];
-// export type BulkSMSResponse = components['schemas']['BulkSMSResponse'];
-// export type SendOTPRequest = components['schemas']['SendOTPRequest'];
-// export type OTPResponse = components['schemas']['OTPResponse'];
-// export type VerifyOTPRequest = components['schemas']['VerifyOTPRequest'];
-// export type OTPVerifyResponse = components['schemas']['OTPVerifyResponse'];
+export interface MessageVariant { text: string; tone: MessageTone; score?: number; }
+
+export interface MessageGenerationRequest {
+  lead_id: string;
+  campaign_goal: CampaignGoal;
+  tone: MessageTone;
+  channel: string;
+  language?: string;
+  max_length?: number;
+  personalization_data?: Record<string, unknown>;
+}
+
+export interface MessageGenerationResponse {
+  variants: MessageVariant[];
+  model?: string;
+  tokens_used?: number;
+}
+
+export interface BatchMessageRequest {
+  lead_ids: string[];
+  campaign_goal: CampaignGoal;
+  tone: MessageTone;
+  channel: string;
+  language?: string;
+}
+
+export interface AILeadScoringResponse { lead_id: string; score: number; explanation?: string; recommendations?: string[]; }
+export interface CampaignAdvisorRequest { hotel_id: string; context?: Record<string, unknown>; }
+export interface CampaignRecommendation { title: string; description: string; campaign_type: CampaignType; goal: CampaignGoal; }
+export interface CampaignAdvisorResponse { recommendations: CampaignRecommendation[]; }
+export interface LeadEnrichmentResponse { lead_id: string; predictions?: Record<string, unknown>; preferences?: Record<string, unknown>; }
+export interface AIUsageStats { total_requests: number; tokens_used: number; cost_estimate?: number; }
 
 // Query params
-export type ListLeadsParams = operations['list_leads_api_v1_leads_get']['parameters']['query'];
-export type ListCampaignsParams = operations['list_campaigns_api_v1_campaigns_get']['parameters']['query'];
-export type ListTemplatesParams = operations['list_templates_api_v1_templates_get']['parameters']['query'];
+export type ListLeadsParams = { page?: number; page_size?: number; search?: string; segment?: string; source?: string; };
+export type ListCampaignsParams = { page?: number; page_size?: number; status?: string; campaign_type?: string; };
+export type ListTemplatesParams = { page?: number; page_size?: number; };
 
-// Events (AI-powered event discovery)
-export type EventResponse = components['schemas']['EventResponse'];
-export type AdCampaignResponse = components['schemas']['AdCampaignResponse'];
-export type EventSearchRequest = components['schemas']['EventSearchRequest'];
+// Events & hospitality API (`api.json` / mock) — not all present in generated OpenAPI components
+
+export interface EventResponse {
+  id: string;
+  title: string;
+  description?: string | null;
+  category?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
+  location_name?: string | null;
+  source_url?: string | null;
+  created_at: string;
+}
+
+export interface AdCampaignResponse {
+  id: string;
+  event_id?: string;
+  headline: string;
+  body_text: string;
+  generated_image_url?: string | null;
+  target_audience?: Record<string, unknown>;
+  ai_rationale?: string;
+  status: string;
+  created_at: string;
+}
+
+export interface AdTemplateResponse {
+  id: string;
+  [key: string]: unknown;
+}
+
+/** Older mock shape; prefer `HospitalityEventSearchRequest` from `api.json`. */
+export interface LegacyEventSearchRequest {
+  query: string;
+  location?: string | null;
+}
+
+export type EventSearchRequest = HospitalityEventSearchRequest | LegacyEventSearchRequest;
+
+export interface SMSTemplateResponse {
+  id: string;
+  segment: string;
+  message_body: string;
+  discount_code: string | null;
+  landing_page_url: string | null;
+  created_at: string;
+}
 
 // Shared
 export type ValidationError = components['schemas']['ValidationError'];

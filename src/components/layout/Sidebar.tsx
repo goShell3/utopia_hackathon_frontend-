@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
+import {
   LayoutDashboard, Users, Zap, MessageSquare, FileUp, Settings, Share2,
   ChevronRight, CalendarDays, Megaphone, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
@@ -11,15 +11,15 @@ import { cn } from '@/lib/utils';
 import { useSidebar } from '@/contexts/SidebarContext';
 
 const navItems = [
-  { label: 'Dashboard',    icon: LayoutDashboard, href: '/dashboard' },
-  { label: 'Calendar',     icon: CalendarDays,    href: '/calendar' },
-  { label: 'Campaigns',    icon: Zap,             href: '/campaigns' },
-  { label: 'Campaign ADs', icon: Megaphone,       href: '/campaign-ads' },
-  { label: 'Leads',        icon: Users,           href: '/leads' },
-  { label: 'Messages',     icon: MessageSquare,   href: '/messages' },
-  { label: 'Data Import',  icon: FileUp,          href: '/data-import' },
-  { label: 'Integrations', icon: Share2,          href: '/integrations' },
-  { label: 'Settings',     icon: Settings,        href: '/settings' },
+  { label: 'Dashboard', icon: LayoutDashboard, href: '/dashboard' },
+  { label: 'Calendar', icon: CalendarDays, href: '/calendar' },
+  { label: 'Campaigns', icon: Zap, href: '/campaigns' },
+  { label: 'Campaign ADs', icon: Megaphone, href: '/campaign-ads' },
+  { label: 'Leads', icon: Users, href: '/leads' },
+  { label: 'Messages', icon: MessageSquare, href: '/messages' },
+  { label: 'Data Import', icon: FileUp, href: '/data-import' },
+  { label: 'Integrations', icon: Share2, href: '/integrations' },
+  { label: 'Settings', icon: Settings, href: '/settings' },
 ];
 
 export function Sidebar() {
@@ -76,7 +76,7 @@ export function Sidebar() {
       {/* Collapse toggle */}
       <div className={cn('p-4 border-t border-white/10', collapsed ? 'flex justify-center' : '')}>
         <button
-          onClick={() => setCollapsed(v => !v)}
+          onClick={() => setCollapsed(!collapsed)}
           className="text-neutral-500 hover:text-white transition-colors"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >

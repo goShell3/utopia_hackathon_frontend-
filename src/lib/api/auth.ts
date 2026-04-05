@@ -1,9 +1,14 @@
 import { client, tokenStorage } from './client';
-import type { Token, UserLogin, UserCreate, UserResponse } from '@/types';
+import { hospitalityRequest } from './hospitalityClient';
+import type { Token, UserCreate, UserResponse, UserLogin } from '@/types';
 
 export const authService = {
+  /** `api.json`: `POST /signin` — returns `access_token` / `token_type`. */
   login: async (credentials: UserLogin): Promise<Token> => {
-    const token = await client.post<Token>('/signin', credentials, { skipPrefix: true });
+    const token = await hospitalityRequest<Token>('/signin', {
+      method: 'POST',
+      body: JSON.stringify(credentials),
+    });
     tokenStorage.set(token.access_token);
     return token;
   },

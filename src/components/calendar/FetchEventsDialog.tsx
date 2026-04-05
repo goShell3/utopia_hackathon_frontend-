@@ -7,13 +7,19 @@ import type { CalendarEvent } from './CalendarView';
 import { TYPE_COLORS } from './CalendarView';
 import { events } from '@/data/events';
 import type { EventCategory } from '@/data/events';
+import { useSearchEvents } from '@/hooks/useCalendar';
+import type { EventResponse } from '@/types';
 
 const CATEGORY_TO_TYPE: Record<EventCategory, CalendarEvent['type']> = {
-  religious:  'holiday',
+  religious: 'holiday',
   conference: 'meeting',
-  festival:   'gathering',
-  diaspora:   'gathering',
-  education:  'gathering',
+  festival: 'gathering',
+  diaspora: 'gathering',
+  education: 'gathering',
+  trade: 'gathering',
+  arts: 'gathering',
+  sports: 'gathering',
+  music: 'gathering',
 };
 
 const TIMEFRAMES = [
@@ -22,6 +28,28 @@ const TIMEFRAMES = [
   { label: '3 Months', days: 90 },
   { label: 'Custom', days: 0 },
 ];
+
+const TIMEFRAME_TO_API: Record<string, '2_weeks' | '1_month' | '3_months' | 'custom'> = {
+  '2 Weeks': '2_weeks',
+  '1 Month': '1_month',
+  '3 Months': '3_months',
+  Custom: 'custom',
+};
+
+function apiEventToCalendar(e: EventResponse): CalendarEvent {
+  const raw = (e.category || '').toLowerCase();
+  let type: CalendarEvent['type'] = 'gathering';
+  if (raw.includes('business')) type = 'meeting';
+  if (raw.includes('cultural') || raw.includes('religious')) type = 'holiday';
+
+  return {
+    id: e.id,
+    title: e.title,
+    date: e.start_time ? e.start_time.split('T')[0] : toYMD(new Date()),
+    type,
+    description: e.description ?? undefined,
+  };
+}
 
 function toYMD(date: Date) {
   return date.toISOString().split('T')[0];
@@ -65,17 +93,30 @@ export function FetchEventsDialog({ open, onClose, onAddEvents }: Props) {
   const [fetchedEvents, setFetchedEvents] = React.useState<CalendarEvent[]>([]);
   const [selected, setSelected] = React.useState<Set<string>>(new Set());
   const [added, setAdded] = React.useState(false);
+  const searchEvents = useSearchEvents();
 
   const days = selectedTimeframe.days || customDays;
 
-  function handleFetch() {
+  async function handleFetch() {
     setStep('fetching');
-    setTimeout(() => {
+    const tf = TIMEFRAME_TO_API[selectedTimeframe.label] ?? '1_month';
+    try {
+      const rows = await searchEvents.mutateAsync({
+        timeframe: tf,
+        custom_days: tf === 'custom' ? customDays : null,
+        categories: null,
+      });
+      const mapped = rows.map(apiEventToCalendar);
+      const finalEvents = mapped.length > 0 ? mapped : generateMockEvents(days);
+      setFetchedEvents(finalEvents);
+      setSelected(new Set(finalEvents.map((e) => e.id)));
+    } catch (err) {
+      console.warn('[FetchEventsDialog] POST /search-events failed, using local mock pool', err);
       const events = generateMockEvents(days);
       setFetchedEvents(events);
-      setSelected(new Set(events.map(e => e.id)));
-      setStep('results');
-    }, 1800);
+      setSelected(new Set(events.map((e) => e.id)));
+    }
+    setStep('results');
   }
 
   function handleAdd() {
@@ -102,9 +143,10 @@ export function FetchEventsDialog({ open, onClose, onAddEvents }: Props) {
   }
 
   function toggleEvent(id: string) {
-    setSelected(prev => {
+    setSelected((prev) => {
       const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   }
@@ -246,8 +288,8 @@ export function FetchEventsDialog({ open, onClose, onAddEvents }: Props) {
                   added
                     ? 'bg-accent-green text-white border-accent-green'
                     : selected.size === 0
-                    ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-                    : 'bg-black text-white hover:bg-neutral-800'
+                      ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
+                      : 'bg-black text-white hover:bg-neutral-800'
                 )}
               >
                 {added ? (

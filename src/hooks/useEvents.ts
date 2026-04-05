@@ -1,9 +1,8 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { eventsService } from '@/lib/api/calendar';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { eventsService } from '@/lib/api/events';
 import { events as staticEvents } from '@/data/events';
 import type { EventResponse, EventSearchRequest } from '@/types';
-
-export const EVENTS_KEY = ['events'] as const;
+import { EVENTS_KEY } from './useCalendar';
 
 function staticEventsAsResponse(): EventResponse[] {
   return staticEvents.map((e) => ({
@@ -21,7 +20,6 @@ function staticEventsAsResponse(): EventResponse[] {
   }));
 }
 
-/** Prefer `GET /events` (`api.json`); on failure keep the in-repo static event catalog. */
 export function useEvents() {
   return useQuery({
     queryKey: EVENTS_KEY,
@@ -29,7 +27,7 @@ export function useEvents() {
       try {
         return await eventsService.list();
       } catch (err) {
-        console.warn('[calendar] GET /events failed, using static data', err);
+        console.warn('[events] GET /events failed, using static data', err);
         return staticEventsAsResponse();
       }
     },
@@ -37,21 +35,21 @@ export function useEvents() {
 }
 
 export function useSearchEvents() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (data: EventSearchRequest) => eventsService.search(data),
-  });
-}
-
-export function useEventCampaigns(eventId: string) {
-  return useQuery({
-    queryKey: [...EVENTS_KEY, eventId, 'campaigns'],
-    queryFn: () => eventsService.campaigns(eventId),
-    enabled: !!eventId,
+    onSuccess: (data) => queryClient.setQueryData(EVENTS_KEY, data),
   });
 }
 
 export function useGenerateCampaigns() {
   return useMutation({
-    mutationFn: (eventId: string) => eventsService.campaigns(eventId),
+    mutationFn: (eventId: string) => eventsService.generateCampaigns(eventId),
+  });
+}
+
+export function useGenerateTemplate() {
+  return useMutation({
+    mutationFn: (campaignId: string) => eventsService.generateTemplate(campaignId),
   });
 }

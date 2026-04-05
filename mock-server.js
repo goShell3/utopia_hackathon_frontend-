@@ -140,9 +140,44 @@ app.get('/events', (req, res) => {
   res.json(db.events);
 });
 
+function daysFromTimeframe(tf, customDays) {
+  switch (tf) {
+    case '2_weeks': return 14;
+    case '1_month': return 30;
+    case '3_months': return 90;
+    case 'custom': return Math.min(Math.max(Number(customDays) || 30, 7), 365);
+    default: return 30;
+  }
+}
+
 app.post('/search-events', (req, res) => {
   const db = readDB();
-  const { query, location } = req.body;
+  const body = req.body || {};
+  if (body.timeframe) {
+    const days = daysFromTimeframe(body.timeframe, body.custom_days);
+    const now = new Date();
+    const end = new Date(now);
+    end.setDate(end.getDate() + days);
+    let results = db.events.filter((e) => {
+      if (!e.start_time) return false;
+      const start = new Date(e.start_time);
+      return start >= now && start <= end;
+    });
+    if (body.categories && body.categories.length) {
+      const cats = body.categories.map((c) => String(c).toLowerCase());
+      results = results.filter((e) =>
+        cats.some(
+          (c) =>
+            (e.category || '').toLowerCase().includes(c) ||
+            (e.title || '').toLowerCase().includes(c) ||
+            (e.description || '').toLowerCase().includes(c)
+        )
+      );
+    }
+    if (results.length === 0) results = db.events.slice(0, Math.min(3, db.events.length));
+    return res.json(results);
+  }
+  const { query, location } = body;
   const q = (query || '').toLowerCase();
   const loc = (location || '').toLowerCase();
   const results = db.events.filter(e =>
@@ -152,7 +187,7 @@ app.post('/search-events', (req, res) => {
   res.json(results);
 });
 
-app.post('/events/:event_id/campaigns', (req, res) => {
+function postEventCampaign(req, res) {
   const db = readDB();
   const { event_id } = req.params;
   const event = db.events.find(e => e.id === event_id);
@@ -173,6 +208,53 @@ app.post('/events/:event_id/campaigns', (req, res) => {
   db.ad_campaigns.push(newCampaign);
   writeDB(db);
   res.json([newCampaign]);
+}
+
+app.post('/events/:event_id/campaigns', postEventCampaign);
+app.post('/events/:event_id/campaign', postEventCampaign);
+
+app.get('/campaigns', (req, res) => {
+  const db = readDB();
+  res.json(db.campaigns);
+});
+
+app.get('/campaigns/:campaign_id', (req, res) => {
+  const db = readDB();
+  const c = db.campaigns.find(x => x.id === req.params.campaign_id);
+  if (c) res.json(c);
+  else res.status(404).json({ detail: 'Not Found' });
+});
+
+app.get('/customers', (req, res) => {
+  const db = readDB();
+  res.json(db.customers || []);
+});
+
+app.post('/customers/import', (req, res) => {
+  res.json({ imported: 12, skipped: 0, message: 'Mock import complete' });
+});
+
+function smsTemplateResponse(segment) {
+  return {
+    id: `sms_${Date.now()}`,
+    segment,
+    message_body: 'Welcome to Utopia — special offer inside.',
+    discount_code: 'UT10',
+    landing_page_url: 'https://example.com/offer',
+    created_at: new Date().toISOString(),
+  };
+}
+
+app.post('/sms-templates/existing', (req, res) => {
+  res.json(smsTemplateResponse('existing'));
+});
+
+app.post('/sms-templates/lead', (req, res) => {
+  res.json(smsTemplateResponse('lead'));
+});
+
+app.post('/sms-templates/:template_id/send', (req, res) => {
+  res.json({ sent: 42, template_id: req.params.template_id });
 });
 
 // --- AI HUB --- 
@@ -187,7 +269,7 @@ app.get('/api/v1/ai/usage', (req, res) => {
 app.post('/api/v1/ai/recommendations', (req, res) => {
   res.json({
     recommendations: [
-       { campaign_type: "Win-back Campaign", target_segment: "Lapsed VIPs", expected_roi: 3.5, confidence: 0.92, reasoning: "VIP guests from 6 months ago show high rebooking propensity when offered incentives.", optional_send_time: "Friday 5pm", estimated_cost: 15, estimated_revenue: 1200 }
+      { campaign_type: "Win-back Campaign", target_segment: "Lapsed VIPs", expected_roi: 3.5, confidence: 0.92, reasoning: "VIP guests from 6 months ago show high rebooking propensity when offered incentives.", optional_send_time: "Friday 5pm", estimated_cost: 15, estimated_revenue: 1200 }
     ]
   });
 });
@@ -195,14 +277,14 @@ app.post('/api/v1/ai/recommendations', (req, res) => {
 app.post('/api/v1/ai/generate', (req, res) => {
   res.json({
     variants: [
-       { id: "v1", text: "Hello! We've missed you at Utopia. Enjoy 15% off your next relaxing stay using code WELCOMEBACK. Book now!", confidence_score: 0.95 }
+      { id: "v1", text: "Hello! We've missed you at Utopia. Enjoy 15% off your next relaxing stay using code WELCOMEBACK. Book now!", confidence_score: 0.95 }
     ]
   });
 });
 
 // Catch all
 app.use((req, res) => {
-   res.status(404).json({ detail: `Endpoint not found: ${req.method} ${req.path}` });
+  res.status(404).json({ detail: `Endpoint not found: ${req.method} ${req.path}` });
 });
 
 const PORT = 4001;
