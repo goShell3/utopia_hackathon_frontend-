@@ -6,6 +6,8 @@ import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, CalendarDays, Clock, MapPin, Link, FileText, Zap, Loader2, RefreshCw, Tag, TrendingUp, Timer, Megaphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEvents, useEventCampaigns, useGenerateCampaigns } from '@/hooks/useCalendar';
+import { GenerateCampaignModal } from '@/components/calendar/GenerateCampaignModal';
+import { events as localEvents } from '@/data/events';
 
 const EventMap = dynamic(() => import('@/components/calendar/EventMap').then(m => m.EventMap), { ssr: false });
 
@@ -31,6 +33,9 @@ export default function CalendarEventPage() {
 
   const { data: campaigns = [], isLoading: loadingCampaigns } = useEventCampaigns(slug);
   const { mutate: generateCampaigns, isPending: generating } = useGenerateCampaigns();
+  const [campaignModalOpen, setCampaignModalOpen] = React.useState(false);
+
+  const localEvent = localEvents.find(e => e.slug === slug || e.id === slug);
 
   if (isLoading) {
     return (
@@ -226,18 +231,10 @@ export default function CalendarEventPage() {
           <div className="flex items-center justify-between">
             <p className="technical-label text-[10px] text-neutral-500 uppercase">Ad Campaigns</p>
             <button
-              onClick={() => generateCampaigns()}
-              disabled={generating || loadingCampaigns}
-              className={cn(
-                'flex items-center gap-2 px-4 py-2 text-xs font-black italic uppercase tracking-tight transition-all',
-                generating || loadingCampaigns
-                  ? 'bg-neutral-100 text-neutral-400 cursor-not-allowed'
-                  : 'bg-black text-white hover:bg-neutral-800'
-              )}
+              onClick={() => setCampaignModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 text-xs font-black italic uppercase tracking-tight transition-all bg-black text-white hover:bg-neutral-800"
             >
-              {generating || loadingCampaigns
-                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                : <Zap className="w-3.5 h-3.5" />}
+              <Zap className="w-3.5 h-3.5" />
               {campaigns.length > 0 ? 'Regenerate' : 'Generate Campaigns'}
             </button>
           </div>
@@ -267,6 +264,14 @@ export default function CalendarEventPage() {
           )}
         </div>
       </div>
+
+      {localEvent && (
+        <GenerateCampaignModal
+          open={campaignModalOpen}
+          onClose={() => setCampaignModalOpen(false)}
+          event={localEvent}
+        />
+      )}
     </div>
   );
 }
