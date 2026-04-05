@@ -24,13 +24,14 @@ interface Props {
   events: CalendarEvent[];
   selectedDate: string;
   onSelectDate: (date: string) => void;
+  onSelectEvent?: (event: CalendarEvent) => void;
 }
 
 function toYMD(date: Date) {
   return date.toISOString().split('T')[0];
 }
 
-export function CalendarView({ events, selectedDate, onSelectDate }: Props) {
+export function CalendarView({ events, selectedDate, onSelectDate, onSelectEvent }: Props) {
   const [cursor, setCursor] = React.useState(() => {
     const d = new Date();
     return { year: d.getFullYear(), month: d.getMonth() };
@@ -75,15 +76,15 @@ export function CalendarView({ events, selectedDate, onSelectDate }: Props) {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 text-center">
+      <div className="grid grid-cols-7 border-l border-t border-neutral-100">
         {DAY_LABELS.map(d => (
-          <span key={d} className="technical-label text-[9px] py-1">{d}</span>
+          <span key={d} className="technical-label text-[9px] py-2 px-2 border-r border-b border-neutral-100 text-neutral-400">{d}</span>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 border-l border-t border-neutral-100">
         {cells.map((day, idx) => {
-          if (!day) return <div key={idx} />;
+          if (!day) return <div key={idx} className="border-r border-b border-neutral-100 min-h-[100px]" />;
           const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           const isToday = dateStr === today;
           const isSelected = dateStr === selectedDate;
@@ -94,19 +95,34 @@ export function CalendarView({ events, selectedDate, onSelectDate }: Props) {
               key={idx}
               onClick={() => onSelectDate(dateStr)}
               className={cn(
-                'relative flex flex-col items-center justify-start pt-1.5 pb-1 rounded-lg min-h-[52px] transition-all duration-150 border',
-                isSelected
-                  ? 'bg-black text-white border-black'
-                  : isToday
-                  ? 'border-utopia text-utopia font-black'
-                  : 'border-transparent hover:bg-neutral-100 text-neutral-700'
+                'relative flex flex-col items-start p-2 min-h-[100px] border-r border-b border-neutral-100 transition-all duration-150 text-left',
+                isSelected ? 'ring-2 ring-inset ring-black' : isToday ? 'bg-utopia/5' : 'hover:bg-neutral-50'
               )}
             >
-              <span className="text-xs font-bold">{day}</span>
-              <div className="flex gap-0.5 mt-1 flex-wrap justify-center px-1">
-                {dayEvents.slice(0, 3).map(e => (
-                  <span key={e.id} className={cn('w-1.5 h-1.5 rounded-full', TYPE_COLORS[e.type])} />
+              {/* Date number top-left */}
+              <span className={cn(
+                'text-xs font-black mb-1.5 w-6 h-6 flex items-center justify-center rounded-full',
+                isSelected ? 'bg-black text-white' : isToday ? 'bg-utopia text-white' : 'text-neutral-500'
+              )}>{day}</span>
+
+              {/* Event pills — up to 2 */}
+              <div className="w-full space-y-0.5">
+                {dayEvents.slice(0, 2).map(e => (
+                  <div
+                    key={e.id}
+                    onClick={(ev) => { ev.stopPropagation(); onSelectDate(dateStr); onSelectEvent?.(e); }}
+                    className={cn('w-full flex items-center gap-1 px-1.5 py-0.5 rounded-[2px] cursor-pointer hover:opacity-80 transition-opacity', TYPE_COLORS[e.type])}
+                  >
+                    <span className="text-[8px] font-black text-white truncate leading-tight">{e.title}</span>
+                  </div>
                 ))}
+                {dayEvents.length > 2 && (
+                  <div className="flex gap-0.5 px-1 pt-0.5">
+                    {dayEvents.slice(2).map(e => (
+                      <span key={e.id} className={cn('w-1.5 h-1.5 rounded-full shrink-0', TYPE_COLORS[e.type])} />
+                    ))}
+                  </div>
+                )}
               </div>
             </button>
           );

@@ -14,10 +14,6 @@ const readDB = () => JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
 const writeDB = (data) => fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
 
 // --- AUTH ---
-app.post('/api/v1/auth/login', (req, res) => {
-  res.json({ access_token: "mock_token_123", token_type: "bearer" });
-});
-
 app.get('/api/v1/auth/me', (req, res) => {
   const db = readDB();
   res.json(db.me);
@@ -132,6 +128,51 @@ app.get('/api/v1/campaigns/:id/leads', (req, res) => {
   const db = readDB();
   // Return some dummy matched leads
   res.json(db.leads.slice(0, 2));
+});
+
+// --- EVENTS (matches api.ts) ---
+app.post('/signin', (req, res) => {
+  res.json({ access_token: "mock_token_123", token_type: "bearer" });
+});
+
+app.get('/events', (req, res) => {
+  const db = readDB();
+  res.json(db.events);
+});
+
+app.post('/search-events', (req, res) => {
+  const db = readDB();
+  const { query, location } = req.body;
+  const q = (query || '').toLowerCase();
+  const loc = (location || '').toLowerCase();
+  const results = db.events.filter(e =>
+    (!q || e.title.toLowerCase().includes(q) || (e.description || '').toLowerCase().includes(q) || (e.category || '').toLowerCase().includes(q)) &&
+    (!loc || (e.location_name || '').toLowerCase().includes(loc))
+  );
+  res.json(results);
+});
+
+app.post('/events/:event_id/campaigns', (req, res) => {
+  const db = readDB();
+  const { event_id } = req.params;
+  const event = db.events.find(e => e.id === event_id);
+  if (!event) return res.status(404).json({ detail: 'Event not found' });
+  const existing = db.ad_campaigns.filter(c => c.event_id === event_id);
+  if (existing.length > 0) return res.json(existing);
+  const newCampaign = {
+    id: `adc_${Date.now()}`,
+    event_id,
+    headline: `Don't Miss: ${event.title}`,
+    body_text: `Book your stay at Utopia Hotel and experience ${event.title}. Limited availability!`,
+    generated_image_url: null,
+    target_audience: {},
+    ai_rationale: `Generated campaign for event: ${event.title}`,
+    status: 'ready',
+    created_at: new Date().toISOString()
+  };
+  db.ad_campaigns.push(newCampaign);
+  writeDB(db);
+  res.json([newCampaign]);
 });
 
 // --- AI HUB --- 

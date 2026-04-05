@@ -1,37 +1,24 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authService } from '@/lib/api/auth';
 import { queryKeys } from './queryKeys';
-import type { UserLogin, UserCreate } from '@/types';
+
+const USER_KEY = 'utopia_user';
 
 export function useMe() {
   return useQuery({
     queryKey: queryKeys.auth.me(),
-    queryFn: authService.me,
-    retry: false,
-  });
-}
-
-export function useLogin() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (credentials: UserLogin) => authService.login(credentials),
-    onSuccess: async () => {
-      const user = await authService.me();
-      queryClient.setQueryData(queryKeys.auth.me(), user);
+    queryFn: () => {
+      const stored = localStorage.getItem(USER_KEY);
+      if (!stored) throw new Error('Not authenticated');
+      return JSON.parse(stored);
     },
-  });
-}
-
-export function useRegister() {
-  return useMutation({
-    mutationFn: (data: UserCreate) => authService.register(data),
+    retry: false,
   });
 }
 
 export function useLogout() {
   const queryClient = useQueryClient();
   return () => {
-    authService.logout();
+    localStorage.removeItem(USER_KEY);
     queryClient.clear();
   };
 }
