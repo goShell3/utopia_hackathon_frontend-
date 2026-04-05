@@ -18,16 +18,50 @@ export type LeadSource = components['schemas']['LeadSource'];
 export type ConsentStatus = components['schemas']['ConsentStatus'];
 
 // Campaigns
-export type Campaign = components['schemas']['CampaignResponse'];
-export type CampaignCreate = components['schemas']['CampaignCreate'];
-export type CampaignUpdate = components['schemas']['CampaignUpdate'];
-export type CampaignListResponse = components['schemas']['CampaignListResponse'];
-export type CampaignStats = components['schemas']['CampaignStatsResponse'];
-export type CampaignStatus = components['schemas']['CampaignStatus'];
-export type CampaignType = components['schemas']['CampaignType'];
-export type TriggerEvent = components['schemas']['TriggerEvent'];
-// export type MessageChannel = components['schemas']['app__models__campaign__MessageChannel'];
-// export type AIMessageChannel = components['schemas']['app__schemas__ai__MessageChannel'];
+export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed';
+export type CampaignType = 'trigger' | 'scheduled' | 'manual';
+export type TriggerEvent = 'lead.created' | 'booking.confirmed' | 'checkin' | 'checkout' | 'checkout.completed';
+export type MessageChannel = 'sms' | 'email' | 'whatsapp';
+
+export interface Campaign {
+  id: string;
+  name: string;
+  description?: string | null;
+  campaign_type: CampaignType;
+  status: CampaignStatus;
+  channels: string[];
+  trigger_event?: TriggerEvent | null;
+  schedule_cron?: string | null;
+  enable_ab_test: boolean;
+  created_at: string;
+  updated_at?: string | null;
+}
+
+export interface CampaignCreate {
+  name: string;
+  description?: string | null;
+  campaign_type: CampaignType;
+  channels: string[];
+  trigger_event?: TriggerEvent | null;
+  schedule_cron?: string | null;
+  enable_ab_test?: boolean;
+}
+
+export type CampaignUpdate = Partial<CampaignCreate>;
+
+export interface CampaignListResponse {
+  items: Campaign[];
+  total: number;
+  page?: number;
+  size?: number;
+}
+
+export interface CampaignStats {
+  total_sent: number;
+  delivery_rate: number;
+  open_rate: number;
+  click_rate: number;
+}
 
 // Templates
 export type MessageTemplate = components['schemas']['MessageTemplateResponse'];

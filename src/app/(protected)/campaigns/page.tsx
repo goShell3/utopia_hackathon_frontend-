@@ -14,8 +14,7 @@ import {
   useCampaigns,
   useCreateCampaign, useUpdateCampaign, useDeleteCampaign
 } from '@/hooks/useCampaigns';
-import type { Campaign, CampaignCreate, CampaignUpdate, CampaignType, TriggerEvent } from '@/types';
-type MessageChannel = 'sms' | 'email' | 'whatsapp';
+import type { Campaign, CampaignCreate, CampaignUpdate, CampaignType, MessageChannel, TriggerEvent } from '@/types';
 
 export default function CampaignsPage() {
   const [showDialog, setShowDialog] = useState<false | 'create' | 'edit'>(false);
