@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { useCampaigns, useCampaignTargetLeads, useExecuteCampaign } from '@/hooks/useCampaigns';
 import { useGenerateMessage } from '@/hooks/useAI';
 import type { Campaign, Lead, MessageGenerationRequest, LeadSource, CampaignGoal, MessageTone } from '@/types';
+import { date } from 'zod';
 
 export default function MessagesPage() {
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
@@ -51,8 +52,9 @@ export default function MessagesPage() {
     const getLoyaltyType = (lead: Lead): 'vip' | 'loyal' | 'new' | 'dormant' => {
       const bookings = lead.total_bookings || 0;
       const lastBooking = lead.last_booking_date;
+      const date = Date.now();
       const daysSinceLastBooking = lastBooking 
-        ? Math.floor((Date.now() - new Date(lastBooking).getTime()) / (1000 * 60 * 60 * 24))
+        ? Math.floor((date - new Date(lastBooking).getTime()) / (1000 * 60 * 60 * 24))
         : 999;
 
       if (bookings >= 5) return 'vip';

@@ -4,7 +4,7 @@
  */
 
 export interface paths {
-    "/api/v1/auth/login": {
+    "/signin": {
         parameters: {
             query?: never;
             header?: never;
@@ -13,49 +13,23 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Login
-         * @description Authenticate user and return JWT tokens.
-         */
-        post: operations["login_api_v1_auth_login_post"];
+        /** Sign In */
+        post: operations["sign_in_signin_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/refresh": {
+    "/events": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
-        /**
-         * Refresh Token
-         * @description Refresh access token using refresh token.
-         */
-        post: operations["refresh_token_api_v1_auth_refresh_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Current User Info
-         * @description Get current authenticated user info.
-         */
-        get: operations["get_current_user_info_api_v1_auth_me_get"];
+        /** List Events */
+        get: operations["list_events_events_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -64,7 +38,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/register": {
+    "/search-events": {
         parameters: {
             query?: never;
             header?: never;
@@ -73,90 +47,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Register User
-         * @description Register new user (for demo - in production add hotel verification).
-         */
-        post: operations["register_user_api_v1_auth_register_post"];
+        /** Search Events */
+        post: operations["search_events_search_events_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/leads": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Leads
-         * @description List leads with filtering and pagination.
-         */
-        get: operations["list_leads_api_v1_leads_get"];
-        put?: never;
-        /**
-         * Create Lead
-         * @description Create new lead with automatic deduplication check.
-         */
-        post: operations["create_lead_api_v1_leads_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/leads/{lead_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Lead
-         * @description Get lead by ID.
-         */
-        get: operations["get_lead_api_v1_leads__lead_id__get"];
-        /**
-         * Update Lead
-         * @description Update lead.
-         */
-        put: operations["update_lead_api_v1_leads__lead_id__put"];
-        post?: never;
-        /**
-         * Delete Lead
-         * @description Delete lead.
-         */
-        delete: operations["delete_lead_api_v1_leads__lead_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/leads/{lead_id}/segment": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Update Lead Segment
-         * @description Update lead segment manually.
-         */
-        put: operations["update_lead_segment_api_v1_leads__lead_id__segment_put"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/leads/{lead_id}/score": {
+    "/events/{event_id}/campaigns": {
         parameters: {
             query?: never;
             header?: never;
@@ -165,18 +64,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Score Lead
-         * @description Score individual lead.
-         */
-        post: operations["score_lead_api_v1_leads__lead_id__score_post"];
+        /** Generate Campaigns */
+        post: operations["generate_campaigns_events__event_id__campaigns_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/leads/score/bulk": {
+    "/campaigns/{campaign_id}/templates": {
         parameters: {
             query?: never;
             header?: never;
@@ -185,90 +81,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Bulk Score Leads
-         * @description Score multiple leads in batch (async operation).
-         */
-        post: operations["bulk_score_leads_api_v1_leads_score_bulk_post"];
+        /** Generate Template */
+        post: operations["generate_template_campaigns__campaign_id__templates_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/leads/stats/summary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Leads Summary
-         * @description Get lead statistics summary.
-         */
-        get: operations["get_leads_summary_api_v1_leads_stats_summary_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/campaigns": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Campaigns
-         * @description List campaigns with filtering and pagination.
-         */
-        get: operations["list_campaigns_api_v1_campaigns_get"];
-        put?: never;
-        /**
-         * Create Campaign
-         * @description Create new campaign.
-         */
-        post: operations["create_campaign_api_v1_campaigns_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/campaigns/{campaign_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Campaign
-         * @description Get campaign by ID.
-         */
-        get: operations["get_campaign_api_v1_campaigns__campaign_id__get"];
-        /**
-         * Update Campaign
-         * @description Update campaign.
-         */
-        put: operations["update_campaign_api_v1_campaigns__campaign_id__put"];
-        post?: never;
-        /**
-         * Delete Campaign
-         * @description Delete campaign.
-         */
-        delete: operations["delete_campaign_api_v1_campaigns__campaign_id__delete"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/campaigns/{campaign_id}/activate": {
+    "/customers/{customer_id}/sms/existing": {
         parameters: {
             query?: never;
             header?: never;
@@ -277,18 +98,15 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Activate Campaign
-         * @description Activate campaign.
-         */
-        post: operations["activate_campaign_api_v1_campaigns__campaign_id__activate_post"];
+        /** Sms Existing Customer */
+        post: operations["sms_existing_customer_customers__customer_id__sms_existing_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/campaigns/{campaign_id}/pause": {
+    "/customers/{customer_id}/sms/lead": {
         parameters: {
             query?: never;
             header?: never;
@@ -297,586 +115,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /**
-         * Pause Campaign
-         * @description Pause campaign.
-         */
-        post: operations["pause_campaign_api_v1_campaigns__campaign_id__pause_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/campaigns/{campaign_id}/execute": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Execute Campaign
-         * @description Execute campaign (queue messages for sending).
-         */
-        post: operations["execute_campaign_api_v1_campaigns__campaign_id__execute_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/campaigns/{campaign_id}/stats": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Campaign Stats
-         * @description Get campaign statistics.
-         */
-        get: operations["get_campaign_stats_api_v1_campaigns__campaign_id__stats_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/campaigns/{campaign_id}/leads": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Campaign Target Leads
-         * @description Get leads matching campaign targeting criteria.
-         */
-        get: operations["get_campaign_target_leads_api_v1_campaigns__campaign_id__leads_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/templates": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List Templates
-         * @description List message templates.
-         */
-        get: operations["list_templates_api_v1_templates_get"];
-        put?: never;
-        /**
-         * Create Template
-         * @description Create message template.
-         */
-        post: operations["create_template_api_v1_templates_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/templates/{template_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Template
-         * @description Get message template.
-         */
-        get: operations["get_template_api_v1_templates__template_id__get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/generate-message": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Generate Campaign Message
-         * @description Generate AI-powered personalized campaign message.
-         *
-         *     Features:
-         *     - Multi-language support (English, Amharic)
-         *     - Tone customization
-         *     - Channel optimization (SMS, Email)
-         *     - A/B test variants
-         *     - Personalization tokens
-         */
-        post: operations["generate_campaign_message_api_v1_ai_generate_message_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/generate-message-batch": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Generate Messages Batch
-         * @description Generate messages for multiple leads in batch.
-         *
-         *     Useful for campaign preparation.
-         */
-        post: operations["generate_messages_batch_api_v1_ai_generate_message_batch_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/score-lead/{lead_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Score Lead With Ai
-         * @description Score lead using AI-enhanced scoring system.
-         *
-         *     Features:
-         *     - Conversion probability prediction
-         *     - Quality score assessment
-         *     - AI-generated explanation
-         *     - Actionable recommendations
-         *     - Confidence scoring
-         */
-        post: operations["score_lead_with_ai_api_v1_ai_score_lead__lead_id__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/score-leads-batch": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Score Leads Batch
-         * @description Score multiple leads in batch.
-         *
-         *     Efficient for bulk lead processing.
-         */
-        post: operations["score_leads_batch_api_v1_ai_score_leads_batch_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/campaign-recommendations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Get Campaign Recommendations
-         * @description Get AI-powered campaign strategy recommendations.
-         *
-         *     Features:
-         *     - Analyzes hotel performance data
-         *     - Recommends optimal campaign types
-         *     - Predicts ROI for each campaign
-         *     - Suggests budget allocation
-         *     - Identifies risks and opportunities
-         */
-        post: operations["get_campaign_recommendations_api_v1_ai_campaign_recommendations_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/enrich-lead/{lead_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Enrich Lead
-         * @description Enrich lead data with AI-powered insights.
-         *
-         *     Features:
-         *     - Predict booking probability
-         *     - Estimate customer lifetime value (CLV)
-         *     - Identify churn risk
-         *     - Predict guest preferences
-         *     - Recommend next actions
-         *     - Suggest optimal contact time
-         */
-        post: operations["enrich_lead_api_v1_ai_enrich_lead__lead_id__post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/usage-stats": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get Ai Usage Stats
-         * @description Get AI service usage statistics.
-         *
-         *     Includes:
-         *     - Request counts (hourly, daily)
-         *     - Success/failure rates
-         *     - Response times
-         *     - Cache hit rates
-         *     - Cost estimates
-         */
-        get: operations["get_ai_usage_stats_api_v1_ai_usage_stats_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/clear-cache": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Clear Ai Cache
-         * @description Clear AI response cache.
-         *
-         *     Useful for testing or when you want fresh AI responses.
-         */
-        post: operations["clear_ai_cache_api_v1_ai_clear_cache_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Ai Health Check
-         * @description Check AI service health.
-         *
-         *     Returns status of all AI features.
-         */
-        get: operations["ai_health_check_api_v1_ai_health_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/ai/test-generation": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Test Message Generation
-         * @description Test AI message generation with custom prompt.
-         *
-         *     Useful for testing and demos.
-         */
-        post: operations["test_message_generation_api_v1_ai_test_generation_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sms/send": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Send Sms
-         * @description Send a single SMS message.
-         *
-         *     Features:
-         *     - Validates phone number
-         *     - Calculates cost
-         *     - Tracks delivery status
-         *     - Returns message ID for tracking
-         */
-        post: operations["send_sms_api_v1_sms_send_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sms/send-bulk": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Send Bulk Sms
-         * @description Send bulk SMS messages.
-         *
-         *     Features:
-         *     - Send to multiple recipients
-         *     - Same message or individual messages
-         *     - Campaign tracking
-         *     - Cost calculation
-         *     - Delivery status callbacks
-         *
-         *     Limits:
-         *     - Max 1000 messages per request
-         */
-        post: operations["send_bulk_sms_api_v1_sms_send_bulk_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sms/otp/send": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Send Otp
-         * @description Generate and send OTP (One-Time Password).
-         *
-         *     Use cases:
-         *     - Phone number verification
-         *     - Two-factor authentication
-         *     - Password reset
-         *     - Transaction confirmation
-         *
-         *     Returns verification_code that must be stored for later verification.
-         */
-        post: operations["send_otp_api_v1_sms_otp_send_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sms/otp/verify": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Verify Otp
-         * @description Verify OTP code entered by user.
-         *
-         *     Args:
-         *         to: Phone number
-         *         verification_code: The 'vc' returned from send_otp endpoint
-         *         user_code: The code entered by the user
-         *
-         *     Returns:
-         *         valid: True if code is correct and not expired
-         */
-        post: operations["verify_otp_api_v1_sms_otp_verify_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sms/webhooks/delivery-status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Sms Delivery Webhook
-         * @description Webhook for SMS delivery status updates from AfroMessage.
-         *
-         *     AfroMessage will POST delivery status updates here.
-         *
-         *     Expected payload:
-         *     {
-         *         "messageId": "...",
-         *         "status": "delivered|failed|pending",
-         *         "to": "+251...",
-         *         "timestamp": "...",
-         *         ...
-         *     }
-         */
-        post: operations["sms_delivery_webhook_api_v1_sms_webhooks_delivery_status_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sms/webhooks/campaign-status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Campaign Status Webhook
-         * @description Webhook for bulk campaign status updates.
-         *
-         *     AfroMessage will POST campaign status here.
-         */
-        post: operations["campaign_status_webhook_api_v1_sms_webhooks_campaign_status_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/sms/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Sms Health Check
-         * @description Check SMS service health.
-         */
-        get: operations["sms_health_check_api_v1_sms_health_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/health": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Health Check
-         * @description Health check endpoint.
-         */
-        get: operations["health_check_health_get"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Root
-         * @description Root endpoint.
-         */
-        get: operations["root__get"];
-        put?: never;
-        post?: never;
+        /** Sms Lead Customer */
+        post: operations["sms_lead_customer_customers__customer_id__sms_lead_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -887,1041 +127,116 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /**
-         * AIUsageStats
-         * @description AI usage statistics.
-         */
-        AIUsageStats: {
-            /** Total Requests */
-            total_requests: number;
-            /** Successful Requests */
-            successful_requests: number;
-            /** Failed Requests */
-            failed_requests: number;
-            /** Avg Response Time */
-            avg_response_time: number;
-            /** Cache Hit Rate */
-            cache_hit_rate: number;
-            /** Estimated Cost */
-            estimated_cost: number;
-            /**
-             * Period Start
-             * Format: date-time
-             */
-            period_start: string;
-            /**
-             * Period End
-             * Format: date-time
-             */
-            period_end: string;
-        };
-        /** BatchMessageRequest */
-        BatchMessageRequest: {
-            /** Lead Ids */
-            lead_ids: string[];
-            /** Campaign Goal */
-            campaign_goal: string;
-            /**
-             * Tone
-             * @default friendly
-             */
-            tone: string;
-            /**
-             * Language
-             * @default en
-             */
-            language: string;
-            /**
-             * Channel
-             * @default sms
-             */
-            channel: string;
-            /**
-             * Max Length
-             * @default 160
-             */
-            max_length: number | null;
-            /** Personalization Data */
-            personalization_data?: Record<string, never> | null;
-        };
-        /**
-         * BehaviorPrediction
-         * @description Predicted future behavior.
-         */
-        BehaviorPrediction: {
-            /** Booking Probability 30D */
-            booking_probability_30d: number;
-            /** Booking Probability 60D */
-            booking_probability_60d: number;
-            /** Booking Probability 90D */
-            booking_probability_90d: number;
-            /** Estimated Clv */
-            estimated_clv: number;
-            /** Churn Risk */
-            churn_risk: number;
-            /** Next Booking Date */
-            next_booking_date?: string | null;
-        };
-        /**
-         * BulkSMSMessage
-         * @description Single message in bulk SMS.
-         */
-        BulkSMSMessage: {
-            /**
-             * To
-             * @description Phone number
-             */
-            to: string;
-            /**
-             * Message
-             * @description Custom message (if not using campaign_message)
-             */
-            message?: string | null;
-        };
-        /**
-         * BulkSMSResponse
-         * @description Bulk SMS response.
-         */
-        BulkSMSResponse: {
-            /** Success */
-            success: boolean;
+        /** AdCampaignResponse */
+        AdCampaignResponse: {
+            /** Id */
+            id: string;
+            /** Event Id */
+            event_id: string;
+            /** Headline */
+            headline: string | null;
+            /** Body Text */
+            body_text: string | null;
+            /** Generated Image Url */
+            generated_image_url: string | null;
+            /** Target Audience */
+            target_audience: Record<string, never> | null;
+            /** Ai Rationale */
+            ai_rationale: string | null;
             /** Status */
             status: string;
-            /** Campaign Id */
-            campaign_id?: string | null;
-            /** Campaign Title */
-            campaign_title?: string | null;
-            /** Total */
-            total: number;
-            /** Sent */
-            sent: number;
-            /** Failed */
-            failed: number;
-            /** Total Cost */
-            total_cost?: number | null;
-            /** Error */
-            error?: string | null;
-        };
-        /**
-         * CampaignAdvisorRequest
-         * @description Request for campaign recommendations.
-         */
-        CampaignAdvisorRequest: {
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** Budget */
-            budget?: number | null;
-            /**
-             * Timeframe Days
-             * @default 30
-             */
-            timeframe_days: number;
-            /**
-             * Preferred Channels
-             * @default [
-             *       "sms"
-             *     ]
-             */
-            preferred_channels: components["schemas"]["app__schemas__ai__MessageChannel"][];
-        };
-        /**
-         * CampaignAdvisorResponse
-         * @description Response from campaign advisor.
-         */
-        CampaignAdvisorResponse: {
-            /** Recommendations */
-            recommendations: components["schemas"]["CampaignRecommendation"][];
-            /** Hotel Insights */
-            hotel_insights: Record<string, never>;
-            /** Optimal Budget Allocation */
-            optimal_budget_allocation: {
-                [key: string]: number;
-            };
-            /** Risk Assessment */
-            risk_assessment: string;
-            /**
-             * Generated At
-             * Format: date-time
-             */
-            generated_at: string;
-        };
-        /**
-         * CampaignCreate
-         * @description Schema for creating campaign.
-         */
-        CampaignCreate: {
-            /** Name */
-            name: string;
-            /** Description */
-            description?: string | null;
-            campaign_type: components["schemas"]["CampaignType"];
-            trigger_event?: components["schemas"]["TriggerEvent"] | null;
-            /** Trigger Delay Minutes */
-            trigger_delay_minutes?: number | null;
-            /** Schedule Cron */
-            schedule_cron?: string | null;
-            /** Schedule Timezone */
-            schedule_timezone?: string | null;
-            /** Target Segments */
-            target_segments?: string[];
-            /** Target Filters */
-            target_filters?: Record<string, never> | null;
-            /** Channels */
-            channels: components["schemas"]["app__models__campaign__MessageChannel"][];
-            /** Sms Template Id */
-            sms_template_id?: string | null;
-            /** Email Template Id */
-            email_template_id?: string | null;
-            /**
-             * Enable Ab Test
-             * @default false
-             */
-            enable_ab_test: boolean;
-            /** Ab Test Split */
-            ab_test_split?: number | null;
-            /** Ab Variant Template Id */
-            ab_variant_template_id?: string | null;
-            /** Throttle Per Minute */
-            throttle_per_minute?: number | null;
-            /** Max Sends Per Lead */
-            max_sends_per_lead?: number | null;
-        };
-        /**
-         * CampaignGoal
-         * @description Campaign goal types.
-         * @enum {string}
-         */
-        CampaignGoal: "booking" | "upsell" | "re_engagement" | "feedback" | "loyalty" | "promotion";
-        /**
-         * CampaignListResponse
-         * @description Schema for paginated campaign list.
-         */
-        CampaignListResponse: {
-            /** Items */
-            items: components["schemas"]["CampaignResponse"][];
-            /** Total */
-            total: number;
-            /** Page */
-            page: number;
-            /** Page Size */
-            page_size: number;
-            /** Pages */
-            pages: number;
-        };
-        /**
-         * CampaignRecommendation
-         * @description A single campaign recommendation.
-         */
-        CampaignRecommendation: {
-            /** Campaign Type */
-            campaign_type: string;
-            /** Target Segment */
-            target_segment: string;
-            goal: components["schemas"]["CampaignGoal"];
-            /** Message Strategy */
-            message_strategy: string;
-            /** Optimal Send Time */
-            optimal_send_time: string;
-            /** Expected Roi */
-            expected_roi: number;
-            /** Estimated Cost */
-            estimated_cost: number;
-            /** Estimated Revenue */
-            estimated_revenue: number;
-            /** Confidence */
-            confidence: number;
-            /** Reasoning */
-            reasoning: string;
-        };
-        /**
-         * CampaignResponse
-         * @description Schema for campaign response.
-         */
-        CampaignResponse: {
-            /**
-             * Id
-             * Format: uuid4
-             */
-            id: string;
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** Name */
-            name: string;
-            /** Description */
-            description: string | null;
-            campaign_type: components["schemas"]["CampaignType"];
-            status: components["schemas"]["CampaignStatus"];
-            trigger_event: components["schemas"]["TriggerEvent"] | null;
-            /** Trigger Delay Minutes */
-            trigger_delay_minutes: number | null;
-            /** Schedule Cron */
-            schedule_cron: string | null;
-            /** Schedule Timezone */
-            schedule_timezone: string | null;
-            /** Target Segments */
-            target_segments: string[];
-            /** Target Filters */
-            target_filters: Record<string, never> | null;
-            /** Channels */
-            channels: components["schemas"]["app__models__campaign__MessageChannel"][];
-            /** Sms Template Id */
-            sms_template_id: string | null;
-            /** Email Template Id */
-            email_template_id: string | null;
-            /** Enable Ab Test */
-            enable_ab_test: boolean;
-            /** Ab Test Split */
-            ab_test_split: number | null;
-            /** Ab Variant Template Id */
-            ab_variant_template_id: string | null;
-            /** Throttle Per Minute */
-            throttle_per_minute: number | null;
-            /** Max Sends Per Lead */
-            max_sends_per_lead: number | null;
-            /** Total Sent */
-            total_sent: number;
-            /** Total Delivered */
-            total_delivered: number;
-            /** Total Failed */
-            total_failed: number;
-            /** Total Opened */
-            total_opened: number;
-            /** Total Clicked */
-            total_clicked: number;
-            /** Total Cost */
-            total_cost: number;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+        };
+        /** AdTemplateResponse */
+        AdTemplateResponse: {
+            /** Id */
+            id: string;
+            /** Campaign Id */
+            campaign_id: string;
+            /** Primary Text */
+            primary_text: string;
+            /** Headline */
+            headline: string;
+            /** Image Prompt */
+            image_prompt: string | null;
+            /** Image Url */
+            image_url: string | null;
+            /** Meta Form Id */
+            meta_form_id: string | null;
+        };
+        /** EventResponse */
+        EventResponse: {
+            /** Id */
+            id: string;
+            /** Title */
+            title: string;
+            /** Description */
+            description: string | null;
+            /** Category */
+            category: string | null;
+            /** Start Time */
+            start_time: string | null;
+            /** End Time */
+            end_time: string | null;
+            /** Location Name */
+            location_name: string | null;
+            /** Source Url */
+            source_url: string | null;
             /**
-             * Updated At
+             * Created At
              * Format: date-time
              */
-            updated_at: string;
+            created_at: string;
         };
-        /**
-         * CampaignStatsResponse
-         * @description Schema for campaign statistics.
-         */
-        CampaignStatsResponse: {
+        /** EventSearchRequest */
+        EventSearchRequest: {
             /**
-             * Campaign Id
-             * Format: uuid4
+             * Days
+             * @default 7
              */
-            campaign_id: string;
-            /** Total Sent */
-            total_sent: number;
-            /** Total Delivered */
-            total_delivered: number;
-            /** Total Failed */
-            total_failed: number;
-            /** Total Opened */
-            total_opened: number;
-            /** Total Clicked */
-            total_clicked: number;
-            /** Delivery Rate */
-            delivery_rate: number;
-            /** Open Rate */
-            open_rate: number;
-            /** Click Rate */
-            click_rate: number;
-            /** Total Cost */
-            total_cost: number;
-            /** Avg Cost Per Send */
-            avg_cost_per_send: number;
-            /** By Channel */
-            by_channel: {
-                [key: string]: {
-                    [key: string]: number;
-                };
-            };
-            /** Ab Test Results */
-            ab_test_results?: Record<string, never> | null;
+            days: number;
         };
-        /**
-         * CampaignStatus
-         * @description Campaign status
-         * @enum {string}
-         */
-        CampaignStatus: "draft" | "active" | "paused" | "completed";
-        /**
-         * CampaignType
-         * @description Campaign types
-         * @enum {string}
-         */
-        CampaignType: "trigger" | "scheduled" | "manual";
-        /**
-         * CampaignUpdate
-         * @description Schema for updating campaign.
-         */
-        CampaignUpdate: {
-            /** Name */
-            name?: string | null;
-            /** Description */
-            description?: string | null;
-            status?: components["schemas"]["CampaignStatus"] | null;
-            /** Trigger Delay Minutes */
-            trigger_delay_minutes?: number | null;
-            /** Schedule Cron */
-            schedule_cron?: string | null;
-            /** Target Segments */
-            target_segments?: string[] | null;
-            /** Target Filters */
-            target_filters?: Record<string, never> | null;
-            /** Channels */
-            channels?: components["schemas"]["app__models__campaign__MessageChannel"][] | null;
-            /** Sms Template Id */
-            sms_template_id?: string | null;
-            /** Email Template Id */
-            email_template_id?: string | null;
-            /** Enable Ab Test */
-            enable_ab_test?: boolean | null;
-            /** Throttle Per Minute */
-            throttle_per_minute?: number | null;
-        };
-        /**
-         * ConsentStatus
-         * @description Consent status
-         * @enum {string}
-         */
-        ConsentStatus: "opted_in" | "opted_out" | "pending";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
         };
-        /**
-         * LeadCreate
-         * @description Schema for creating a new lead.
-         */
-        LeadCreate: {
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /**
-             * Phone
-             * @description E.164 format: +251911234567
-             */
-            phone: string;
-            /** Email */
-            email?: string | null;
-            /**
-             * Country
-             * @description ISO 3166-1 alpha-2
-             */
-            country: string;
-            /**
-             * Language
-             * @default en
-             */
-            language: string;
-            source: components["schemas"]["LeadSource"];
-            /** Source Details */
-            source_details?: string | null;
-            /** @default pending */
-            consent_status: components["schemas"]["ConsentStatus"];
-        };
-        /**
-         * LeadEnrichmentResponse
-         * @description Response from lead enrichment.
-         */
-        LeadEnrichmentResponse: {
-            /**
-             * Lead Id
-             * Format: uuid4
-             */
-            lead_id: string;
-            predicted_preferences?: components["schemas"]["PredictedPreferences"] | null;
-            behavior_prediction?: components["schemas"]["BehaviorPrediction"] | null;
-            /**
-             * Recommended Actions
-             * @default []
-             */
-            recommended_actions: string[];
-            /** Best Contact Time */
-            best_contact_time?: string | null;
-            /**
-             * Engagement Tips
-             * @default []
-             */
-            engagement_tips: string[];
-            /**
-             * Enriched At
-             * Format: date-time
-             */
-            enriched_at: string;
-        };
-        /**
-         * LeadListResponse
-         * @description Schema for paginated lead list.
-         */
-        LeadListResponse: {
-            /** Items */
-            items: components["schemas"]["LeadResponse"][];
-            /** Total */
-            total: number;
-            /** Page */
-            page: number;
-            /** Page Size */
-            page_size: number;
-            /** Pages */
-            pages: number;
-        };
-        /**
-         * LeadResponse
-         * @description Schema for lead response.
-         */
-        LeadResponse: {
-            /**
-             * Id
-             * Format: uuid4
-             */
+        /** SMSCampaignResponse */
+        SMSCampaignResponse: {
+            /** Id */
             id: string;
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** First Name */
-            first_name: string;
-            /** Last Name */
-            last_name: string;
-            /** Phone */
-            phone: string;
-            /** Email */
-            email?: string | null;
-            /** Country */
-            country: string;
-            /** Language */
-            language: string;
-            source: components["schemas"]["LeadSource"];
-            /** Source Details */
-            source_details?: string | null;
-            segment?: components["schemas"]["LeadSegment"] | null;
-            /** Conversion Score */
-            conversion_score?: number | null;
-            /** Conversion Probability */
-            conversion_probability?: number | null;
-            /** Quality Score */
-            quality_score?: number | null;
-            /** Last Scored At */
-            last_scored_at?: string | null;
-            /**
-             * Total Bookings
-             * @default 0
-             */
-            total_bookings: number;
-            /**
-             * Total Revenue
-             * @default 0
-             */
-            total_revenue: number;
-            /** Last Booking Date */
-            last_booking_date?: string | null;
-            /** Last Contact Date */
-            last_contact_date?: string | null;
-            consent_status: components["schemas"]["ConsentStatus"];
-            /**
-             * Is Duplicate
-             * @default false
-             */
-            is_duplicate: boolean;
-            /** Extra Data */
-            extra_data?: Record<string, never> | null;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-            /**
-             * Updated At
-             * Format: date-time
-             */
-            updated_at: string;
-        };
-        /**
-         * LeadScoreResponse
-         * @description Schema for lead scoring result.
-         */
-        LeadScoreResponse: {
-            /**
-             * Lead Id
-             * Format: uuid4
-             */
-            lead_id: string;
-            /** Conversion Score */
-            conversion_score: number;
-            /** Conversion Probability */
-            conversion_probability: number;
-            /** Quality Score */
-            quality_score: number;
-            segment: components["schemas"]["LeadSegment"];
-            /**
-             * Scored At
-             * Format: date-time
-             */
-            scored_at: string;
-            /** Factors */
-            factors: Record<string, never>;
-        };
-        /**
-         * LeadScoringResponse
-         * @description Response from AI lead scoring.
-         */
-        LeadScoringResponse: {
-            /**
-             * Lead Id
-             * Format: uuid4
-             */
-            lead_id: string;
-            /** Conversion Score */
-            conversion_score: number;
-            /** Conversion Probability */
-            conversion_probability: number;
-            /** Quality Score */
-            quality_score: number;
-            /** Confidence */
-            confidence: number;
+            /** Customer Id */
+            customer_id: string | null;
+            /** Ad Campaign Id */
+            ad_campaign_id: string | null;
             /** Segment */
             segment: string;
-            factors: components["schemas"]["ScoringFactors"];
-            /** Ai Reasoning */
-            ai_reasoning?: string | null;
-            /**
-             * Recommendations
-             * @default []
-             */
-            recommendations: string[];
-            /**
-             * Scored At
-             * Format: date-time
-             */
-            scored_at: string;
+            /** Message Body */
+            message_body: string;
+            /** Discount Code */
+            discount_code: string | null;
+            /** Landing Page Url */
+            landing_page_url: string | null;
+            /** Is Delivered */
+            is_delivered: boolean;
         };
-        /**
-         * LeadSegment
-         * @description Lead segments
-         * @enum {string}
-         */
-        LeadSegment: "hot" | "warm" | "cold" | "unqualified";
-        /**
-         * LeadSegmentUpdate
-         * @description Schema for updating lead segment.
-         */
-        LeadSegmentUpdate: {
-            segment: components["schemas"]["LeadSegment"];
-            /** Reason */
-            reason?: string | null;
-        };
-        /**
-         * LeadSource
-         * @description Lead source types
-         * @enum {string}
-         */
-        LeadSource: "pms" | "csv" | "meta_ads" | "data_broker" | "manual";
-        /**
-         * LeadUpdate
-         * @description Schema for updating a lead.
-         */
-        LeadUpdate: {
-            /** First Name */
-            first_name?: string | null;
-            /** Last Name */
-            last_name?: string | null;
-            /** Phone */
-            phone?: string | null;
+        /** SignIn */
+        SignIn: {
             /** Email */
-            email?: string | null;
-            /** Country */
-            country?: string | null;
-            /** Language */
-            language?: string | null;
-            consent_status?: components["schemas"]["ConsentStatus"] | null;
-            /** Extra Data */
-            extra_data?: Record<string, never> | null;
-        };
-        /**
-         * MessageGenerationRequest
-         * @description Request to generate AI message.
-         */
-        MessageGenerationRequest: {
-            /**
-             * Lead Id
-             * Format: uuid4
-             */
-            lead_id: string;
-            campaign_goal: components["schemas"]["CampaignGoal"];
-            /** @default friendly */
-            tone: components["schemas"]["MessageTone"];
-            /**
-             * Language
-             * @description Language code (en, am)
-             * @default en
-             */
-            language: string;
-            /** @default sms */
-            channel: components["schemas"]["app__schemas__ai__MessageChannel"];
-            /**
-             * Max Length
-             * @description Max message length
-             * @default 160
-             */
-            max_length: number | null;
-            /** Personalization Data */
-            personalization_data?: Record<string, never> | null;
-        };
-        /**
-         * MessageGenerationResponse
-         * @description Response from AI message generation.
-         */
-        MessageGenerationResponse: {
-            /** Message */
-            message: string;
-            /**
-             * Variants
-             * @default []
-             */
-            variants: components["schemas"]["MessageVariant"][];
-            /** Personalization Tokens */
-            personalization_tokens: string[];
-            /** Estimated Engagement */
-            estimated_engagement: number;
-            /** Language */
-            language: string;
-            channel: components["schemas"]["app__schemas__ai__MessageChannel"];
-            /**
-             * Generated At
-             * Format: date-time
-             */
-            generated_at: string;
-        };
-        /**
-         * MessageTemplateCreate
-         * @description Schema for creating message template.
-         */
-        MessageTemplateCreate: {
-            /** Name */
-            name: string;
-            channel: components["schemas"]["app__models__campaign__MessageChannel"];
-            /** Subject */
-            subject?: string | null;
-            /** Body */
-            body: string;
-            /** Variables */
-            variables?: string[];
-            /**
-             * Language
-             * @default en
-             */
-            language: string;
-        };
-        /**
-         * MessageTemplateResponse
-         * @description Schema for message template response.
-         */
-        MessageTemplateResponse: {
-            /**
-             * Id
-             * Format: uuid4
-             */
-            id: string;
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** Name */
-            name: string;
-            channel: components["schemas"]["app__models__campaign__MessageChannel"];
-            /** Subject */
-            subject: string | null;
-            /** Body */
-            body: string;
-            /** Variables */
-            variables: string[];
-            /** Language */
-            language: string;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
-        };
-        /**
-         * MessageTone
-         * @description Message tone options.
-         * @enum {string}
-         */
-        MessageTone: "friendly" | "professional" | "urgent" | "casual" | "formal";
-        /**
-         * MessageVariant
-         * @description A single message variant.
-         */
-        MessageVariant: {
-            /** Text */
-            text: string;
-            /** Variant Id */
-            variant_id: string;
-            /** Estimated Engagement */
-            estimated_engagement: number;
-            /**
-             * Personalization Tokens
-             * @default []
-             */
-            personalization_tokens: string[];
-        };
-        /**
-         * OTPResponse
-         * @description OTP response.
-         */
-        OTPResponse: {
-            /** Success */
-            success: boolean;
-            /** Verification Code */
-            verification_code?: string | null;
-            /** To */
-            to?: string | null;
-            /** Expires After */
-            expires_after?: number | null;
-            /** Error */
-            error?: string | null;
-        };
-        /**
-         * OTPVerifyResponse
-         * @description OTP verification response.
-         */
-        OTPVerifyResponse: {
-            /** Success */
-            success: boolean;
-            /** Valid */
-            valid: boolean;
-            /** To */
-            to?: string | null;
-            /** Error */
-            error?: string | null;
-        };
-        /**
-         * PredictedPreferences
-         * @description Predicted guest preferences.
-         */
-        PredictedPreferences: {
-            /** Room Type */
-            room_type?: string | null;
-            /**
-             * Amenities
-             * @default []
-             */
-            amenities: string[];
-            /** Price Range */
-            price_range?: string | null;
-            /** Booking Window */
-            booking_window?: string | null;
-            /** Preferred Contact Time */
-            preferred_contact_time?: string | null;
-        };
-        /**
-         * SMSResponse
-         * @description SMS sending response.
-         */
-        SMSResponse: {
-            /** Success */
-            success: boolean;
-            /** Status */
-            status: string;
-            /** Message Id */
-            message_id?: string | null;
-            /** To */
-            to?: string | null;
-            /** Cost */
-            cost?: number | null;
-            /** Error */
-            error?: string | null;
-            /** Sent At */
-            sent_at?: string | null;
-        };
-        /**
-         * ScoringFactors
-         * @description Factors contributing to lead score.
-         */
-        ScoringFactors: {
-            /** Has Email */
-            has_email: boolean;
-            /**
-             * Email Verified
-             * @default false
-             */
-            email_verified: boolean;
-            /**
-             * Phone Verified
-             * @default false
-             */
-            phone_verified: boolean;
-            /** Consent Status */
-            consent_status: string;
-            /** Total Bookings */
-            total_bookings: number;
-            /** Total Revenue */
-            total_revenue: number;
-            /** Days Since Last Contact */
-            days_since_last_contact?: number | null;
-            /**
-             * Engagement Score
-             * @default 0
-             */
-            engagement_score: number;
-            /** Source Quality */
-            source_quality: string;
-            /** Country */
-            country: string;
-        };
-        /**
-         * SendBulkSMSRequest
-         * @description Request to send bulk SMS.
-         */
-        SendBulkSMSRequest: {
-            /**
-             * Messages
-             * @description List of messages
-             */
-            messages: components["schemas"]["BulkSMSMessage"][];
-            /**
-             * Campaign Title
-             * @description Campaign title
-             */
-            campaign_title: string;
-            /**
-             * Campaign Message
-             * @description Same message for all (if not individual messages)
-             */
-            campaign_message?: string | null;
-            /** Create Callback */
-            create_callback?: string | null;
-            /** Status Callback */
-            status_callback?: string | null;
-        };
-        /**
-         * SendOTPRequest
-         * @description Request to send OTP.
-         */
-        SendOTPRequest: {
-            /**
-             * To
-             * @description Phone number
-             */
-            to: string;
-            /**
-             * Code Length
-             * @description OTP length
-             * @default 6
-             */
-            code_length: number;
-            /**
-             * Expires After
-             * @description Expiry in seconds
-             * @default 300
-             */
-            expires_after: number;
-        };
-        /**
-         * SendSMSRequest
-         * @description Request to send single SMS.
-         */
-        SendSMSRequest: {
-            /**
-             * To
-             * @description Phone number in international format
-             */
-            to: string;
-            /**
-             * Message
-             * @description SMS message content
-             */
-            message: string;
-            /**
-             * Metadata
-             * @description Optional metadata for tracking
-             */
-            metadata?: Record<string, never> | null;
+            email: string;
+            /** Password */
+            password: string;
         };
         /** Token */
         Token: {
             /** Access Token */
             access_token: string;
-            /** Refresh Token */
-            refresh_token: string;
-            /**
-             * Token Type
-             * @default bearer
-             */
+            /** Token Type */
             token_type: string;
-        };
-        /**
-         * TriggerEvent
-         * @description Trigger events
-         * @enum {string}
-         */
-        TriggerEvent: "lead.created" | "checkout.completed" | "booking.confirmed" | "checkin" | "checkout";
-        /** UserCreate */
-        UserCreate: {
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            /** Password */
-            password: string;
-            /** Full Name */
-            full_name: string;
-            /** Hotel Id */
-            hotel_id: string;
-        };
-        /** UserLogin */
-        UserLogin: {
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            /** Password */
-            password: string;
-        };
-        /** UserResponse */
-        UserResponse: {
-            /**
-             * Id
-             * Format: uuid4
-             */
-            id: string;
-            /**
-             * Email
-             * Format: email
-             */
-            email: string;
-            /** Full Name */
-            full_name: string;
-            /**
-             * Hotel Id
-             * Format: uuid4
-             */
-            hotel_id: string;
-            /** Is Active */
-            is_active: boolean;
-            /** Is Verified */
-            is_verified: boolean;
-            /**
-             * Created At
-             * Format: date-time
-             */
-            created_at: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -1932,39 +247,6 @@ export interface components {
             /** Error Type */
             type: string;
         };
-        /**
-         * VerifyOTPRequest
-         * @description Request to verify OTP.
-         */
-        VerifyOTPRequest: {
-            /**
-             * To
-             * @description Phone number
-             */
-            to: string;
-            /**
-             * Verification Code
-             * @description Verification code from send_otp
-             */
-            verification_code: string;
-            /**
-             * User Code
-             * @description Code entered by user
-             */
-            user_code: string;
-        };
-        /**
-         * MessageChannel
-         * @description Message channels
-         * @enum {string}
-         */
-        app__models__campaign__MessageChannel: "sms" | "email";
-        /**
-         * MessageChannel
-         * @description Message delivery channel.
-         * @enum {string}
-         */
-        app__schemas__ai__MessageChannel: "sms" | "email" | "whatsapp";
     };
     responses: never;
     parameters: never;
@@ -1974,7 +256,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    login_api_v1_auth_login_post: {
+    sign_in_signin_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -1983,7 +265,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UserLogin"];
+                "application/json": components["schemas"]["SignIn"];
             };
         };
         responses: {
@@ -2007,38 +289,7 @@ export interface operations {
             };
         };
     };
-    refresh_token_api_v1_auth_refresh_post: {
-        parameters: {
-            query: {
-                refresh_token: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Token"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_current_user_info_api_v1_auth_me_get: {
+    list_events_events_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2053,12 +304,12 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserResponse"];
+                    "application/json": components["schemas"]["EventResponse"][];
                 };
             };
         };
     };
-    register_user_api_v1_auth_register_post: {
+    search_events_search_events_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2067,49 +318,9 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["UserCreate"];
+                "application/json": components["schemas"]["EventSearchRequest"];
             };
         };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_leads_api_v1_leads_get: {
-        parameters: {
-            query?: {
-                page?: number;
-                page_size?: number;
-                segment?: components["schemas"]["LeadSegment"] | null;
-                source?: string | null;
-                country?: string | null;
-                consent_status?: string | null;
-                min_conversion_score?: number | null;
-                max_conversion_score?: number | null;
-                is_duplicate?: boolean | null;
-                search?: string | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -2117,7 +328,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LeadListResponse"];
+                    "application/json": components["schemas"]["EventResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -2131,45 +342,12 @@ export interface operations {
             };
         };
     };
-    create_lead_api_v1_leads_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LeadCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_lead_api_v1_leads__lead_id__get: {
+    generate_campaigns_events__event_id__campaigns_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                lead_id: string;
+                event_id: string;
             };
             cookie?: never;
         };
@@ -2181,7 +359,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["LeadResponse"];
+                    "application/json": components["schemas"]["AdCampaignResponse"][];
                 };
             };
             /** @description Validation Error */
@@ -2195,254 +373,7 @@ export interface operations {
             };
         };
     };
-    update_lead_api_v1_leads__lead_id__put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LeadUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    delete_lead_api_v1_leads__lead_id__delete: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    update_lead_segment_api_v1_leads__lead_id__segment_put: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["LeadSegmentUpdate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    score_lead_api_v1_leads__lead_id__score_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadScoreResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    bulk_score_leads_api_v1_leads_score_bulk_post: {
-        parameters: {
-            query?: {
-                limit?: number;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_leads_summary_api_v1_leads_stats_summary_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    list_campaigns_api_v1_campaigns_get: {
-        parameters: {
-            query?: {
-                page?: number;
-                page_size?: number;
-                status?: components["schemas"]["CampaignStatus"] | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CampaignListResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_campaign_api_v1_campaigns_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CampaignCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CampaignResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_campaign_api_v1_campaigns__campaign_id__get: {
+    generate_template_campaigns__campaign_id__templates_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2459,7 +390,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CampaignResponse"];
+                    "application/json": components["schemas"]["AdTemplateResponse"];
                 };
             };
             /** @description Validation Error */
@@ -2473,20 +404,16 @@ export interface operations {
             };
         };
     };
-    update_campaign_api_v1_campaigns__campaign_id__put: {
+    sms_existing_customer_customers__customer_id__sms_existing_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                campaign_id: string;
+                customer_id: string;
             };
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CampaignUpdate"];
-            };
-        };
+        requestBody?: never;
         responses: {
             /** @description Successful Response */
             200: {
@@ -2494,7 +421,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CampaignResponse"];
+                    "application/json": components["schemas"]["SMSCampaignResponse"];
                 };
             };
             /** @description Validation Error */
@@ -2508,41 +435,12 @@ export interface operations {
             };
         };
     };
-    delete_campaign_api_v1_campaigns__campaign_id__delete: {
+    sms_lead_customer_customers__customer_id__sms_lead_post: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                campaign_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    activate_campaign_api_v1_campaigns__campaign_id__activate_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                campaign_id: string;
+                customer_id: string;
             };
             cookie?: never;
         };
@@ -2554,7 +452,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CampaignResponse"];
+                    "application/json": components["schemas"]["SMSCampaignResponse"];
                 };
             };
             /** @description Validation Error */
@@ -2564,756 +462,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    pause_campaign_api_v1_campaigns__campaign_id__pause_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                campaign_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CampaignResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    execute_campaign_api_v1_campaigns__campaign_id__execute_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                campaign_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": string[] | null;
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            202: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_campaign_stats_api_v1_campaigns__campaign_id__stats_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                campaign_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CampaignStatsResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_campaign_target_leads_api_v1_campaigns__campaign_id__leads_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                campaign_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    list_templates_api_v1_templates_get: {
-        parameters: {
-            query?: {
-                channel?: components["schemas"]["app__models__campaign__MessageChannel"] | null;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageTemplateResponse"][];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    create_template_api_v1_templates_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MessageTemplateCreate"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageTemplateResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_template_api_v1_templates__template_id__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                template_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageTemplateResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    generate_campaign_message_api_v1_ai_generate_message_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MessageGenerationRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageGenerationResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    generate_messages_batch_api_v1_ai_generate_message_batch_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["BatchMessageRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    score_lead_with_ai_api_v1_ai_score_lead__lead_id__post: {
-        parameters: {
-            query?: {
-                /** @description Include AI reasoning */
-                include_explanation?: boolean;
-                /** @description Include recommendations */
-                include_recommendations?: boolean;
-            };
-            header?: never;
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadScoringResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    score_leads_batch_api_v1_ai_score_leads_batch_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": string[];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_campaign_recommendations_api_v1_ai_campaign_recommendations_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CampaignAdvisorRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CampaignAdvisorResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    enrich_lead_api_v1_ai_enrich_lead__lead_id__post: {
-        parameters: {
-            query?: {
-                include_predictions?: boolean;
-                include_preferences?: boolean;
-                include_recommendations?: boolean;
-            };
-            header?: never;
-            path: {
-                lead_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["LeadEnrichmentResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    get_ai_usage_stats_api_v1_ai_usage_stats_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AIUsageStats"];
-                };
-            };
-        };
-    };
-    clear_ai_cache_api_v1_ai_clear_cache_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    ai_health_check_api_v1_ai_health_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    test_message_generation_api_v1_ai_test_generation_post: {
-        parameters: {
-            query: {
-                /** @description Test prompt */
-                prompt: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    send_sms_api_v1_sms_send_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SendSMSRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SMSResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    send_bulk_sms_api_v1_sms_send_bulk_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SendBulkSMSRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BulkSMSResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    send_otp_api_v1_sms_otp_send_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SendOTPRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OTPResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    verify_otp_api_v1_sms_otp_verify_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["VerifyOTPRequest"];
-            };
-        };
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["OTPVerifyResponse"];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
-    };
-    sms_delivery_webhook_api_v1_sms_webhooks_delivery_status_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    campaign_status_webhook_api_v1_sms_webhooks_campaign_status_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    sms_health_check_api_v1_sms_health_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    health_check_health_get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
-                };
-            };
-        };
-    };
-    root__get: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": unknown;
                 };
             };
         };
