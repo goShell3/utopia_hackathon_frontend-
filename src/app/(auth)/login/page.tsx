@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLogin } from '@/hooks/useAuth';
 import { Button } from '@/components/shared/Button';
 import { ApiError } from '@/lib/api/client';
 import { loginSchema, type LoginFormData } from '@/lib/validation/auth';
+import { queryKeys } from '@/hooks/queryKeys';
 import { cn } from '@/lib/utils';
 
 const DEMO_INFO = {
@@ -21,6 +23,7 @@ const DEMO_INFO = {
 export default function LoginPage() {
   const router = useRouter();
   const { mutateAsync: login, isPending } = useLogin();
+  const queryClient = useQueryClient();
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
 
@@ -124,7 +127,10 @@ export default function LoginPage() {
             </div>
             <div className="flex justify-end mt-auto">
               <button
-                onClick={() => handleSubmit(onSubmit)()}
+                onClick={() => {
+                  queryClient.setQueryData(queryKeys.auth.me(), { id: 'demo', email: 'demo@hotel.com', name: 'Demo User' });
+                  router.push('/dashboard');
+                }}
                 className="text-[10px] font-black italic uppercase text-utopia hover:text-white transition-colors"
               >
                 Continue to dashboard →
