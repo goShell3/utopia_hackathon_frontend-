@@ -29,7 +29,7 @@ export default function RegisterPage() {
   async function onSubmit(data: RegisterFormData) {
     setServerError('');
     try {
-      await register({ full_name: data.full_name, email: data.email, password: data.password, hotel_id: data.hotel_id });
+      await register({ full_name: data.full_name, email: data.email, password: data.password, hotel_id: data.hotel_id, role: 'owner' });
       await login({ email: data.email, password: data.password });
       router.replace('/dashboard');
     } catch (err) {
