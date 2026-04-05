@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import * as d3 from 'd3';
 import { Plus, Minus } from 'lucide-react';
-import type { Campaign } from '@/types';
+import type { Campaign } from '@/data/campaign';
 
 const STATUS_COLORS: Record<string, { bar: string; text: string }> = {
   active:    { bar: '#22c55e', text: '#ffffff' },
@@ -25,7 +25,7 @@ export function CampaignTimeline({ campaigns }: Props) {
   const buildChart = useCallback((containerWidth: number) => {
     if (!svgRef.current || containerWidth === 0) return;
 
-    const valid = campaigns.filter(c => (c as any).start_date && (c as any).end_date);
+    const valid = campaigns.filter(c => c.startDate && c.endDate);
     if (!valid.length) return;
 
     const ROW_HEIGHT = 48;
@@ -49,8 +49,8 @@ export function CampaignTimeline({ campaigns }: Props) {
     const root = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
     const allDates = valid.flatMap(c => [
-      new Date((c as any).start_date),
-      new Date((c as any).end_date),
+      new Date(c.startDate),
+      new Date(c.endDate),
     ]);
     const padded: [Date, Date] = [
       d3.timeDay.offset(d3.min(allDates)!, -5),
@@ -100,8 +100,8 @@ export function CampaignTimeline({ campaigns }: Props) {
     valid.forEach((campaign, i) => {
       const y = i * (ROW_HEIGHT + ROW_GAP);
       const colors = STATUS_COLORS[campaign.status] ?? STATUS_COLORS.draft;
-      const start = new Date((campaign as any).start_date);
-      const end = new Date((campaign as any).end_date);
+      const start = new Date(campaign.startDate);
+      const end = new Date(campaign.endDate);
 
       root.append('rect')
         .attr('x', 0).attr('y', y)
@@ -137,7 +137,7 @@ export function CampaignTimeline({ campaigns }: Props) {
         .attr('font-weight', '800')
         .attr('font-style', 'italic')
         .attr('pointer-events', 'none')
-        .text(`${(campaign as any).start_date} → ${(campaign as any).end_date}`);
+        .text(`${campaign.startDate} → ${campaign.endDate}`);
     });
 
     const zoom = d3.zoom<SVGSVGElement, unknown>()
@@ -164,8 +164,8 @@ export function CampaignTimeline({ campaigns }: Props) {
           .attr('x', newX(today) + 4);
 
         valid.forEach((campaign) => {
-          const start = new Date((campaign as any).start_date);
-          const end = new Date((campaign as any).end_date);
+          const start = new Date(campaign.startDate);
+          const end = new Date(campaign.endDate);
           const newW = Math.max(newX(end) - newX(start), 4);
 
           barsG.select(`.bar-${campaign.id}`)
