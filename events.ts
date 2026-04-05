@@ -1,6 +1,6 @@
 export const events = [
   {
-    id: "timkat-addis",
+    id: "timkat",
     name: "Timkat (Epiphany)",
     type: "demand_driver",
     category: "religious",
@@ -11,7 +11,30 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Addis Ababa", "Gondar", "Lalibela"]
+      venues: [
+        {
+          name: "Fasilides Bath",
+          city: "Gondar",
+          lat: 12.6080,
+          lng: 37.4680,
+          capacity: 200000,
+          isPrimary: true
+        },
+        {
+          name: "Jan Meda",
+          city: "Addis Ababa",
+          lat: 9.05,
+          lng: 38.75,
+          capacity: 150000
+        },
+        {
+          name: "Lalibela Churches",
+          city: "Lalibela",
+          lat: 12.0317,
+          lng: 39.0476,
+          capacity: 80000
+        }
+      ]
     },
 
     demandImpact: {
@@ -20,8 +43,6 @@ export const events = [
     },
 
     leadTimeDays: 30,
-
-    tags: ["orthodox", "festival", "pilgrimage"],
 
     description: "Major Orthodox celebration attracting large domestic and international visitors.",
 
@@ -32,7 +53,7 @@ export const events = [
   },
 
   {
-    id: "meskel-addis",
+    id: "meskel",
     name: "Meskel",
     type: "demand_driver",
     category: "religious",
@@ -43,7 +64,16 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Addis Ababa"]
+      venues: [
+        {
+          name: "Meskel Square",
+          city: "Addis Ababa",
+          lat: 9.0108,
+          lng: 38.7613,
+          capacity: 300000,
+          isPrimary: true
+        }
+      ]
     },
 
     demandImpact: {
@@ -52,8 +82,6 @@ export const events = [
     },
 
     leadTimeDays: 21,
-
-    tags: ["orthodox", "bonfire"],
 
     hotelStrategy: {
       campaignType: ["event-based"],
@@ -73,7 +101,7 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Addis Ababa", "Dire Dawa", "Harar"]
+      venues: [] // global event
     },
 
     demandImpact: {
@@ -82,8 +110,6 @@ export const events = [
     },
 
     leadTimeDays: 14,
-
-    tags: ["muslim", "holiday"],
 
     hotelStrategy: {
       campaignType: ["discount", "package"],
@@ -103,7 +129,16 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Addis Ababa"]
+      venues: [
+        {
+          name: "African Union Headquarters",
+          city: "Addis Ababa",
+          lat: 9.0127,
+          lng: 38.7578,
+          capacity: 5000,
+          isPrimary: true
+        }
+      ]
     },
 
     demandImpact: {
@@ -112,8 +147,6 @@ export const events = [
     },
 
     leadTimeDays: 45,
-
-    tags: ["diplomatic", "government"],
 
     hotelStrategy: {
       campaignType: ["corporate", "package"],
@@ -133,7 +166,23 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Bishoftu", "Addis Ababa"]
+      venues: [
+        {
+          name: "Hora Arsadi",
+          city: "Bishoftu",
+          lat: 8.7520,
+          lng: 38.9780,
+          capacity: 500000,
+          isPrimary: true
+        },
+        {
+          name: "Addis Ababa Celebration Area",
+          city: "Addis Ababa",
+          lat: 8.9806,
+          lng: 38.7578,
+          capacity: 100000
+        }
+      ]
     },
 
     demandImpact: {
@@ -142,8 +191,6 @@ export const events = [
     },
 
     leadTimeDays: 30,
-
-    tags: ["oromo", "culture"],
 
     hotelStrategy: {
       campaignType: ["event-based"],
@@ -163,7 +210,7 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Addis Ababa"]
+      venues: [] // nationwide effect
     },
 
     demandImpact: {
@@ -172,8 +219,6 @@ export const events = [
     },
 
     leadTimeDays: 25,
-
-    tags: ["holiday", "seasonal"],
 
     hotelStrategy: {
       campaignType: ["package", "discount"],
@@ -193,7 +238,7 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Addis Ababa", "Bahir Dar"]
+      venues: [] // nationwide effect
     },
 
     demandImpact: {
@@ -202,8 +247,6 @@ export const events = [
     },
 
     leadTimeDays: 60,
-
-    tags: ["seasonal"],
 
     hotelStrategy: {
       campaignType: ["long-stay", "package"],
@@ -223,7 +266,30 @@ export const events = [
 
     locations: {
       country: "Ethiopia",
-      cities: ["Addis Ababa", "Hawassa", "Mekelle"]
+      venues: [
+        {
+          name: "Addis Ababa University",
+          city: "Addis Ababa",
+          lat: 9.035,
+          lng: 38.757,
+          capacity: 20000,
+          isPrimary: true
+        },
+        {
+          name: "Hawassa University",
+          city: "Hawassa",
+          lat: 7.0621,
+          lng: 38.4764,
+          capacity: 15000
+        },
+        {
+          name: "Mekelle University",
+          city: "Mekelle",
+          lat: 13.4967,
+          lng: 39.4762,
+          capacity: 15000
+        }
+      ]
     },
 
     demandImpact: {
@@ -232,8 +298,6 @@ export const events = [
     },
 
     leadTimeDays: 14,
-
-    tags: ["education"],
 
     hotelStrategy: {
       campaignType: ["discount"],

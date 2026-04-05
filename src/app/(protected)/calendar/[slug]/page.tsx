@@ -1,10 +1,13 @@
 'use client';
 
 import React from 'react';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, CalendarDays, Clock, MapPin, Link, FileText, Zap, Loader2, RefreshCw, Tag, TrendingUp, Timer, Megaphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEvents, useEventCampaigns, useGenerateCampaigns } from '@/hooks/useCalendar';
+
+const EventMap = dynamic(() => import('@/components/calendar/EventMap').then(m => m.EventMap), { ssr: false });
 
 export default function CalendarEventPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -12,6 +15,19 @@ export default function CalendarEventPage() {
 
   const { data: events = [], isLoading } = useEvents();
   const event = events.find(e => e.id === slug);
+
+  const hotel = React.useMemo(() => {
+    try {
+      const stored = localStorage.getItem('utopia_user');
+      return stored ? JSON.parse(stored).location : null;
+    } catch { return null; }
+  }, []);
+
+  const localVenues = React.useMemo(() => {
+    const venues = (event as any)?.venues ?? [];
+    if (!hotel) return venues;
+    return venues.filter((v: any) => v.city.toLowerCase() === hotel.city.toLowerCase());
+  }, [event, hotel]);
 
   const { data: campaigns = [], isLoading: loadingCampaigns } = useEventCampaigns(slug);
   const { mutate: generateCampaigns, isPending: generating } = useGenerateCampaigns();
@@ -184,9 +200,28 @@ export default function CalendarEventPage() {
           )}
         </div>
 
-        <div className="h-px bg-neutral-100" />
+        {/* Map */}
+        {hotel && localVenues.length > 0 && (
+          <>
+            <div className="h-px bg-neutral-100" />
+            <div className="space-y-3">
+              <p className="technical-label text-[10px] text-neutral-500 uppercase">Venue Distances from Your Hotel</p>
+              <EventMap venues={localVenues} hotel={hotel} />
+            </div>
+          </>
+        )}
 
-        {/* Ad Campaigns */}
+        {hotel && localVenues.length === 0 && (
+          <>
+            <div className="h-px bg-neutral-100" />
+            <div className="flex items-center gap-2 px-3 py-2 bg-neutral-50 border border-neutral-100">
+              <MapPin className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
+              <p className="text-[10px] technical-label text-neutral-400">This event has no specific venue — it's a nationwide or global occurrence.</p>
+            </div>
+          </>
+        )}
+
+        <div className="h-px bg-neutral-100" />
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <p className="technical-label text-[10px] text-neutral-500 uppercase">Ad Campaigns</p>

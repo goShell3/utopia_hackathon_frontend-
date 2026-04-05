@@ -1,6 +1,9 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
+
+const HotelMiniMap = dynamic(() => import('@/components/auth/HotelMiniMap').then(m => m.HotelMiniMap), { ssr: false });
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
@@ -17,7 +20,11 @@ const DEMO_USER = {
   email: 'selam@utopiahotels.com',
   password: 'utopia2026',
   hotelId: 'HTL-ETH-0042',
-  location: 'Addis Ababa',
+  location: {
+    city: 'Addis Ababa',
+    lat: 9.0320,
+    lng: 38.7469,
+  },
 };
 
 export default function LoginPage() {
@@ -130,13 +137,14 @@ export default function LoginPage() {
                 ['Email', DEMO_USER.email],
                 ['Password', 'utopia2•••6'],
                 ['Hotel ID', DEMO_USER.hotelId],
-                ['Location', DEMO_USER.location],
+                ['Location', DEMO_USER.location.city],
               ] as [string, string][]).map(([label, value]) => (
                 <div key={label}>
                   <p className="text-[9px] technical-label text-neutral-500 uppercase">{label}</p>
                   <p className="text-[11px] font-black italic text-white tracking-tight mt-0.5">{value}</p>
                 </div>
               ))}
+              <HotelMiniMap lat={DEMO_USER.location.lat} lng={DEMO_USER.location.lng} />
             </div>
             <div className="flex justify-end mt-auto">
               <button
