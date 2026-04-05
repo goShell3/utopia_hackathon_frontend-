@@ -94,8 +94,8 @@ export function LeadsTable({ leads, isLoading }: LeadsTableProps) {
                 <td className="p-4">
                   {lead.segment ? (
                     <div className="flex items-center gap-2">
-                      <div className={cn('w-1.5 h-1.5 rounded-full', SEGMENT_COLORS[lead.segment])} />
-                      <span className="text-xs font-bold italic tracking-tight">{SEGMENT_LABELS[lead.segment]}</span>
+                      <div className={cn('w-1.5 h-1.5 rounded-full', SEGMENT_COLORS[lead.segment as LeadSegment] ?? 'bg-neutral-300')} />
+                      <span className="text-xs font-bold italic tracking-tight">{SEGMENT_LABELS[lead.segment as LeadSegment] ?? lead.segment}</span>
                     </div>
                   ) : (
                     <span className="text-[10px] technical-label text-neutral-300">—</span>

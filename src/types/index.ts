@@ -1,21 +1,42 @@
-import type { components, operations } from './api';
+import type { components } from './api';
 
 // Auth
 export type Token = components['schemas']['Token'];
-export type UserLogin = components['schemas']['UserLogin'];
-export type UserCreate = components['schemas']['UserCreate'];
-export type UserResponse = components['schemas']['UserResponse'];
+export interface UserLogin { email: string; password: string; }
+export interface UserCreate { email: string; password: string; full_name?: string; hotel_id?: string; }
+export interface UserResponse { id: string; email: string; full_name?: string; hotel_id?: string; }
 
 // Leads
-export type Lead = components['schemas']['LeadResponse'];
-export type LeadCreate = components['schemas']['LeadCreate'];
-export type LeadUpdate = components['schemas']['LeadUpdate'];
-export type LeadListResponse = components['schemas']['LeadListResponse'];
-export type LeadScoreResponse = components['schemas']['LeadScoreResponse'];
-export type LeadSegmentUpdate = components['schemas']['LeadSegmentUpdate'];
-export type LeadSegment = components['schemas']['LeadSegment'];
-export type LeadSource = components['schemas']['LeadSource'];
-export type ConsentStatus = components['schemas']['ConsentStatus'];
+export interface Lead {
+  id: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  email?: string | null;
+  country?: string | null;
+  source: string;
+  segment?: string | null;
+  consent_status?: string | null;
+  language?: string | null;
+  total_bookings?: number;
+  total_revenue?: number;
+  last_booking_date?: string | null;
+  last_contact_date?: string | null;
+  score?: number | null;
+  conversion_score?: number | null;
+  conversion_probability?: number | null;
+  quality_score?: number | null;
+  is_duplicate?: boolean;
+  created_at?: string;
+}
+export interface LeadCreate { first_name: string; last_name: string; phone: string; email?: string | null; country?: string | null; source?: string; segment?: string | null; consent_status?: string | null; }
+export type LeadUpdate = Partial<LeadCreate>;
+export interface LeadListResponse { items: Lead[]; total: number; pages: number; page: number; }
+export interface LeadScoreResponse { lead_id: string; score: number; }
+export interface LeadSegmentUpdate { segment: string; }
+export type LeadSegment = 'hot' | 'warm' | 'cold' | 'unqualified';
+export type LeadSource = 'pms' | 'meta_ads' | 'website' | 'manual' | string;
+export type ConsentStatus = 'granted' | 'denied' | 'pending';
 
 // Campaigns
 export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed';
@@ -64,18 +85,14 @@ export interface CampaignStats {
 }
 
 // Templates
-export type MessageTemplate = components['schemas']['MessageTemplateResponse'];
-export type MessageTemplateCreate = components['schemas']['MessageTemplateCreate'];
+export interface MessageTemplate { id: string; name: string; content: string; channel: string; created_at: string; }
+export interface MessageTemplateCreate { name: string; content: string; channel: string; }
 
 // AI
 export type MessageTone = 'professional' | 'friendly' | 'casual' | 'urgent';
 export type CampaignGoal = 'booking' | 'upsell' | 'loyalty' | 're_engagement' | 'feedback';
 
-export interface MessageVariant {
-  text: string;
-  tone: MessageTone;
-  score?: number;
-}
+export interface MessageVariant { text: string; tone: MessageTone; score?: number; }
 
 export interface MessageGenerationRequest {
   lead_id: string;
@@ -101,57 +118,19 @@ export interface BatchMessageRequest {
   language?: string;
 }
 
-export interface AILeadScoringResponse {
-  lead_id: string;
-  score: number;
-  explanation?: string;
-  recommendations?: string[];
-}
-
-export interface CampaignAdvisorRequest {
-  hotel_id: string;
-  context?: Record<string, unknown>;
-}
-
-export interface CampaignRecommendation {
-  title: string;
-  description: string;
-  campaign_type: CampaignType;
-  goal: CampaignGoal;
-}
-
-export interface CampaignAdvisorResponse {
-  recommendations: CampaignRecommendation[];
-}
-
-export interface LeadEnrichmentResponse {
-  lead_id: string;
-  predictions?: Record<string, unknown>;
-  preferences?: Record<string, unknown>;
-}
-
-export interface AIUsageStats {
-  total_requests: number;
-  tokens_used: number;
-  cost_estimate?: number;
-}
-
-// SMS
-// export type SendSMSRequest = components['schemas']['SendSMSRequest'];
-// export type SMSResponse = components['schemas']['SMSResponse'];
-// export type SendBulkSMSRequest = components['schemas']['SendBulkSMSRequest'];
-// export type BulkSMSResponse = components['schemas']['BulkSMSResponse'];
-// export type SendOTPRequest = components['schemas']['SendOTPRequest'];
-// export type OTPResponse = components['schemas']['OTPResponse'];
-// export type VerifyOTPRequest = components['schemas']['VerifyOTPRequest'];
-// export type OTPVerifyResponse = components['schemas']['OTPVerifyResponse'];
+export interface AILeadScoringResponse { lead_id: string; score: number; explanation?: string; recommendations?: string[]; }
+export interface CampaignAdvisorRequest { hotel_id: string; context?: Record<string, unknown>; }
+export interface CampaignRecommendation { title: string; description: string; campaign_type: CampaignType; goal: CampaignGoal; }
+export interface CampaignAdvisorResponse { recommendations: CampaignRecommendation[]; }
+export interface LeadEnrichmentResponse { lead_id: string; predictions?: Record<string, unknown>; preferences?: Record<string, unknown>; }
+export interface AIUsageStats { total_requests: number; tokens_used: number; cost_estimate?: number; }
 
 // Query params
-export type ListLeadsParams = operations['list_leads_api_v1_leads_get']['parameters']['query'];
-export type ListCampaignsParams = operations['list_campaigns_api_v1_campaigns_get']['parameters']['query'];
-export type ListTemplatesParams = operations['list_templates_api_v1_templates_get']['parameters']['query'];
+export type ListLeadsParams = { page?: number; page_size?: number; search?: string; segment?: string; source?: string; };
+export type ListCampaignsParams = { page?: number; page_size?: number; status?: string; campaign_type?: string; };
+export type ListTemplatesParams = { page?: number; page_size?: number; };
 
-// Events (AI-powered event discovery)
+// Events
 export type EventResponse = components['schemas']['EventResponse'];
 export type AdCampaignResponse = components['schemas']['AdCampaignResponse'];
 export type EventSearchRequest = components['schemas']['EventSearchRequest'];

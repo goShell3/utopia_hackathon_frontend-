@@ -1,11 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { smsService } from '@/lib/api/sms';
-import type { 
-  SendSMSRequest, 
-  SendBulkSMSRequest, 
-  SendOTPRequest, 
-  VerifyOTPRequest 
-} from '@/types';
+
+type SendSMSRequest = { to: string; message: string; sender_id?: string };
+type SendBulkSMSRequest = { recipients: string[]; message: string; sender_id?: string };
+type SendOTPRequest = { phone: string; length?: number };
+type VerifyOTPRequest = { phone: string; code: string; reference: string };
 
 export function useSendSMS() {
   return useMutation({

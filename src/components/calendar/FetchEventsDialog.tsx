@@ -14,6 +14,10 @@ const CATEGORY_TO_TYPE: Record<EventCategory, CalendarEvent['type']> = {
   festival:   'gathering',
   diaspora:   'gathering',
   education:  'gathering',
+  trade:      'gathering',
+  arts:       'gathering',
+  sports:     'gathering',
+  music:      'gathering',
 };
 
 const TIMEFRAMES = [

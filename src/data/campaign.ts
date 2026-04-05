@@ -10,8 +10,8 @@ export type CampaignStatus = 'draft' | 'active' | 'paused' | 'completed';
 export type CampaignGoal = 'bookings' | 'awareness' | 'lead_generation';
 
 export type CampaignTarget = {
-  segmentIds?: string[]; // references Segment.id
-  source?: ('pms' | 'meta' | 'website')[];
+  segmentIds?: string[];
+  source?: ('pms' | 'meta' | 'website' | 'manual' | 'meta_ads' | string)[];
 };
 
 export type Campaign = {

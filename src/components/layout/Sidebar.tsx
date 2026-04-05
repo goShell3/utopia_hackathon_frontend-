@@ -76,7 +76,7 @@ export function Sidebar() {
       {/* Collapse toggle */}
       <div className={cn('p-4 border-t border-white/10', collapsed ? 'flex justify-center' : '')}>
         <button
-          onClick={() => setCollapsed(v => !v)}
+          onClick={() => setCollapsed(!collapsed)}
           className="text-neutral-500 hover:text-white transition-colors"
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >

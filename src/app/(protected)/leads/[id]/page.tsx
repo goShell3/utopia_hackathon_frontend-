@@ -105,7 +105,7 @@ export default function LeadDetailPage({ params }: { params: Promise<{ id: strin
             <div className="flex items-center gap-3">
               <Calendar size={14} className="text-neutral-400 shrink-0" />
               <span className="text-[10px] technical-label text-neutral-500">
-                Added {new Date(lead.created_at).toLocaleDateString()}
+                Added {lead.created_at ? new Date(lead.created_at).toLocaleDateString() : '—'}
               </span>
             </div>
           </div>
