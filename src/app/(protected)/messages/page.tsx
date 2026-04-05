@@ -8,8 +8,40 @@ import { Button } from '@/components/shared/Button';
 import { cn } from '@/lib/utils';
 import { useCampaigns, useCampaignTargetLeads, useExecuteCampaign } from '@/hooks/useCampaigns';
 import { useGenerateMessage } from '@/hooks/useAI';
-import type { Campaign, Lead, MessageGenerationRequest, LeadSource, CampaignGoal, MessageTone } from '@/types';
-import { date } from 'zod';
+
+type CampaignGoal = 'booking' | 'upsell' | 'loyalty' | 're_engagement' | 'feedback';
+type MessageTone = 'professional' | 'friendly' | 'casual' | 'urgent';
+
+type Lead = {
+  id: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  source: string;
+  segment?: string;
+  language?: string;
+  total_bookings?: number;
+  total_revenue?: number;
+  last_booking_date?: string;
+};
+
+type Campaign = {
+  id: string;
+  name: string;
+  description?: string | null;
+  status: string;
+  campaign_type: string;
+};
+
+type MessageGenerationRequest = {
+  lead_id: string;
+  campaign_goal: CampaignGoal;
+  tone: MessageTone;
+  channel: string;
+  language?: string;
+  max_length?: number;
+  personalization_data?: Record<string, unknown>;
+};
 
 export default function MessagesPage() {
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
@@ -75,7 +107,7 @@ export default function MessagesPage() {
     };
 
     // Determine tone based on source and loyalty
-    const getTone = (source: LeadSource, loyaltyType: string): MessageTone => {
+    const getTone = (source: string, loyaltyType: string): MessageTone => {
       if (loyaltyType === 'vip') return 'professional';
       if (source === 'pms') return 'friendly';
       if (source === 'meta_ads') return 'casual';

@@ -292,7 +292,7 @@ export default function SettingsPage() {
 
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 rounded-full bg-black text-white flex items-center justify-center font-black italic text-xl">
-                  {user?.full_name?.split(' ').map(n => n[0]).join('') ?? 'U'}
+                  {user?.full_name?.split(' ').map((n: string) => n[0]).join('') ?? 'U'}
                 </div>
                 <div>
                   <p className="text-sm font-black italic uppercase">{user?.full_name ?? 'User'}</p>

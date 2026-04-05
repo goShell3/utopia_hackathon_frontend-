@@ -14,6 +14,7 @@ import { Button } from '@/components/shared/Button';
 import { loginSchema, type LoginFormData } from '@/lib/validation/auth';
 import { queryKeys } from '@/hooks/queryKeys';
 import { cn } from '@/lib/utils';
+import { tokenStorage } from '@/lib/api/client';
 
 const DEMO_USER = {
   id: 'demo-001',
@@ -42,12 +43,14 @@ export default function LoginPage() {
     setServerError('');
     localStorage.setItem('utopia_user', JSON.stringify(DEMO_USER));
     queryClient.setQueryData(queryKeys.auth.me(), DEMO_USER);
+    tokenStorage.set('mock_token_123');
     router.replace('/dashboard');
   }
 
   function handleDemoContinue() {
     localStorage.setItem('utopia_user', JSON.stringify(DEMO_USER));
     queryClient.setQueryData(queryKeys.auth.me(), DEMO_USER);
+    tokenStorage.set('mock_token_123');
     router.push('/dashboard');
   }
 
